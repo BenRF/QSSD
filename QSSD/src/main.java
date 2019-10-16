@@ -5,8 +5,7 @@ import java.util.ArrayList;
 public class main {
     public static void main(String[] args) {
         excelFile ef = new excelFile("./testing/perfect.xlsx");
-        ArrayList<ArrayList<Object>> fc = ef.getContent(0);
-        parseTable pT = new parseTable(fc);
+        parseTable pT = ef.getTables().get(0);
         System.out.println(pT);
     }
 }

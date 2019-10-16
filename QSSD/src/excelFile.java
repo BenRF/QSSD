@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import parse.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +33,7 @@ public class excelFile {
         }
     }
 
-    ArrayList<ArrayList<Object>> getContent(int sheetIndex) {
+    ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
         ArrayList<ArrayList<Object>> content = new ArrayList<>();
         Iterator<Row> rI = this.sheets.get(sheetIndex).iterator();
         while (rI.hasNext()) {
@@ -57,6 +59,12 @@ public class excelFile {
             }
             content.add(row);
         }
+        return content;
+    }
+
+    ArrayList<parseTable> getTables() {
+        ArrayList<parseTable> content = new ArrayList<>();
+        content.add(new parseTable(this.readFile(0)));
         return content;
     }
 }

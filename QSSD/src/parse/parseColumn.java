@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class parseColumn {
+public class parseColumn implements Comparable<parseColumn>{
     private String name;
     private ArrayList<Object> content;
     private boolean uniqueValues;
@@ -53,5 +53,33 @@ public class parseColumn {
             output = output + ",Mixed type";
         }
         return output + "]";
+    }
+
+    private boolean checkAtt(parseColumn p2) {
+        boolean names = this.name.equals(p2.name);
+        boolean bothUnique = this.uniqueValues == p2.uniqueValues;
+        boolean bothSameType = this.sameType == p2.sameType;
+        return bothUnique && bothSameType && names;
+    }
+
+    private boolean checkContent(parseColumn p2) {
+        Set<Object> c1 = new HashSet<>(this.content);
+        Set<Object> c2 = new HashSet<>(p2.content);
+        return c1.equals(c2);
+    }
+
+    // 1 = current is bigger, exact same
+    // 0 = current is equal, same column different data
+    // -1 = current is smaller, no correlation
+    @Override
+    public int compareTo(parseColumn p2) {
+        parseColumn p1 = this;
+        if (this.checkAtt(p2) && this.checkContent(p2)) {
+            return 1;
+        } else if (this.checkAtt(p2) && !this.checkContent(p2)) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 }
