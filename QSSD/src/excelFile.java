@@ -43,7 +43,12 @@ public class excelFile {
                 if (c.getCellType() == CellType.STRING) {
                     row.add(c.getStringCellValue());
                 } else if (c.getCellType() == CellType.NUMERIC) {
-                    row.add(c.getNumericCellValue());
+                    double d = c.getNumericCellValue();
+                    if (d % 1 == 0) {
+                        row.add( (int) d);
+                    } else {
+                        row.add(d);
+                    }
                 } else if (c.getCellType() == CellType.BOOLEAN) {
                     row.add(c.getBooleanCellValue());
                 } else if (c.getCellType() == CellType.BLANK) {

@@ -5,18 +5,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class parseColumn {
-    public String name;
+    private String name;
     private ArrayList<Object> content;
     private boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
 
-    public parseColumn(String name) {
+    parseColumn(String name) {
         this.name = name;
         this.content = new ArrayList<>();
     }
 
-    public void addContent(Object c) {
+    void addContent(Object c) {
         content.add(c);
         performChecks();
     }
@@ -27,8 +27,7 @@ public class parseColumn {
     }
 
     private void checkUnique() {
-        Set<Object> content = new HashSet<>();
-        content.addAll(this.content);
+        Set<Object> content = new HashSet<>(this.content);
         this.numOfUniqueVals = content.size();
         this.uniqueValues = content.size() == this.content.size();
     }
