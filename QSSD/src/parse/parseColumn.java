@@ -35,13 +35,23 @@ public class parseColumn implements Comparable<parseColumn>{
     private void checkTypes() {
         boolean same = true;
         for (int i = 0; i < this.content.size()-1; i++) {
-            same = this.content.get(i).getClass().equals(this.content.get(i+1).getClass());
+            same = this.content.get(i).getClass().equals(this.content.get(i + 1).getClass());
         }
         this.sameType = same;
     }
 
     public String toString() {
-        String output = this.name + "[";
+        return this.name + "[" + this.getAttributes() + "]";
+    }
+
+    int size() {
+        return this.content.size();
+    }
+
+    String getName() {return this.name; }
+
+    String getAttributes() {
+        String output = "";
         if (this.uniqueValues) {
             output = output + "Unique";
         } else {
@@ -52,7 +62,7 @@ public class parseColumn implements Comparable<parseColumn>{
         } else {
             output = output + ",Mixed type";
         }
-        return output + "]";
+        return output;
     }
 
     private boolean checkAtt(parseColumn p2) {

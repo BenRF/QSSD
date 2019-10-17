@@ -17,6 +17,32 @@ public class parseTable {
         }
     }
 
+    public int[] getDimensions() {
+        return new int[]{this.columns.get(0).size(), this.columns.size()};
+    }
+
+    public ArrayList<parseColumn> getCols() {
+        return this.columns;
+    }
+
+    public String[] getHeaderNames() {
+        String[] names = new String[this.columns.size()];
+        for (int i = 0; i < this.columns.size(); i++) {
+            names[i] = this.columns.get(i).getName();
+        }
+        return names;
+    }
+
+    public String[][] getColumnAttributes() {
+        String[] attributes = new String[this.columns.size()];
+        for (int i = 0; i < this.columns.size(); i++) {
+            attributes[i] = this.columns.get(i).getAttributes();
+        }
+        String[][] result = new String[1][this.columns.size()];
+        result[0] = attributes;
+        return result;
+    }
+
     public String toString() {
         String output = "ParseTable(";
         boolean first = true;

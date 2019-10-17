@@ -1,3 +1,5 @@
+package files;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,7 +19,7 @@ import java.util.List;
 public class excelFile {
     private List<XSSFSheet> sheets;
 
-    excelFile(String f) {
+    public excelFile(String f) {
         File myFile = new File(f);
         try {
             FileInputStream fis = new FileInputStream(myFile);
@@ -33,11 +35,9 @@ public class excelFile {
         }
     }
 
-    ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
+    private ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
         ArrayList<ArrayList<Object>> content = new ArrayList<>();
-        Iterator<Row> rI = this.sheets.get(sheetIndex).iterator();
-        while (rI.hasNext()) {
-            Row r = rI.next();
+        for (Row r : this.sheets.get(sheetIndex)) {
             Iterator<Cell> cI = r.iterator();
             ArrayList<Object> row = new ArrayList<>();
             while (cI.hasNext()) {
@@ -47,14 +47,12 @@ public class excelFile {
                 } else if (c.getCellType() == CellType.NUMERIC) {
                     double d = c.getNumericCellValue();
                     if (d % 1 == 0) {
-                        row.add( (int) d);
+                        row.add((int) d);
                     } else {
                         row.add(d);
                     }
                 } else if (c.getCellType() == CellType.BOOLEAN) {
                     row.add(c.getBooleanCellValue());
-                } else if (c.getCellType() == CellType.BLANK) {
-                    row.add(null);
                 }
             }
             content.add(row);
@@ -62,7 +60,7 @@ public class excelFile {
         return content;
     }
 
-    ArrayList<parseTable> getTables() {
+    public ArrayList<parseTable> getTables() {
         ArrayList<parseTable> content = new ArrayList<>();
         content.add(new parseTable(this.readFile(0)));
         return content;
