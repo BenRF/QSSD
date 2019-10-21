@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class mainWindow {
     private JFrame main;
     private ArrayList<fileOption> files;
-    private JScrollPane sp;
+    private JPanel sp;
 
     public mainWindow() {
         this.files = new ArrayList<>();
@@ -20,8 +20,7 @@ public class mainWindow {
             JFileChooser fc = new JFileChooser();
             int choice = fc.showOpenDialog(null);
             if (choice == JFileChooser.APPROVE_OPTION) {
-                System.out.println(fc.getSelectedFile().getAbsolutePath());
-                fileOption fo = new fileOption(fc.getSelectedFile().getAbsolutePath());
+                fileOption fo = new fileOption(fc.getSelectedFile().getAbsolutePath(),this.files.size());
                 this.files.add(fo);
                 this.sp.add(fo);
                 //this.sp.revalidate();
@@ -30,10 +29,10 @@ public class mainWindow {
         });
         this.main.add(addFile);
 
-        this.sp = new JScrollPane();
+        this.sp = new JPanel();
         this.sp.setBounds(25,50,430,500);
         this.sp.setBackground(Color.WHITE);
-        this.sp.setLayout(null);
+        this.sp.setLayout(new BoxLayout(this.sp, BoxLayout.Y_AXIS));
         main.add(this.sp);
 
         this.main.setPreferredSize(new Dimension(500,700));
