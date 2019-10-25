@@ -16,6 +16,14 @@ public class parseColumn {
         this.content = new ArrayList<>();
     }
 
+    public parseColumn(parseColumn c) {
+        this.name = c.name;
+        this.content = new ArrayList<>(c.content);
+        this.uniqueValues = c.uniqueValues;
+        this.numOfUniqueVals = c.numOfUniqueVals;
+        this.sameType = c.sameType;
+    }
+
     public void addContent(Object c) {
         content.add(c);
         performChecks();

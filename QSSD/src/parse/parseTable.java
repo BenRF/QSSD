@@ -17,6 +17,13 @@ public class parseTable {
         }
     }
 
+    public parseTable(parseTable pT) {
+        this.columns = new ArrayList<>();
+        for (parseColumn pC: pT.getColumns()) {
+            this.columns.add(new parseColumn(pC));
+        }
+    }
+
     public parseTable(parseTable p1, parseTable p2) {
         ArrayList<parseColumn> p1c = p1.getColumns();
         ArrayList<parseColumn> p2c = p2.getColumns();
@@ -37,15 +44,36 @@ public class parseTable {
             }
         }
         if (strongestP1C != null && strongestP2C != null) {
-            parseTable p1f = p1;
-            parseTable p2f = p2;
-            p1f.sortBy(strongestP1C.getName());
-            p2f.sortBy(strongestP2C.getName());
+            this.columns = new ArrayList<>();
+            p1.sortBy(strongestP1C.getName());
+            p2.sortBy(strongestP2C.getName());
+            if (strongestCont == 0) {
+                for (parseColumn c: p1.getColumns()) {
+                    this.columns.add(new parseColumn(c));
+                }
+                for(parseColumn c: p2.getColumns()) {
+                    if (strongestP2C.checkContent(c) != 0) {
+                        this.columns.add(new parseColumn(c));
+                    }
+                }
+            }
         }
     }
 
     private ArrayList<parseColumn> getColumns() {
         return this.columns;
+    }
+
+    public ArrayList<Object> getRow(int i) {
+        ArrayList<Object> r = new ArrayList<>();
+        for (parseColumn pC: this.columns) {
+            r.add(pC.get(i));
+        }
+        return r;
+    }
+
+    public int rowSize() {
+        return this.columns.get(0).size();
     }
 
     public boolean sortBy(String colName) {

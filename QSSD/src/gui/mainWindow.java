@@ -1,5 +1,7 @@
 package gui;
 
+import parse.parseTable;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -20,19 +22,48 @@ public class mainWindow {
             JFileChooser fc = new JFileChooser();
             int choice = fc.showOpenDialog(null);
             if (choice == JFileChooser.APPROVE_OPTION) {
-                fileOption fo = new fileOption(fc.getSelectedFile().getAbsolutePath(),this.files.size());
+                fileOption fo = new fileOption(fc.getSelectedFile().getAbsolutePath());
+                for (parseTable pT: fo.getTables()) {
+                    for (int i = 0; i < pT.rowSize(); i++) {
+                        System.out.println(pT.getRow(i));
+                    }
+                    System.out.println("");
+                }
                 this.files.add(fo);
                 this.sp.add(fo);
-                //this.sp.revalidate();
                 this.sp.updateUI();
             }
         });
         this.main.add(addFile);
+        JButton mergeFile = new JButton("Merge");
+        mergeFile.setBounds(150,10,85,25);
+        mergeFile.addActionListener(e -> {
+            ArrayList<parseTable> tables =  new ArrayList<>();
+            for (fileOption fO: this.files) {
+                tables.addAll(fO.getTables());
+            }
+            parseTable output = null;
+            for (parseTable pT: tables) {
+                if (output == null) {
+                    output = new parseTable(pT);
+                } else {
+                    output = new parseTable(output,pT);
+                }
+            }
+            for (int i = 0; i < output.rowSize(); i++) {
+                System.out.println(output.getRow(i));
+            }
+            fileOption fo = new fileOption(output);
+            this.files.add(fo);
+            this.sp.add(fo);
+            this.sp.updateUI();
+        });
+        this.main.add(mergeFile);
 
         this.sp = new JPanel();
         this.sp.setBounds(25,50,430,500);
         this.sp.setBackground(Color.WHITE);
-        this.sp.setLayout(new BoxLayout(this.sp, BoxLayout.Y_AXIS));
+        this.sp.setLayout(new FlowLayout());
         main.add(this.sp);
 
         this.main.setPreferredSize(new Dimension(500,700));
