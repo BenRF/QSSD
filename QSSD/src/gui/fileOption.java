@@ -31,7 +31,7 @@ class fileOption extends JPanel {
         }
         this.name = name;
         this.tables = f.getTables();
-        this.setSize(new Dimension(430,50));
+        //this.setSize(new Dimension(430,50 + (this.tables.size()*100)));
         this.setOpaque(false);
         this.draw();
     }
@@ -41,17 +41,19 @@ class fileOption extends JPanel {
         n.setText(this.name);
         n.setBounds(15,10,400,30);
         this.add(n);
-        for (parseTable pt : this.tables) {
+        for (int i = 0; i < this.tables.size(); i++) {
+            parseTable pt = this.tables.get(i);
             String[] headers = pt.getHeaderNames();
             String[][] content = pt.getColumnAttributes();
             JTable jT = new JTable(content, headers);
             JTableHeader header = jT.getTableHeader();
-            header.setBounds(15, 45, 380, 20);
-            jT.setBounds(15, 65, 380, 30);
+            header.setBounds(15, 45+(i*50), 380, 20);
+            jT.setBounds(15, 65+(i*50), 380, 30);
             this.add(header);
             this.add(jT);
         }
-        this.setPreferredSize(new Dimension(400,100));
+        //this.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.RED));
+        this.setPreferredSize(new Dimension(400,20 + (this.tables.size()*70)));
         this.setBackground(Color.white);
         this.setLayout(null);
         this.setVisible(true);

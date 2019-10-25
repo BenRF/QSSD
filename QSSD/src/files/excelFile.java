@@ -62,7 +62,9 @@ public class excelFile {
 
     public ArrayList<parseTable> getTables() {
         ArrayList<parseTable> content = new ArrayList<>();
-        content.add(new parseTable(this.readFile(0)));
+        for (int i = 0; i < this.sheets.size(); i++) {
+            content.add(new parseTable(this.readFile(i)));
+        }
         return content;
     }
 }

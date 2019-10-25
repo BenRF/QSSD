@@ -11,18 +11,26 @@ public class mainWindow {
     private JFrame main;
     private ArrayList<fileOption> files;
     private JPanel sp;
+    private String previousFile;
 
     public mainWindow() {
         this.files = new ArrayList<>();
+        this.previousFile = null;
         this.main = new JFrame("QSSD");
         this.main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JButton addFile = new JButton("New File");
         addFile.setBounds(10,10,85,25);
         addFile.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
+            JFileChooser fc;
+            if (this.previousFile == null) {
+                fc = new JFileChooser();
+            } else {
+                fc = new JFileChooser(this.previousFile);
+            }
             int choice = fc.showOpenDialog(null);
             if (choice == JFileChooser.APPROVE_OPTION) {
-                fileOption fo = new fileOption(fc.getSelectedFile().getAbsolutePath());
+                this.previousFile = fc.getSelectedFile().getAbsolutePath();
+                fileOption fo = new fileOption(this.previousFile);
                 for (parseTable pT: fo.getTables()) {
                     for (int i = 0; i < pT.rowSize(); i++) {
                         System.out.println(pT.getRow(i));
