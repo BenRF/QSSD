@@ -57,6 +57,12 @@ public class excelFile {
             }
             content.add(row);
         }
+        for (int i = 0; i < content.size(); i++) {
+            if (content.get(i).size() < 1) {
+                content.remove(i);
+                i = 0;
+            }
+        }
         return content;
     }
 

@@ -6,27 +6,49 @@ import java.util.Set;
 
 public class parseColumn {
     private String name;
+    private int id;
     private ArrayList<Object> content;
     private boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
 
-    public parseColumn(String name) {
+    parseColumn(String name, int id) {
         this.name = name;
+        this.id = id;
         this.content = new ArrayList<>();
     }
 
-    public parseColumn(parseColumn c) {
+    parseColumn(String name, int id, int startSize) {
+        this.name = name;
+        this.id = id;
+        this.content = new ArrayList<>();
+        for (int i = 0; i < startSize; i++) {
+            this.content.add(null);
+        }
+    }
+
+    parseColumn(parseColumn c, int i) {
         this.name = c.name;
+        this.id = i;
         this.content = new ArrayList<>(c.content);
         this.uniqueValues = c.uniqueValues;
         this.numOfUniqueVals = c.numOfUniqueVals;
         this.sameType = c.sameType;
     }
 
-    public void addContent(Object c) {
+    void addContent(Object c) {
         content.add(c);
         performChecks();
+    }
+
+    void normalise(int size) {
+        while (this.content.size() < size) {
+            this.content.add(null);
+        }
+    }
+
+    void set(int r, Object o) {
+        this.content.set(r,o);
     }
 
     private void performChecks() {
@@ -60,6 +82,8 @@ public class parseColumn {
 
     String getName() { return this.name; }
 
+    int getId() { return this.id; }
+
     String getAttributes() {
         String output = "";
         if (this.uniqueValues) {
@@ -75,11 +99,11 @@ public class parseColumn {
         return output;
     }
 
-    public Object get(int i) {
+    Object get(int i) {
         return this.content.get(i);
     }
 
-    public void swap(int a, int b) {
+    void swap(int a, int b) {
         Object temp = this.content.get(a);
         this.content.set(a,this.content.get(b));
         this.content.set(b,temp);
@@ -89,7 +113,7 @@ public class parseColumn {
     // 0 = exact same
     // 1 = same type, difference in uniqueness
     // 2 = both unique, different type
-    public int checkAtt(parseColumn p2) {
+    int checkAtt(parseColumn p2) {
         boolean bothUnique = this.uniqueValues == p2.uniqueValues;
         boolean bothSameType = this.sameType == p2.sameType;
         if (bothUnique && bothSameType) {
@@ -103,11 +127,18 @@ public class parseColumn {
         }
     }
 
+    int intersection(parseColumn p2) {
+        Set<Object> s1 = new HashSet<>(this.content);
+        Set<Object> s2 = new HashSet<>(p2.content);
+        s1.retainAll(s2);
+        return s1.size();
+    }
+
     // 10 = no link
     // 0 = exact same
     // 1 = one column is a subset of another
     // 2 = columns share some elements
-    public int checkContent(parseColumn p2) {
+    int checkContent(parseColumn p2) {
         if (this.uniqueValues && p2.uniqueValues) {
             Set<Object> c1 = new HashSet<>(this.content);
             Set<Object> c2 = new HashSet<>(p2.content);

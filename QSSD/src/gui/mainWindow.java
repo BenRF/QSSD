@@ -32,10 +32,10 @@ public class mainWindow {
                 this.previousFile = fc.getSelectedFile().getAbsolutePath();
                 fileOption fo = new fileOption(this.previousFile);
                 for (parseTable pT: fo.getTables()) {
-                    for (int i = 0; i < pT.rowSize(); i++) {
+                    for (int i = 0; i < pT.rowCount(); i++) {
                         System.out.println(pT.getRow(i));
                     }
-                    System.out.println("");
+                    System.out.println();
                 }
                 this.files.add(fo);
                 this.sp.add(fo);
@@ -50,16 +50,23 @@ public class mainWindow {
             for (fileOption fO: this.files) {
                 tables.addAll(fO.getTables());
             }
-            parseTable output = null;
-            for (parseTable pT: tables) {
-                if (output == null) {
-                    output = new parseTable(pT);
-                } else {
-                    output = new parseTable(output,pT);
+            parseTable output;
+            if (tables.size() < 3) {
+                output = new parseTable(tables.get(0),tables.get(1));
+            } else {
+                output = null;
+                for (parseTable pT: tables) {
+                    if (output == null) {
+                        output = new parseTable(pT);
+                    } else {
+                        output = new parseTable(output,pT);
+                    }
                 }
             }
-            for (int i = 0; i < output.rowSize(); i++) {
-                System.out.println(output.getRow(i));
+            if (output != null) {
+                for (int i = 0; i < output.rowCount(); i++) {
+                    System.out.println(output.getRow(i));
+                }
             }
             fileOption fo = new fileOption(output);
             this.files.add(fo);
