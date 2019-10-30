@@ -32,7 +32,7 @@ public class ExcelFile {
         }
     }
 
-    public ExcelFile(ParseTable pT, String location) {
+    public ExcelFile(ParseTable pT) {
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet s = wb.createSheet();
         String[] headers = pT.getHeaderNames();

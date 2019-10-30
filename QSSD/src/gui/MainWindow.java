@@ -86,7 +86,7 @@ public class MainWindow {
                 }
             }
             if (pT != null) {
-                ExcelFile f = new ExcelFile(pT,this.previousFile);
+                ExcelFile f = new ExcelFile(pT);
             }
         });
         this.main.add(output);
