@@ -152,11 +152,11 @@ public class ParseTable {
         }
     }
 
-    public void toConsole() {
-        for (int i = 0; i < this.rowCount(); i++) {
-            System.out.println(this.getRow(i));
-        }
-    }
+//    public void toConsole() {
+//        for (int i = 0; i < this.rowCount(); i++) {
+//            System.out.println(this.getRow(i));
+//        }
+//    }
 
     private void newCol(String name, int setSize) {
         this.columns.add(new ParseColumn(name,this.columns.size(),setSize));
@@ -176,10 +176,6 @@ public class ParseTable {
         return this.columns;
     }
 
-    private ParseColumn getColumn(int i) {
-        return this.columns.get(i);
-    }
-
     public ArrayList<Object> getRow(int i) {
         ArrayList<Object> r = new ArrayList<>();
         for (ParseColumn pC: this.columns) {
@@ -188,7 +184,7 @@ public class ParseTable {
         return r;
     }
 
-    void normalise() {
+    private void normalise() {
         int max = 0;
         for (ParseColumn pC: this.columns) {
             if (pC.size() > max) {
@@ -216,16 +212,14 @@ public class ParseTable {
         }
     }
 
-    public boolean sortBy(String colName) {
+    private void sortBy(String colName) {
         int primaryCol = -1;
         for (int i = 0; i < this.columns.size(); i++) {
             if (this.columns.get(i).getName().equals(colName)) {
                 primaryCol = i;
             }
         }
-        if (primaryCol == -1) {
-            return false;
-        } else {
+        if (primaryCol != -1) {
             boolean sorted = false;
             ParseColumn mainCol = this.columns.get(primaryCol);
             while (!sorted) {
@@ -278,7 +272,6 @@ public class ParseTable {
                     }
                 }
             }
-            return true;
         }
     }
 

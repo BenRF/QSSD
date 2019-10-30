@@ -56,7 +56,7 @@ public class ExcelFile {
             }
         }
         try {
-            FileOutputStream outputStream = new FileOutputStream("/testing/output.xlsx");
+            FileOutputStream outputStream = new FileOutputStream("output.xlsx");
             wb.write(outputStream);
             wb.close();
             System.out.println("DONE");

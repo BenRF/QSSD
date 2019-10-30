@@ -2,6 +2,7 @@ package parse;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ParseColumn {
@@ -11,6 +12,8 @@ public class ParseColumn {
     private boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
+    private ArrayList<String> format;
+    private String Setformat;
 
     ParseColumn(String name, int id) {
         this.name = name;
@@ -54,6 +57,7 @@ public class ParseColumn {
     private void performChecks() {
         this.checkUnique();
         this.checkTypes();
+        this.findFormat();
     }
 
     private void checkUnique() {
@@ -132,6 +136,39 @@ public class ParseColumn {
         Set<Object> s2 = new HashSet<>(p2.content);
         s1.retainAll(s2);
         return s1.size();
+    }
+
+    void findFormat() {
+        if (this.sameType) {
+            if (this.content.get(0) instanceof String) {
+                if (this.isEmail()) {
+                    this.Setformat = "EMAIL";
+                } else {
+                    this.findExpressions();
+                }
+            } else{
+                this.findExpressions();
+            }
+        }
+    }
+
+    void findExpressions() {
+        List<Expression> expressions = new ArrayList<>();
+        for (Object o: this.content) {
+            expressions.add(new Expression(o));
+        }
+    }
+
+    boolean isEmail() {
+        for (Object o: this.content) {
+            String s = (String) o;
+            int at = s.indexOf("@");
+            int dot = s.indexOf(".");
+            if (dot > at) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // 10 = no link
