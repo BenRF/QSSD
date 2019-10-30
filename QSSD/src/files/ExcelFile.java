@@ -8,18 +8,15 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import parse.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class excelFile {
+public class ExcelFile {
     private List<XSSFSheet> sheets;
 
-    public excelFile(String f) {
+    public ExcelFile(String f) {
         File myFile = new File(f);
         try {
             FileInputStream fis = new FileInputStream(myFile);
@@ -32,6 +29,40 @@ public class excelFile {
             System.out.println("FILE NOT FOUND");
         } catch (IOException e) {
             System.out.println("NOT AN EXCEL FILE");
+        }
+    }
+
+    public ExcelFile(ParseTable pT, String location) {
+        XSSFWorkbook wb = new XSSFWorkbook();
+        XSSFSheet s = wb.createSheet();
+        String[] headers = pT.getHeaderNames();
+        Row r = s.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            Cell c = r.createCell(i);
+            c.setCellValue(headers[i]);
+        }
+        for (int i = 0; i < pT.rowCount(); i++) {
+            r = s.createRow(i+1);
+            ArrayList<Object> pTo = pT.getRow(i);
+            for (int j = 0; j < pTo.size(); j++) {
+                Cell c = r.createCell(j);
+                if (pTo.get(j) instanceof String) {
+                    c.setCellValue((String) pTo.get(j));
+                } else if (pTo.get(j) instanceof Integer) {
+                    c.setCellValue((Integer) pTo.get(j));
+                } else if (pTo.get(j) instanceof Double) {
+                    c.setCellValue((Double) pTo.get(j));
+                }
+            }
+        }
+        try {
+            FileOutputStream outputStream = new FileOutputStream("/testing/output.xlsx");
+            wb.write(outputStream);
+            wb.close();
+            System.out.println("DONE");
+        } catch (Exception e) {
+            System.out.println("ERROR");
+            System.out.println(e);
         }
     }
 
@@ -66,10 +97,10 @@ public class excelFile {
         return content;
     }
 
-    public ArrayList<parseTable> getTables() {
-        ArrayList<parseTable> content = new ArrayList<>();
+    public ArrayList<ParseTable> getTables() {
+        ArrayList<ParseTable> content = new ArrayList<>();
         for (int i = 0; i < this.sheets.size(); i++) {
-            content.add(new parseTable(this.readFile(i)));
+            content.add(new ParseTable(this.readFile(i)));
         }
         return content;
     }

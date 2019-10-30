@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class parseColumn {
+public class ParseColumn {
     private String name;
     private int id;
     private ArrayList<Object> content;
@@ -12,13 +12,13 @@ public class parseColumn {
     private int numOfUniqueVals;
     private boolean sameType;
 
-    parseColumn(String name, int id) {
+    ParseColumn(String name, int id) {
         this.name = name;
         this.id = id;
         this.content = new ArrayList<>();
     }
 
-    parseColumn(String name, int id, int startSize) {
+    ParseColumn(String name, int id, int startSize) {
         this.name = name;
         this.id = id;
         this.content = new ArrayList<>();
@@ -27,7 +27,7 @@ public class parseColumn {
         }
     }
 
-    parseColumn(parseColumn c, int i) {
+    ParseColumn(ParseColumn c, int i) {
         this.name = c.name;
         this.id = i;
         this.content = new ArrayList<>(c.content);
@@ -113,7 +113,7 @@ public class parseColumn {
     // 0 = exact same
     // 1 = same type, difference in uniqueness
     // 2 = both unique, different type
-    int checkAtt(parseColumn p2) {
+    int checkAtt(ParseColumn p2) {
         boolean bothUnique = this.uniqueValues == p2.uniqueValues;
         boolean bothSameType = this.sameType == p2.sameType;
         if (bothUnique && bothSameType) {
@@ -127,7 +127,7 @@ public class parseColumn {
         }
     }
 
-    int intersection(parseColumn p2) {
+    int intersection(ParseColumn p2) {
         Set<Object> s1 = new HashSet<>(this.content);
         Set<Object> s2 = new HashSet<>(p2.content);
         s1.retainAll(s2);
@@ -138,7 +138,7 @@ public class parseColumn {
     // 0 = exact same
     // 1 = one column is a subset of another
     // 2 = columns share some elements
-    int checkContent(parseColumn p2) {
+    int checkContent(ParseColumn p2) {
         if (this.uniqueValues && p2.uniqueValues) {
             Set<Object> c1 = new HashSet<>(this.content);
             Set<Object> c2 = new HashSet<>(p2.content);

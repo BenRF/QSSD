@@ -2,10 +2,10 @@ package parse;
 
 import java.util.ArrayList;
 
-public class parseTable {
-    private ArrayList<parseColumn> columns;
+public class ParseTable {
+    private ArrayList<ParseColumn> columns;
 
-    public parseTable(ArrayList<ArrayList<Object>> content) {
+    public ParseTable(ArrayList<ArrayList<Object>> content) {
         this.columns = new ArrayList<>();
         for (Object header: content.get(0)) {
             this.newCol((String) header);
@@ -17,22 +17,22 @@ public class parseTable {
         }
     }
 
-    public parseTable(parseTable pT) {
+    public ParseTable(ParseTable pT) {
         this.columns = new ArrayList<>();
-        for (parseColumn pC: pT.getColumns()) {
+        for (ParseColumn pC: pT.getColumns()) {
             this.newCol(pC);
         }
     }
 
-    public parseTable(parseTable p1, parseTable p2) {
-        ArrayList<parseColumn> p1c = p1.getColumns();
-        ArrayList<parseColumn> p2c = p2.getColumns();
-        parseColumn strongestP1C = null;
-        parseColumn strongestP2C = null;
+    public ParseTable(ParseTable p1, ParseTable p2) {
+        ArrayList<ParseColumn> p1c = p1.getColumns();
+        ArrayList<ParseColumn> p2c = p2.getColumns();
+        ParseColumn strongestP1C = null;
+        ParseColumn strongestP2C = null;
         int strongestAtt = 100;
         int strongestCont = 100;
-        for (parseColumn c1: p1c) {
-            for (parseColumn c2: p2c) {
+        for (ParseColumn c1: p1c) {
+            for (ParseColumn c2: p2c) {
                 int atts = c1.checkAtt(c2);
                 int content = c1.checkContent(c2);
                 if (atts < strongestAtt && content < strongestCont) {
@@ -48,17 +48,17 @@ public class parseTable {
             p1.sortBy(strongestP1C.getName());
             p2.sortBy(strongestP2C.getName());
             if (strongestCont == 0) {
-                for (parseColumn c: p1.getColumns()) {
+                for (ParseColumn c: p1.getColumns()) {
                     this.newCol(c);
                 }
-                for(parseColumn c: p2.getColumns()) {
+                for(ParseColumn c: p2.getColumns()) {
                     if (strongestP2C.getId() != c.getId()) {
                         this.newCol(c);
                     }
                 }
             } else if (strongestCont == 1) {
-                parseTable t1;
-                parseTable t2;
+                ParseTable t1;
+                ParseTable t2;
                 int i1;
                 int i2;
                 if (p1.rowCount() > p2.rowCount()) {
@@ -73,11 +73,11 @@ public class parseTable {
                     i2 = strongestP1C.getId();
                 }
                 //copy content of first table
-                for (parseColumn c: t1.getColumns()) {
+                for (ParseColumn c: t1.getColumns()) {
                     this.newCol(c);
                 }
                 //add extra columns to new table from second table
-                for (parseColumn c: t2.getColumns()) {
+                for (ParseColumn c: t2.getColumns()) {
                     if (i2 != c.getId()) {
                         this.newCol(c.getName());
                     }
@@ -103,7 +103,7 @@ public class parseTable {
                 int size = (strongestP1C.size() - intersection) + (strongestP2C.size() - intersection) + intersection;
                 boolean first = true;
                 //get columns from first table
-                for (parseColumn c: p1.getColumns()) {
+                for (ParseColumn c: p1.getColumns()) {
                     if (first) {
                         this.newCol(c.getName(), size);
                         first = false;
@@ -112,7 +112,7 @@ public class parseTable {
                     }
                 }
                 //get columns from second table (excluding common column
-                for (parseColumn c: p2.getColumns()) {
+                for (ParseColumn c: p2.getColumns()) {
                     if (c.getId() != strongestP2C.getId()) {
                         this.newCol(c.getName());
                     }
@@ -159,30 +159,30 @@ public class parseTable {
     }
 
     private void newCol(String name, int setSize) {
-        this.columns.add(new parseColumn(name,this.columns.size(),setSize));
+        this.columns.add(new ParseColumn(name,this.columns.size(),setSize));
         this.normalise();
     }
 
     private void newCol(String name) {
-        this.columns.add(new parseColumn(name,this.columns.size()));
+        this.columns.add(new ParseColumn(name,this.columns.size()));
         this.normalise();
     }
 
-    private void newCol(parseColumn pC) {
-        this.columns.add(new parseColumn(pC,this.columns.size()));
+    private void newCol(ParseColumn pC) {
+        this.columns.add(new ParseColumn(pC,this.columns.size()));
     }
 
-    private ArrayList<parseColumn> getColumns() {
+    private ArrayList<ParseColumn> getColumns() {
         return this.columns;
     }
 
-    private parseColumn getColumn(int i) {
+    private ParseColumn getColumn(int i) {
         return this.columns.get(i);
     }
 
     public ArrayList<Object> getRow(int i) {
         ArrayList<Object> r = new ArrayList<>();
-        for (parseColumn pC: this.columns) {
+        for (ParseColumn pC: this.columns) {
             r.add(pC.get(i));
         }
         return r;
@@ -190,12 +190,12 @@ public class parseTable {
 
     void normalise() {
         int max = 0;
-        for (parseColumn pC: this.columns) {
+        for (ParseColumn pC: this.columns) {
             if (pC.size() > max) {
                 max = pC.size();
             }
         }
-        for(parseColumn pC: this.columns) {
+        for(ParseColumn pC: this.columns) {
             pC.normalise(max);
         }
     }
@@ -227,7 +227,7 @@ public class parseTable {
             return false;
         } else {
             boolean sorted = false;
-            parseColumn mainCol = this.columns.get(primaryCol);
+            ParseColumn mainCol = this.columns.get(primaryCol);
             while (!sorted) {
                 sorted = true;
                 for (int i = 0; i < mainCol.size()-1; i++) {
@@ -272,7 +272,7 @@ public class parseTable {
                     //swap the items if needed
                     if (swapping) {
                         sorted = false;
-                        for (parseColumn c: this.columns) {
+                        for (ParseColumn c: this.columns) {
                             c.swap(i, i+1);
                         }
                     }
@@ -307,7 +307,7 @@ public class parseTable {
     public String toString() {
         String output = "ParseTable(";
         boolean first = true;
-        for (parseColumn pC: this.columns) {
+        for (ParseColumn pC: this.columns) {
             if (first) {
                 output = output + pC.toString();
                 first = false;

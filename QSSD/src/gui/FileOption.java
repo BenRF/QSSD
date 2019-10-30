@@ -7,19 +7,19 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.ArrayList;
 
-class fileOption extends JPanel {
+class FileOption extends JPanel {
     private String name;
-    private ArrayList<parseTable> tables;
+    private ArrayList<ParseTable> tables;
 
-    fileOption(parseTable pT) {
+    FileOption(ParseTable pT) {
         this.tables = new ArrayList<>();
         this.tables.add(pT);
         this.name = "OUTPUT";
         this.draw();
     }
 
-    fileOption(String fileLocation) {
-        excelFile f = new excelFile(fileLocation);
+    FileOption(String fileLocation) {
+        ExcelFile f = new ExcelFile(fileLocation);
         String name = "";
         for (int i = fileLocation.length()-1; i > 0; i--) {
             char c = fileLocation.charAt(i);
@@ -42,7 +42,7 @@ class fileOption extends JPanel {
         n.setBounds(15,10,400,30);
         this.add(n);
         for (int i = 0; i < this.tables.size(); i++) {
-            parseTable pt = this.tables.get(i);
+            ParseTable pt = this.tables.get(i);
             String[] headers = pt.getHeaderNames();
             String[][] content = pt.getColumnAttributes();
             JTable jT = new JTable(content, headers);
@@ -59,7 +59,15 @@ class fileOption extends JPanel {
         this.setVisible(true);
     }
 
-    ArrayList<parseTable> getTables() {
+    String getFileName() {
+        return this.name;
+    }
+
+    ArrayList<ParseTable> getTables() {
         return this.tables;
+    }
+
+    ParseTable getTable(int i) {
+        return this.tables.get(i);
     }
 }

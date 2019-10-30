@@ -1,19 +1,20 @@
 package gui;
 
-import parse.parseTable;
+import files.ExcelFile;
+import parse.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class mainWindow {
+public class MainWindow {
     private JFrame main;
-    private ArrayList<fileOption> files;
+    private ArrayList<FileOption> files;
     private JPanel sp;
     private String previousFile;
 
-    public mainWindow() {
+    public MainWindow() {
         this.files = new ArrayList<>();
         this.previousFile = null;
         this.main = new JFrame("QSSD");
@@ -30,8 +31,8 @@ public class mainWindow {
             int choice = fc.showOpenDialog(null);
             if (choice == JFileChooser.APPROVE_OPTION) {
                 this.previousFile = fc.getSelectedFile().getAbsolutePath();
-                fileOption fo = new fileOption(this.previousFile);
-                for (parseTable pT: fo.getTables()) {
+                FileOption fo = new FileOption(this.previousFile);
+                for (ParseTable pT: fo.getTables()) {
                     for (int i = 0; i < pT.rowCount(); i++) {
                         System.out.println(pT.getRow(i));
                     }
@@ -44,22 +45,22 @@ public class mainWindow {
         });
         this.main.add(addFile);
         JButton mergeFile = new JButton("Merge");
-        mergeFile.setBounds(150,10,85,25);
+        mergeFile.setBounds(100,10,85,25);
         mergeFile.addActionListener(e -> {
-            ArrayList<parseTable> tables =  new ArrayList<>();
-            for (fileOption fO: this.files) {
+            ArrayList<ParseTable> tables =  new ArrayList<>();
+            for (FileOption fO: this.files) {
                 tables.addAll(fO.getTables());
             }
-            parseTable output;
+            ParseTable output;
             if (tables.size() < 3) {
-                output = new parseTable(tables.get(0),tables.get(1));
+                output = new ParseTable(tables.get(0),tables.get(1));
             } else {
                 output = null;
-                for (parseTable pT: tables) {
+                for (ParseTable pT: tables) {
                     if (output == null) {
-                        output = new parseTable(pT);
+                        output = new ParseTable(pT);
                     } else {
-                        output = new parseTable(output,pT);
+                        output = new ParseTable(output,pT);
                     }
                 }
             }
@@ -68,12 +69,27 @@ public class mainWindow {
                     System.out.println(output.getRow(i));
                 }
             }
-            fileOption fo = new fileOption(output);
+            FileOption fo = new FileOption(output);
             this.files.add(fo);
             this.sp.add(fo);
             this.sp.updateUI();
         });
         this.main.add(mergeFile);
+
+        JButton output = new JButton("Output");
+        output.setBounds(190,10,85,25);
+        output.addActionListener(e -> {
+            ParseTable pT = null;
+            for (FileOption fO: this.files) {
+                if (fO.getFileName().equals("OUTPUT")) {
+                    pT = fO.getTable(0);
+                }
+            }
+            if (pT != null) {
+                ExcelFile f = new ExcelFile(pT,this.previousFile);
+            }
+        });
+        this.main.add(output);
 
         this.sp = new JPanel();
         this.sp.setBounds(25,50,430,500);
