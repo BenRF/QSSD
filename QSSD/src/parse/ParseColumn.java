@@ -38,11 +38,11 @@ public class ParseColumn {
         this.uniqueValues = c.uniqueValues;
         this.numOfUniqueVals = c.numOfUniqueVals;
         this.sameType = c.sameType;
+        this.format = c.format;
     }
 
     void addContent(Object c) {
         content.add(c);
-        performChecks();
     }
 
     void normalise(int size) {
@@ -69,9 +69,13 @@ public class ParseColumn {
 
     private void checkTypes() {
         boolean same = true;
-        for (int i = 0; i < this.content.size()-1; i++) {
-            if (this.content.get(i) != null) {
-                same = this.content.get(i).getClass().equals(this.content.get(i + 1).getClass());
+        for (int i = 0; i < this.content.size() - 1; i++) {
+            try {
+                if (this.content.get(i) != null && this.content.get(i+1) != null) {
+                    same = this.content.get(i).getClass().equals(this.content.get(i + 1).getClass());
+                }
+            } catch (NullPointerException e) {
+                System.out.println(this.content.get(i));
             }
         }
         this.sameType = same;
@@ -90,6 +94,7 @@ public class ParseColumn {
     int getId() { return this.id; }
 
     String getAttributes() {
+        this.performChecks();
         String output = "";
         if (this.uniqueValues) {
             output = output + "Unique";
@@ -145,9 +150,19 @@ public class ParseColumn {
     private void findExpressions() {
         Expression e = new Expression(this.content.get(0));
         for (int i = 1; i < this.content.size(); i++) {
-            e = new Expression(e,new Expression(this.content.get(i)));
+            if (this.content.get(i) != null) {
+                e = new Expression(e, new Expression(this.content.get(i)));
+            }
         }
         this.format = e;
+    }
+
+    boolean checkType(ParseColumn p2) {
+        return this.sameType && p2.sameType && this.content.get(0).getClass().equals(p2.content.get(0).getClass()) && this.format.equals(p2.format);
+    }
+
+    boolean sameTypes(ParseColumn p2) {
+        return this.sameType && p2.sameType && this.content.get(0).getClass().equals(p2.content.get(0).getClass());
     }
 
     boolean isEmail() {

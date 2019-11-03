@@ -27,128 +27,110 @@ public class ParseTable {
     public ParseTable(ParseTable p1, ParseTable p2) {
         ArrayList<ParseColumn> p1c = p1.getColumns();
         ArrayList<ParseColumn> p2c = p2.getColumns();
-        ParseColumn strongestP1C = null;
-        ParseColumn strongestP2C = null;
-        int strongestAtt = 100;
-        int strongestCont = 100;
+        ArrayList<ArrayList<Integer>> links = new ArrayList<>();
+        int i1,i2,strength,content = 0;
         for (ParseColumn c1: p1c) {
+            i1 = c1.getId();
+            i2 = -1;
+            strength = 0;
             for (ParseColumn c2: p2c) {
-                int atts = c1.checkAtt(c2);
-                int content = c1.checkContent(c2);
-                if (atts < strongestAtt && content < strongestCont) {
-                    strongestP1C = c1;
-                    strongestP2C = c2;
-                    strongestAtt = atts;
-                    strongestCont = content;
+                content = c1.checkContent(c2);
+                if (content != 10) {
+                    i2 = c2.getId();
+                    strength = 6;
+                    break;
+                } else if (c1.getName().equals(c2.getName()) && c1.sameTypes(c2)) {
+                    i2 = c2.getId();
+                    strength = 5;
+                } else if (c1.checkType(c2) && strength < 5) {
+                    i2 = c2.getId();
+                    strength = 4;
+                }
+            }
+            if (strength >= 4) {
+                ArrayList<Integer> link = new ArrayList<>();
+                link.add(i1);
+                link.add(i2);
+                link.add(strength);
+                link.add(content);
+                links.add(link);
+            }
+        }
+        System.out.println(links);
+        this.columns = new ArrayList<>();
+        int strongestP1C = -1;
+        int strongestP2C = -1;
+        strength = 0;
+        boolean merging = true;
+        for (ArrayList<Integer> link: links) {
+            if (link.get(2) > strength) {
+                strongestP1C = link.get(0);
+                strongestP2C = link.get(1);
+                strength = link.get(2);
+                if (strength != 6) {
+                    merging = false;
                 }
             }
         }
-        if (strongestP1C != null) {
-            this.columns = new ArrayList<>();
-            p1.sortBy(strongestP1C.getName());
-            p2.sortBy(strongestP2C.getName());
-            if (strongestCont == 0) {
-                for (ParseColumn c: p1.getColumns()) {
-                    this.newCol(c);
-                }
-                for(ParseColumn c: p2.getColumns()) {
-                    if (strongestP2C.getId() != c.getId()) {
-                        this.newCol(c);
-                    }
-                }
-            } else if (strongestCont == 1) {
-                ParseTable t1;
-                ParseTable t2;
-                int i1;
-                int i2;
-                if (p1.rowCount() > p2.rowCount()) {
-                    t1 = p1;
-                    i1 = strongestP1C.getId();
-                    t2 = p2;
-                    i2 = strongestP2C.getId();
-                } else {
-                    t1 = p2;
-                    i1 = strongestP2C.getId();
-                    t2 = p1;
-                    i2 = strongestP1C.getId();
-                }
-                //copy content of first table
-                for (ParseColumn c: t1.getColumns()) {
-                    this.newCol(c);
-                }
-                //add extra columns to new table from second table
-                for (ParseColumn c: t2.getColumns()) {
-                    if (i2 != c.getId()) {
-                        this.newCol(c.getName());
-                    }
-                }
-                //populate new columns with data from table 2
-                for (int i = 0; i < t2.rowCount(); i++) {
-                    //loop through each row of t2
-                    ArrayList<Object> row = t2.getRow(i);
-                    for (int j = 0; j < this.rowCount(); j++) {
-                        //loop through current table rows
-                        if (row.get(i2) == this.getRow(j).get(i1)) {
-                            //if unique values from each row match up
-                            row.remove(i2);
-                            for (int o = 0; o < row.size(); o++) {
-                                //loop through values to add and add them to the table
-                                this.setCell(t1.colCount() + o, j, row.get(o));
-                            }
-                        }
-                    }
-                }
-            } else {
-                int intersection = strongestP1C.intersection(strongestP2C);
-                int size = (strongestP1C.size() - intersection) + (strongestP2C.size() - intersection) + intersection;
-                boolean first = true;
-                //get columns from first table
-                for (ParseColumn c: p1.getColumns()) {
-                    if (first) {
-                        this.newCol(c.getName(), size);
-                        first = false;
-                    } else {
-                        this.newCol(c.getName());
-                    }
-                }
-                //get columns from second table (excluding common column
-                for (ParseColumn c: p2.getColumns()) {
-                    if (c.getId() != strongestP2C.getId()) {
-                        this.newCol(c.getName());
-                    }
-                }
-                //insert all values from first table
-                for (int r = 0; r < p1.rowCount(); r++) {
-                    ArrayList<Object> row = p1.getRow(r);
-                    for (int c = 0; c < row.size(); c++) {
-                        this.setCell(c,r,row.get(c));
-                    }
-                }
-                //add in values from second table
-                for (int r = 0;r < p2.rowCount(); r++) {
-                    ArrayList<Object> row = p2.getRow(r);
-                    //loop through current content and find match
-                    for (int tr = 0; tr < this.rowCount(); tr++) {
-                        //if matching row found or no match found
-                        if (this.getRow(tr).get(strongestP1C.getId()) == row.get(strongestP2C.getId())) {
-                            row.remove(strongestP2C.getId());
-                            for (int c = 0; c < row.size(); c++) {
-                                this.setCell(p1.colCount() + c, r, row.get(c));
-                            }
-                            break;
-                        } else if (this.getRow(tr).get(strongestP1C.getId()) == null) {
-                            this.setCell(strongestP1C.getId(),tr,row.get(strongestP2C.getId()));
-                            row.remove(strongestP2C.getId());
-                            for (int c = 0; c < row.size(); c++) {
-                                System.out.println("added " + row.get(c) + " to" + (p1.colCount() + c) + "," + tr);
-                                this.setCell(p1.colCount() + c, tr, row.get(c));
-                            }
-                            break;
-                        }
-                    }
-                }
-                this.sortBy(strongestP1C.getName());
+        p1.sortBy(p1.getCol(strongestP1C).getName());
+        p2.sortBy(p2.getCol(strongestP2C).getName());
+        for (ParseColumn c: p1.getColumns()) {
+            this.newCol(c);
+        }
+        if (merging) {
+            ArrayList<Integer> linkedT2Cols = new ArrayList<>();
+            for (ArrayList<Integer> l: links) {
+                linkedT2Cols.add(l.get(1));
             }
+            for (ParseColumn c: p2.getColumns()) {
+                if (!linkedT2Cols.contains(c.getId())) {
+                    this.newCol(c.getName());
+                }
+            }
+            for (int r = 0; r < p2.rowCount(); r++) {
+                ArrayList<Object> row = p2.getRow(r);
+                boolean match = true;
+                for (int tr = 0; tr < this.rowCount(); tr++) {
+                    match = true;
+                    for (ArrayList<Integer> l: links) {
+                        if (row.get(l.get(1)) != this.getRow(tr).get(l.get(0))) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        int count = 0;
+                        for (Integer i: linkedT2Cols) {
+                            row.remove(i-count);
+                            count++;
+                        }
+                        for (int c = 0; c < row.size(); c++) {
+                            this.setCell(p1.colCount() + c, r, row.get(c));
+                        }
+                        break;
+                    }
+                }
+                if (!match) {
+                    this.newRow();
+                    int rowPos = this.rowCount()-1;
+                    int count = 0;
+                    for (ArrayList<Integer> link: links) {
+                        this.setCell(link.get(0),rowPos,row.get(link.get(1)));
+                        row.remove(link.get(1)-count);
+                        count++;
+                    }
+                    for (int c = 0; c < row.size(); c++) {
+                        this.setCell(p1.colCount() + c, rowPos, row.get(c));
+                    }
+                }
+            }
+        }
+        this.sortBy(p1.getCol(strongestP1C).getName());
+    }
+
+    private void newRow() {
+        for (ParseColumn c: this.columns) {
+            c.addContent(null);
         }
     }
 
@@ -170,6 +152,10 @@ public class ParseTable {
 
     private void newCol(ParseColumn pC) {
         this.columns.add(new ParseColumn(pC,this.columns.size()));
+    }
+
+    private ParseColumn getCol(int i) {
+        return this.columns.get(i);
     }
 
     private ArrayList<ParseColumn> getColumns() {
