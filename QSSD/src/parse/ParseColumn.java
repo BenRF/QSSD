@@ -1,5 +1,7 @@
 package parse;
 
+import org.apache.commons.math3.analysis.function.Exp;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,8 +14,7 @@ public class ParseColumn {
     private boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
-    private ArrayList<String> format;
-    private String Setformat;
+    private Expression format;
 
     ParseColumn(String name, int id) {
         this.name = name;
@@ -57,7 +58,7 @@ public class ParseColumn {
     private void performChecks() {
         this.checkUnique();
         this.checkTypes();
-        this.findFormat();
+        this.findExpressions();
     }
 
     private void checkUnique() {
@@ -100,6 +101,9 @@ public class ParseColumn {
         } else {
             output = output + ",Mixed type";
         }
+        if (this.format.toString().length() > 0) {
+            output = output + ", Format found";
+        }
         return output;
     }
 
@@ -138,25 +142,12 @@ public class ParseColumn {
         return s1.size();
     }
 
-    void findFormat() {
-        if (this.sameType) {
-            if (this.content.get(0) instanceof String) {
-                if (this.isEmail()) {
-                    this.Setformat = "EMAIL";
-                } else {
-                    this.findExpressions();
-                }
-            } else{
-                this.findExpressions();
-            }
+    private void findExpressions() {
+        Expression e = new Expression(this.content.get(0));
+        for (int i = 1; i < this.content.size(); i++) {
+            e = new Expression(e,new Expression(this.content.get(i)));
         }
-    }
-
-    void findExpressions() {
-        List<Expression> expressions = new ArrayList<>();
-        for (Object o: this.content) {
-            expressions.add(new Expression(o));
-        }
+        this.format = e;
     }
 
     boolean isEmail() {

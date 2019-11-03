@@ -152,11 +152,11 @@ public class ParseTable {
         }
     }
 
-//    public void toConsole() {
-//        for (int i = 0; i < this.rowCount(); i++) {
-//            System.out.println(this.getRow(i));
-//        }
-//    }
+    public void toConsole() {
+        for (int i = 0; i < this.rowCount(); i++) {
+            System.out.println(this.getRow(i));
+        }
+    }
 
     private void newCol(String name, int setSize) {
         this.columns.add(new ParseColumn(name,this.columns.size(),setSize));
