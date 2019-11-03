@@ -77,16 +77,16 @@ public class ParseTable {
         for (ParseColumn c: p1.getColumns()) {
             this.newCol(c);
         }
+        ArrayList<Integer> linkedT2Cols = new ArrayList<>();
+        for (ArrayList<Integer> l: links) {
+            linkedT2Cols.add(l.get(1));
+        }
+        for (ParseColumn c: p2.getColumns()) {
+            if (!linkedT2Cols.contains(c.getId())) {
+                this.newCol(c.getName());
+            }
+        }
         if (merging) {
-            ArrayList<Integer> linkedT2Cols = new ArrayList<>();
-            for (ArrayList<Integer> l: links) {
-                linkedT2Cols.add(l.get(1));
-            }
-            for (ParseColumn c: p2.getColumns()) {
-                if (!linkedT2Cols.contains(c.getId())) {
-                    this.newCol(c.getName());
-                }
-            }
             for (int r = 0; r < p2.rowCount(); r++) {
                 ArrayList<Object> row = p2.getRow(r);
                 boolean match = true;
@@ -115,13 +115,29 @@ public class ParseTable {
                     int rowPos = this.rowCount()-1;
                     int count = 0;
                     for (ArrayList<Integer> link: links) {
-                        this.setCell(link.get(0),rowPos,row.get(link.get(1)));
+                        this.setCell(link.get(0),rowPos,row.get(link.get(1)-count));
                         row.remove(link.get(1)-count);
                         count++;
                     }
                     for (int c = 0; c < row.size(); c++) {
                         this.setCell(p1.colCount() + c, rowPos, row.get(c));
                     }
+                }
+            }
+        } else {
+            System.out.println("Concatenating");
+            for (int r = 0; r < p2.rowCount(); r++) {
+                this.newRow();
+                ArrayList<Object> row = p2.getRow(r);
+                int rowPos = this.rowCount()-1;
+                int count = 0;
+                for (ArrayList<Integer> link: links) {
+                    this.setCell(link.get(0),rowPos,row.get(link.get(1)-count));
+                    row.remove(link.get(1)-count);
+                    count++;
+                }
+                for (int c = 0; c < row.size(); c++) {
+                    this.setCell(p1.colCount() + c, rowPos, row.get(c));
                 }
             }
         }
