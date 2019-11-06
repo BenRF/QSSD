@@ -1,8 +1,10 @@
 package files;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.binary.XSSFBUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -25,6 +27,7 @@ public class ExcelFile {
             for (int i = 0; i < wb.getNumberOfSheets(); i++) {
                 this.sheets.add(wb.getSheetAt(i));
             }
+            fis.close();
         } catch (FileNotFoundException e) {
             System.out.println("FILE NOT FOUND");
         } catch (IOException e) {
@@ -77,7 +80,9 @@ public class ExcelFile {
                     row.add(c.getStringCellValue());
                 } else if (c.getCellType() == CellType.NUMERIC) {
                     double d = c.getNumericCellValue();
-                    if (d % 1 == 0) {
+                    if (HSSFDateUtil.isCellDateFormatted(c)) {
+                        row.add(c.getDateCellValue());
+                    } else if (d % 1 == 0) {
                         row.add((int) d);
                     } else {
                         row.add(d);

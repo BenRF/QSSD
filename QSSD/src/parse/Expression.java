@@ -1,30 +1,29 @@
 package parse;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Expression {
     private ArrayList<Part> expression;
     private Object o;
 
-    public Expression(Object o) {
+    Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
         String s = o.toString();
-        String basic = "";
+        StringBuilder basic = new StringBuilder();
         String symbols = "/*!@#$%^&*()\"{}_[]|\\?/<>,.";
         for (int i = 0; i < s.length(); i++) {
             if (Character.isLetter(s.charAt(i))) {
-                basic = basic + "L";
+                basic.append("L");
             } else if (Character.isDigit(s.charAt(i))) {
-                basic = basic + "N";
+                basic.append("N");
             } else if (Character.isSpaceChar(s.charAt(i))) {
-                basic = basic + "S";
+                basic.append("S");
             } else if (symbols.contains("" + s.charAt(i))) {
-                basic = basic + "#";
+                basic.append("#");
             }
         }
-        Character c = basic.charAt(0);
+        char c = basic.charAt(0);
         int count = 1;
         for (int i = 1; i < basic.length(); i++) {
             if (basic.charAt(i) == c) {
@@ -46,53 +45,67 @@ public class Expression {
         }
     }
 
-    public Expression(Expression e1,Expression e2) {
+    Expression(Expression e1, Expression e2) {
         this.expression = new ArrayList<>();
         this.o = e2.o;
         ArrayList<ArrayList<Integer>> links = e1.compare(e2);
-        int i1 = 0;
-        int i2 = 0;
-        for (int i = 0; i < links.size(); i++) {
-            this.expression.add(e2.getPart(links.get(i).get(1)));
+        for (ArrayList<Integer> link : links) {
+            this.expression.add(e2.getPart(link.get(1)));
         }
-    }
-
-    public ArrayList<Part> getParts() {
-        return this.expression;
     }
 
     @Override
     public String toString() {
-        String output = "";
+        StringBuilder output = new StringBuilder();
         boolean first = true;
         for (Part p : this.expression) {
             if (first) {
-                output = output + p.toString();
+                output.append(p.toString());
                 first = false;
             } else {
-                output = output + "," + p.toString();
+                output.append(",").append(p.toString());
             }
         }
-        return output;
+        return output.toString();
     }
 
-    public String getPartString(int partNum) {
+    private String getPartString(int partNum) {
         int[] pos = this.expression.get(partNum).getPos();
         return this.o.toString().substring(pos[0],pos[0]+pos[1]);
     }
 
-    public Part getPart(int partNum) {
+    private Part getPart(int partNum) {
         return this.expression.get(partNum);
     }
 
-    public int getSize() {
+    private int getSize() {
         return this.expression.size();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Expression) {
+            boolean same = false;
+            for (Part p1: this.expression) {
+                for (Part p2: ((Expression) o).expression) {
+                    if (p1.equals(p2)) {
+                        same = true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+            return same;
+        } else {
+            return false;
+        }
     }
 
     //  0 = exact same
     //  1 = same pattern (size and type)
-    public ArrayList<ArrayList<Integer>> compare(Expression e) {
-        List<Part> similarities = new ArrayList<>();
+    private ArrayList<ArrayList<Integer>> compare(Expression e) {
         ArrayList<ArrayList<Integer>> links = new ArrayList<>();
         int s1,s2,strength;
         ArrayList<Integer> found = new ArrayList<>();

@@ -91,6 +91,15 @@ public class MainWindow {
         });
         this.main.add(output);
 
+        JButton clear = new JButton("Clear");
+        clear.setBounds(280,10,85,25);
+        clear.addActionListener(e -> {
+            this.files = new ArrayList<>();
+            this.sp.removeAll();
+            this.sp.updateUI();
+        });
+        this.main.add(clear);
+
         this.sp = new JPanel();
         this.sp.setBounds(25,50,430,500);
         this.sp.setBackground(Color.WHITE);

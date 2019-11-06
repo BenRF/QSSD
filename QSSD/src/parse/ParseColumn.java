@@ -1,20 +1,20 @@
 package parse;
 
-import org.apache.commons.math3.analysis.function.Exp;
+import org.omg.CORBA.OBJ_ADAPTER;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class ParseColumn {
     private String name;
     private int id;
     private ArrayList<Object> content;
-    private boolean uniqueValues;
+    boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
-    private Expression format;
+    private boolean empty;
+    Expression format;
 
     ParseColumn(String name, int id) {
         this.name = name;
@@ -56,9 +56,16 @@ public class ParseColumn {
     }
 
     private void performChecks() {
-        this.checkUnique();
-        this.checkTypes();
-        this.findExpressions();
+        this.isEmpty();
+        if (!this.empty) {
+            this.findExpressions();
+            this.checkUnique();
+            this.checkTypes();
+        } else {
+            this.format = null;
+            this.uniqueValues = false;
+            this.sameType = false;
+        }
     }
 
     private void checkUnique() {
@@ -96,20 +103,24 @@ public class ParseColumn {
     String getAttributes() {
         this.performChecks();
         String output = "";
-        if (this.uniqueValues) {
-            output = output + "Unique";
+        if (this.empty) {
+            return "EMPTY";
         } else {
-            output = output + "!Unique";
+            if (this.uniqueValues) {
+                output = output + "Unique";
+            } else {
+                output = output + "!Unique";
+            }
+            if (this.sameType) {
+                output = output + "," + this.content.get(0).getClass().getSimpleName();
+            } else {
+                output = output + ",Mixed type";
+            }
+            if (this.format.toString().length() > 0) {
+                output = output + ", Format found";
+            }
+            return output;
         }
-        if (this.sameType) {
-            output = output + "," + this.content.get(0).getClass().getSimpleName();
-        } else {
-            output = output + ",Mixed type";
-        }
-        if (this.format.toString().length() > 0) {
-            output = output + ", Format found";
-        }
-        return output;
     }
 
     Object get(int i) {
@@ -147,91 +158,59 @@ public class ParseColumn {
         return s1.size();
     }
 
+    private void isEmpty() {
+        boolean empty = true;
+        for (Object o: this.content) {
+            if (o != null) {
+                empty = false;
+            }
+        }
+        this.empty = empty;
+    }
+
     private void findExpressions() {
-        Expression e = new Expression(this.content.get(0));
-        for (int i = 1; i < this.content.size(); i++) {
+        int i = 0;
+        while(this.content.get(i) == null) {
+            i++;
+        }
+        Expression e = new Expression(this.content.get(i));
+        while (i < this.content.size()) {
             if (this.content.get(i) != null) {
                 e = new Expression(e, new Expression(this.content.get(i)));
             }
+            i++;
         }
         this.format = e;
     }
 
     boolean checkType(ParseColumn p2) {
-        return this.sameType && p2.sameType && this.content.get(0).getClass().equals(p2.content.get(0).getClass()) && this.format.equals(p2.format);
-    }
-
-    boolean sameTypes(ParseColumn p2) {
         return this.sameType && p2.sameType && this.content.get(0).getClass().equals(p2.content.get(0).getClass());
     }
 
-    boolean isEmail() {
-        for (Object o: this.content) {
-            String s = (String) o;
-            int at = s.indexOf("@");
-            int dot = s.indexOf(".");
-            if (dot > at) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // 10 = no link
-    // 0 = exact same
-    // 1 = one column is a subset of another
-    // 2 = columns share some elements
-    int checkContent(ParseColumn p2) {
-        if (this.uniqueValues && p2.uniqueValues) {
-            Set<Object> c1 = new HashSet<>(this.content);
-            Set<Object> c2 = new HashSet<>(p2.content);
-            Set<Object> intersection = new HashSet<>(c1);
-            intersection.retainAll(c2);
-            if (c1.equals(c2)) {
-                return 0;
-            } else if (c1.containsAll(c2) || c2.containsAll(c1)) {
-                return 1;
-            } else if (intersection.size() > 0) {
-                return 2;
-            } else {
-                return 10;
-            }
-        } else {
-            int c1Size = this.content.size();
-            int c2Size = p2.size();
-            ArrayList<Object> c1 = new ArrayList<>(this.content);
-            ArrayList<Object> c2 = new ArrayList<>(p2.content);
-            int i1 = 0;
-            int i2 = 0;
-            boolean pair = false;
-            while (i1 < c1.size()) {
-                while (i2 < c2.size()) {
-                    if (c1.get(i1).equals(c2.get(i2))) {
-                        c1.remove(i1);
-                        c2.remove(i2);
-                        pair = true;
-                        break;
-                    }
-                    i2++;
-                }
-                if (pair) {
-                    i1 = 0;
-                    i2 = 0;
-                    pair = false;
-                } else {
-                    i1++;
+    int[] checkContent(ParseColumn p2) {
+        int[] results = new int[2];
+        ArrayList<Object> c1 = new ArrayList<>(this.content);
+        ArrayList<Object> c2 = new ArrayList<>(p2.content);
+        boolean found = false;
+        int i1 = 0;
+        while (i1 < c1.size()){
+            for (int i2 = 0; i2 < c2.size(); i2++) {
+                if (c1.get(i1).equals(c2.get(i2))) {
+                    c1.remove(i1);
+                    c2.remove(i2);
+                    found = true;
+                    break;
                 }
             }
-            if (c1.size() == 0 && c2.size() == 0) {
-                return 0;
-            } else if (c1.size() == 0 || c2.size() == 0) {
-                return 1;
-            } else if (c1.size() < c1Size || c2.size() < c2Size) {
-                return 2;
+            if (found) {
+                found = false;
+                i1 = 0;
             } else {
-                return 10;
+                i1++;
             }
         }
+        results[0] = (int)(((double)(this.content.size()-c1.size()))/this.content.size() * 100);
+        results[1] = (int)(((double)(p2.content.size()-c2.size()))/p2.content.size() * 100);
+        return results;
     }
-
 }

@@ -9,19 +9,6 @@ class Part {
     private int min;
     private int max;
     private int startPos;
-    private boolean single;
-
-    Part(Part p) {
-        this.count = p.count;
-        this.alphabetical = p.alphabetical;
-        this.digit = p.digit;
-        this.space = p.space;
-        this.symbol = p.symbol;
-        this.min = p.min;
-        this.max = p.max;
-        this.startPos = p.startPos;
-        this.single = p.single;
-    }
 
     Part(int type, int startPos) {
         this.count = 1;
@@ -29,7 +16,6 @@ class Part {
         this.max = -1;
         this.typeCalc(type);
         this.startPos = startPos;
-        this.single = true;
     }
 
     Part(int type, int count, int startPos) {
@@ -38,43 +24,6 @@ class Part {
         this.max = -1;
         this.startPos = startPos;
         this.typeCalc(type);
-        this.single = true;
-    }
-
-    public void add(Part p) {
-        if (this.single && p.single) {
-            this.single = false;
-            if (this.count < p.count) {
-                this.min = this.count;
-                this.max = p.count;
-            } else {
-                this.max = this.count;
-                this.min = this.count;
-            }
-            this.count = -1;
-        } else if (!this.single && p.single) {
-            if (p.count < this.min) {
-                this.min = p.count;
-            } else if (p.count > this.max) {
-                this.max = p.count;
-            }
-        } else if (this.single) {
-
-        }
-        if (!this.sameTypes(p)) {
-            if (p.alphabetical) {
-                this.alphabetical = true;
-            }
-            if (p.digit) {
-                this.digit = true;
-            }
-            if (p.symbol) {
-                this.symbol = true;
-            }
-            if (p.space) {
-                this.space = true;
-            }
-        }
     }
 
     private void typeCalc(int t) {
@@ -112,6 +61,22 @@ class Part {
             return 1;
         } else {
             return -1;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Part) {
+            Part oP = (Part) o;
+            boolean alpha = this.alphabetical == oP.alphabetical;
+            boolean numer = this.digit == oP.digit;
+            boolean symbo = this.symbol == oP.symbol;
+            boolean spac = this.space == oP.space;
+            return this.count == oP.count && alpha && numer && symbo && spac;
+        } else {
+            return false;
         }
     }
 
