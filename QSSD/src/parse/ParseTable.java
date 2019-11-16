@@ -2,6 +2,7 @@ package parse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class ParseTable {
     private ArrayList<ParseColumn> columns;
@@ -48,7 +49,27 @@ public class ParseTable {
                 }
             }
         }
-        System.out.println(links);
+
+        System.out.println("LINKS FOUND: " + links.toString());
+        boolean removed = false;
+        int x = 0;
+        while (x < links.size()) {
+            ArrayList<Object> link = links.get(x);
+            for (int y = 0; y < links.size(); y++) {
+                ArrayList<Object> link2 = links.get(y);
+                if (link.get(0) == link2.get(0) && link.get(1) != link2.get(1)) {
+                    links.remove(y);
+                    removed = true;
+                }
+            }
+            if (removed) {
+                removed = false;
+                x = 0;
+            } else {
+                x++;
+            }
+        }
+        System.out.println("LINKS TO BE USED: " + links.toString());
         this.columns = new ArrayList<>();
         p1.sortBy(p1.getCol((int)links.get(0).get(0)).getName());
         p2.sortBy(p2.getCol((int)links.get(0).get(1)).getName());
@@ -64,49 +85,54 @@ public class ParseTable {
                 this.newCol(c.getName());
             }
         }
-        boolean merging = true;
-        if (merging) {
-            for (int r = 0; r < p2.rowCount(); r++) {
-                ArrayList<Object> row = p2.getRow(r);
-                boolean match = true;
-                for (int tr = 0; tr < this.rowCount(); tr++) {
-                    match = true;
-                    for (ArrayList<Object> l : links) {
-                        if (row.get((int) l.get(1)) != this.getRow(tr).get((int) l.get(0))) {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (match) {
-                        int count = 0;
-                        for (Integer i : linkedT2Cols) {
-                            row.remove(i - count);
-                            count++;
-                        }
-                        for (int c = 0; c < row.size(); c++) {
-                            this.setCell(p1.colCount() + c, r, row.get(c));
-                        }
+        HashSet<Object> tab2Set = p2.getCol((int)links.get(0).get(1)).getContentAsSet();
+        for (int r = 0; r < this.rowCount(); r++) {
+            ArrayList<Object> row;
+            boolean match;
+            for (int r2 = 0; r2 < p2.rowCount(); r2++) {
+                row = p2.getRow(r2);
+                match = true;
+                for (ArrayList<Object> l: links) {
+                    if (row.get((int) l.get(1)) != this.getRow(r).get((int) l.get(0))) {
+                        match = false;
                         break;
                     }
                 }
-                if (!match) {
-                    this.newRow();
-                    int rowPos = this.rowCount();
-                    if (rowPos > 0) {
-                        rowPos--;
-                    }
+                if (match) {
                     int count = 0;
-                    for (ArrayList<Object> link : links) {
-                        this.setCell((int) link.get(0), rowPos, row.get((int) link.get(1) - count));
-                        row.remove((int) link.get(1) - count);
+                    tab2Set.remove(row.get((int)links.get(0).get(1)));
+                    for (Integer i : linkedT2Cols) {
+                        row.remove(i - count);
                         count++;
                     }
                     for (int c = 0; c < row.size(); c++) {
-                        this.setCell(p1.colCount() + c, rowPos, row.get(c));
+                        this.setCell(p1.colCount() + c, r, row.get(c));
                     }
+                    break;
                 }
             }
         }
+        if (tab2Set.size() > 0) {
+            for (Object o: tab2Set) {
+                ArrayList<Object> rowToAdd = p2.findRowByObject((int)links.get(0).get(1),o);
+                this.newRow();
+                int count = 0;
+                for (Integer i : linkedT2Cols) {
+                    this.setCell(i-count,this.rowCount()-1,rowToAdd.get(i-count));
+                    rowToAdd.remove(i - count);
+                    count++;
+                }
+                for (int c = 0; c < rowToAdd.size(); c++) {
+                    this.setCell(p1.colCount() + c, this.rowCount()-1, rowToAdd.get(c));
+                }
+            }
+        }
+    }
+
+    ArrayList<Object> findRowByObject(int columnId, Object searchFor) {
+        ParseColumn selected = this.getCol(columnId);
+        int row = selected.findRowByObject(searchFor);
+        return this.getRow(row);
     }
 
     private void newRow() {

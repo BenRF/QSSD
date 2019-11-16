@@ -127,6 +127,19 @@ public class ParseColumn {
         return this.content.get(i);
     }
 
+    int findRowByObject(Object obj) {
+        for (int i = 0; i < this.content.size(); i++) {
+            if (this.content.get(i).equals(obj)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    HashSet<Object> getContentAsSet() {
+        return new HashSet<>(this.content);
+    }
+
     void swap(int a, int b) {
         Object temp = this.content.get(a);
         this.content.set(a,this.content.get(b));

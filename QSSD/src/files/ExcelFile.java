@@ -4,7 +4,6 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.binary.XSSFBUtils;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -15,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExcelFile {
+public class ExcelFile extends TabSeperatedFile{
     private List<XSSFSheet> sheets;
 
     public ExcelFile(String f) {
@@ -102,6 +101,7 @@ public class ExcelFile {
         return content;
     }
 
+    @Override
     public ArrayList<ParseTable> getTables() {
         ArrayList<ParseTable> content = new ArrayList<>();
         for (int i = 0; i < this.sheets.size(); i++) {
