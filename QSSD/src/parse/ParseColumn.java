@@ -1,34 +1,27 @@
 package parse;
 
-import org.omg.CORBA.OBJ_ADAPTER;
+import parse.problems.MixedTypes;
+import parse.problems.NearlyUnique;
+import parse.problems.Problem;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class ParseColumn {
     private String name;
     private int id;
     private ArrayList<Object> content;
-    boolean uniqueValues;
+    private boolean uniqueValues;
     private int numOfUniqueVals;
     private boolean sameType;
     private boolean empty;
     Expression format;
+    private ArrayList<Problem> errors;
 
     ParseColumn(String name, int id) {
         this.name = name;
         this.id = id;
         this.content = new ArrayList<>();
-    }
-
-    ParseColumn(String name, int id, int startSize) {
-        this.name = name;
-        this.id = id;
-        this.content = new ArrayList<>();
-        for (int i = 0; i < startSize; i++) {
-            this.content.add(null);
-        }
+        this.errors = new ArrayList<>();
     }
 
     ParseColumn(ParseColumn c, int i) {
@@ -39,6 +32,7 @@ public class ParseColumn {
         this.numOfUniqueVals = c.numOfUniqueVals;
         this.sameType = c.sameType;
         this.format = c.format;
+        this.errors = new ArrayList<>();
     }
 
     void addContent(Object c) {
@@ -72,20 +66,50 @@ public class ParseColumn {
         Set<Object> content = new HashSet<>(this.content);
         this.numOfUniqueVals = content.size();
         this.uniqueValues = content.size() == this.content.size();
+        if (content.size() > this.content.size() * 0.85) {
+            for (int i = 0; i < this.content.size(); i++) {
+                if (this.count(this.content.get(i)) > 1) {
+                    this.errors.add(new NearlyUnique(this.id,i));
+                    System.out.println(this.name + " was nearly unique");
+                }
+            }
+        }
+    }
+
+    ArrayList<Problem> getProblems() {
+        return this.errors;
+    }
+
+    private int count(Object o) {
+        int count = 0;
+        for (Object c: this.content) {
+            if (c.equals(o)) {
+                count++;
+            }
+        }
+        return count;
     }
 
     private void checkTypes() {
-        boolean same = true;
-        for (int i = 0; i < this.content.size() - 1; i++) {
-            try {
-                if (this.content.get(i) != null && this.content.get(i+1) != null) {
-                    same = this.content.get(i).getClass().equals(this.content.get(i + 1).getClass());
-                }
-            } catch (NullPointerException e) {
-                System.out.println(this.content.get(i));
+        Map<Class, Integer> types = new HashMap<>();
+        for (Object o: this.content) {
+            if (types.containsKey(o.getClass())) {
+                types.put(o.getClass(),1);
+            } else if (!o.equals(null)) {
+                types.put(o.getClass(),types.get(o.getClass()) + 1);
             }
         }
-        this.sameType = same;
+        int size = this.content.size();
+        for (Map.Entry<Class, Integer> entry : types.entrySet()) {
+            if (entry.getValue() >= size * 0.85) {
+                for (int i = 0; i < this.content.size(); i++) {
+                    if (!this.content.get(i).getClass().equals(entry.getKey())) {
+                        this.errors.add(new MixedTypes(this.id,i));
+                    }
+                }
+            }
+        }
+        this.sameType = types.size() == 1;
     }
 
     public String toString() {

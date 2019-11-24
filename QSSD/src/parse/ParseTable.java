@@ -1,8 +1,11 @@
 package parse;
 
+import parse.problems.Problem;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ParseTable {
     private ArrayList<ParseColumn> columns;
@@ -38,7 +41,7 @@ public class ParseTable {
                 boolean format = c1.format.equals(c2.format);
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
                     ArrayList<Object> link = new ArrayList<>();
-                    // [col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
+                    //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
                     link.add(c1.getId());
                     link.add(c2.getId());
                     link.add(name);
@@ -70,6 +73,19 @@ public class ParseTable {
             }
         }
         System.out.println("LINKS TO BE USED: " + links.toString());
+
+        ArrayList<ParseColumn> t1 = new ArrayList<>();
+        ArrayList<ParseColumn> t2 = new ArrayList<>();
+        for (ArrayList<Object> l: links) {
+            t1.add(p1.getCol((int) l.get(0)));
+            t2.add(p2.getCol((int) l.get(1)));
+        }
+        if (isUnique(t1) && !isUnique(t2)) {
+            ParseTable temp = p2;
+            p2 = p1;
+            p1 = temp;
+        }
+
         this.columns = new ArrayList<>();
         p1.sortBy(p1.getCol((int)links.get(0).get(0)).getName());
         p2.sortBy(p2.getCol((int)links.get(0).get(1)).getName());
@@ -127,6 +143,27 @@ public class ParseTable {
                 }
             }
         }
+    }
+
+    ArrayList<Problem> getProblems() {
+        ArrayList<Problem> problems = new ArrayList<>();
+        for (ParseColumn pC: this.columns) {
+            problems.addAll(pC.getProblems());
+        }
+        return problems;
+    }
+
+    boolean isUnique(ArrayList<ParseColumn> columns) {
+        ArrayList<ArrayList<Object>> values = new ArrayList<>();
+        for (int i = 0; i < columns.get(0).size(); i++) {
+            ArrayList<Object> row = new ArrayList<>();
+            for (ParseColumn p: columns) {
+                row.add(p.get(i));
+            }
+            values.add(row);
+        }
+        Set<ArrayList<Object>> results = new HashSet<>(values);
+        return results.size() == values.size();
     }
 
     ArrayList<Object> findRowByObject(int columnId, Object searchFor) {
