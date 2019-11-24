@@ -1,9 +1,12 @@
 package parse.problems;
 
+import java.util.ArrayList;
+
 public abstract class Problem {
     boolean Severe;
     String title,description;
-    int row,column;
+    int column;
+    ArrayList<Integer> rows;
 
     public String getTitle() {
         return this.title;
@@ -14,7 +17,7 @@ public abstract class Problem {
     }
 
     public String getCoords() {
-        return this.column + "" + this.row;
+        return this.column + ": " + this.rows.toString();
     }
 
     public boolean isSevere() {

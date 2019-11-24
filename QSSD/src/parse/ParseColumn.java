@@ -1,5 +1,6 @@
 package parse;
 
+import parse.problems.MissingValues;
 import parse.problems.MixedTypes;
 import parse.problems.NearlyUnique;
 import parse.problems.Problem;
@@ -55,6 +56,7 @@ public class ParseColumn {
             this.findExpressions();
             this.checkUnique();
             this.checkTypes();
+            this.hasEmpty();
         } else {
             this.format = null;
             this.uniqueValues = false;
@@ -62,17 +64,33 @@ public class ParseColumn {
         }
     }
 
+    private void hasEmpty() {
+        int count = 0;
+        ArrayList<Integer> nulls = new ArrayList<>();
+        for (int i = 0; i < this.content.size(); i++) {
+            if (this.content.get(i) == null) {
+                count++;
+                nulls.add(i);
+            }
+        }
+        if (count >= this.content.size() * 0.1) {
+            this.errors.add(new MissingValues(this.id,nulls));
+        }
+    }
+
     private void checkUnique() {
         Set<Object> content = new HashSet<>(this.content);
         this.numOfUniqueVals = content.size();
         this.uniqueValues = content.size() == this.content.size();
+        ArrayList<Integer> flags = new ArrayList<>();
         if (content.size() > this.content.size() * 0.85) {
             for (int i = 0; i < this.content.size(); i++) {
                 if (this.count(this.content.get(i)) > 1) {
-                    this.errors.add(new NearlyUnique(this.id,i));
-                    System.out.println(this.name + " was nearly unique");
+                    flags.add(i);
                 }
             }
+            this.errors.add(new NearlyUnique(this.id,flags));
+            System.out.println(this.name + " was nearly unique");
         }
     }
 
@@ -100,14 +118,19 @@ public class ParseColumn {
             }
         }
         int size = this.content.size();
+        ArrayList<Integer> flags = new ArrayList<>();
         for (Map.Entry<Class, Integer> entry : types.entrySet()) {
             if (entry.getValue() >= size * 0.85) {
                 for (int i = 0; i < this.content.size(); i++) {
                     if (!this.content.get(i).getClass().equals(entry.getKey())) {
-                        this.errors.add(new MixedTypes(this.id,i));
+                        flags.add(i);
                     }
                 }
             }
+        }
+        if (flags.size() > 0) {
+            this.errors.add(new MixedTypes(this.id,flags));
+            System.out.println(this.name + " was nearly one type");
         }
         this.sameType = types.size() == 1;
     }
