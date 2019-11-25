@@ -83,7 +83,7 @@ public class ParseColumn {
         this.numOfUniqueVals = content.size();
         this.uniqueValues = content.size() == this.content.size();
         ArrayList<Integer> flags = new ArrayList<>();
-        if (content.size() > this.content.size() * 0.85) {
+        if (content.size() > this.content.size() * 0.85 && content.size() < this.content.size()) {
             for (int i = 0; i < this.content.size(); i++) {
                 if (this.count(this.content.get(i)) > 1) {
                     flags.add(i);
@@ -112,15 +112,15 @@ public class ParseColumn {
         Map<Class, Integer> types = new HashMap<>();
         for (Object o: this.content) {
             if (types.containsKey(o.getClass())) {
-                types.put(o.getClass(),1);
-            } else if (!o.equals(null)) {
                 types.put(o.getClass(),types.get(o.getClass()) + 1);
+            } else {
+                types.put(o.getClass(),1);
             }
         }
         int size = this.content.size();
         ArrayList<Integer> flags = new ArrayList<>();
         for (Map.Entry<Class, Integer> entry : types.entrySet()) {
-            if (entry.getValue() >= size * 0.85) {
+            if (entry.getValue() >= size * 0.85 && entry.getValue() < size) {
                 for (int i = 0; i < this.content.size(); i++) {
                     if (!this.content.get(i).getClass().equals(entry.getKey())) {
                         flags.add(i);

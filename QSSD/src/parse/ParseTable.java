@@ -60,10 +60,11 @@ public class ParseTable {
             ArrayList<Object> link = links.get(x);
             for (int y = 0; y < links.size(); y++) {
                 ArrayList<Object> link2 = links.get(y);
-                if (link.get(0) == link2.get(0) && link.get(1) != link2.get(1)) {
-                    links.remove(y);
-                    removed = true;
-                } else if (link.get(0) != link.get(1) && link.get(1) == link2.get(1)) {
+                boolean commonCol1 = link.get(0) == link2.get(0) && link.get(1) != link2.get(1);
+                boolean commonCol2 = link.get(0) != link2.get(0) && link.get(1) == link2.get(1);
+                boolean higherSimilarity = (int) link.get(3) + (int) link.get(4) > (int) link2.get(3) + (int) link2.get(4);
+
+                if (commonCol1 || commonCol2) {
                     links.remove(y);
                     removed = true;
                 }
