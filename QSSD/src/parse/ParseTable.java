@@ -63,6 +63,9 @@ public class ParseTable {
                 if (link.get(0) == link2.get(0) && link.get(1) != link2.get(1)) {
                     links.remove(y);
                     removed = true;
+                } else if (link.get(0) != link.get(1) && link.get(1) == link2.get(1)) {
+                    links.remove(y);
+                    removed = true;
                 }
             }
             if (removed) {
