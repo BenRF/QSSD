@@ -193,31 +193,6 @@ public class ParseColumn {
         this.content.set(b,temp);
     }
 
-    // 10 = no link
-    // 0 = exact same
-    // 1 = same type, difference in uniqueness
-    // 2 = both unique, different type
-    int checkAtt(ParseColumn p2) {
-        boolean bothUnique = this.uniqueValues == p2.uniqueValues;
-        boolean bothSameType = this.sameType == p2.sameType;
-        if (bothUnique && bothSameType) {
-            return 0;
-        } else if (bothSameType) {
-            return 1;
-        } else if (bothUnique) {
-            return 2;
-        } else {
-            return 10;
-        }
-    }
-
-    int intersection(ParseColumn p2) {
-        Set<Object> s1 = new HashSet<>(this.content);
-        Set<Object> s2 = new HashSet<>(p2.content);
-        s1.retainAll(s2);
-        return s1.size();
-    }
-
     private void isEmpty() {
         boolean empty = true;
         for (Object o: this.content) {
@@ -256,8 +231,10 @@ public class ParseColumn {
         while (i1 < c1.size()){
             for (int i2 = 0; i2 < c2.size(); i2++) {
                 if (c1.get(i1).equals(c2.get(i2))) {
-                    c1.remove(i1);
-                    c2.remove(i2);
+                    //c1.remove(i1);
+                    //c2.remove(i2);
+                    c1.removeAll(Collections.singletonList(c1.get(i1)));
+                    c2.removeAll(Collections.singletonList(c2.get(i2)));
                     found = true;
                     break;
                 }
