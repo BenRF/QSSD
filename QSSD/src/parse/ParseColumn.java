@@ -101,8 +101,10 @@ public class ParseColumn {
     private int count(Object o) {
         int count = 0;
         for (Object c: this.content) {
-            if (c.equals(o)) {
-                count++;
+            if (c != null) {
+                if (c.equals(o)) {
+                    count++;
+                }
             }
         }
         return count;
@@ -111,10 +113,12 @@ public class ParseColumn {
     private void checkTypes() {
         Map<Class, Integer> types = new HashMap<>();
         for (Object o: this.content) {
-            if (types.containsKey(o.getClass())) {
-                types.put(o.getClass(),types.get(o.getClass()) + 1);
-            } else {
-                types.put(o.getClass(),1);
+            if (o != null) {
+                if (types.containsKey(o.getClass())) {
+                    types.put(o.getClass(), types.get(o.getClass()) + 1);
+                } else {
+                    types.put(o.getClass(), 1);
+                }
             }
         }
         int size = this.content.size();

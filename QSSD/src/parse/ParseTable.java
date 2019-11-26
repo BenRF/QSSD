@@ -3,7 +3,6 @@ package parse;
 import parse.problems.Problem;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,10 +62,21 @@ public class ParseTable {
                 boolean commonCol1 = link.get(0) == link2.get(0) && link.get(1) != link2.get(1);
                 boolean commonCol2 = link.get(0) != link2.get(0) && link.get(1) == link2.get(1);
                 boolean higherSimilarity = (int) link.get(3) + (int) link.get(4) > (int) link2.get(3) + (int) link2.get(4);
-
+                boolean sameSimilarity = (int) link.get(3) + (int) link.get(4) == (int) link2.get(3) + (int) link2.get(4);
+                boolean sameNameVal = ((boolean) link.get(2)) == ((boolean) link2.get(2));
+                boolean overThreshold = (int) link.get(3) > 80 || (int) link.get(4) > 80;
+                boolean otherHasNameMatch = !((boolean) link.get(2)) && (boolean) link2.get(2);
+                boolean thisHasNameMatch = ((boolean) link.get(2)) && !(boolean) link2.get(2);
                 if (commonCol1 || commonCol2) {
-                    links.remove(y);
-                    removed = true;
+                    if ((sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameSimilarity)) {
+                        links.remove(y);
+                        removed = true;
+                    } else {
+                        System.out.println(x + " was removed");
+                        links.remove(x);
+                        removed = true;
+                        break;
+                    }
                 }
             }
             if (removed) {
@@ -136,9 +146,11 @@ public class ParseTable {
             for (Object o: tab2Set) {
                 ArrayList<Object> rowToAdd = p2.findRowByObject((int)links.get(0).get(1),o);
                 this.newRow();
+                for (Integer i : linkedT2Cols) {
+                    this.setCell(i,this.rowCount()-1,rowToAdd.get(i));
+                }
                 int count = 0;
                 for (Integer i : linkedT2Cols) {
-                    this.setCell(i-count,this.rowCount()-1,rowToAdd.get(i-count));
                     rowToAdd.remove(i - count);
                     count++;
                 }
