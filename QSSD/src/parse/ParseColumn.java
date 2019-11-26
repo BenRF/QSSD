@@ -74,7 +74,7 @@ public class ParseColumn {
             }
         }
         if (count >= this.content.size() * 0.1) {
-            this.errors.add(new MissingValues(this.id,nulls));
+            this.errors.add(new MissingValues(this.id,nulls,this.name));
         }
     }
 
@@ -89,7 +89,7 @@ public class ParseColumn {
                     flags.add(i);
                 }
             }
-            this.errors.add(new NearlyUnique(this.id,flags));
+            this.errors.add(new NearlyUnique(this.id,flags,this.name));
             System.out.println(this.name + " was nearly unique");
         }
     }
@@ -133,7 +133,7 @@ public class ParseColumn {
             }
         }
         if (flags.size() > 0) {
-            this.errors.add(new MixedTypes(this.id,flags));
+            this.errors.add(new MixedTypes(this.id,flags,this.name));
             System.out.println(this.name + " was nearly one type");
         }
         this.sameType = types.size() == 1;
@@ -201,6 +201,7 @@ public class ParseColumn {
         for (Object o: this.content) {
             if (o != null) {
                 empty = false;
+                break;
             }
         }
         this.empty = empty;

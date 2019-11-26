@@ -1,7 +1,6 @@
 package gui;
 
 import parse.ParseTable;
-import sun.applet.Main;
 
 import javax.swing.*;
 import java.awt.*;
