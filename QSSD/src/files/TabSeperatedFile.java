@@ -4,6 +4,6 @@ import parse.ParseTable;
 
 import java.util.ArrayList;
 
-public abstract class TabSeperatedFile {
+public interface TabSeperatedFile {
     public abstract ArrayList<ParseTable> getTables();
 }

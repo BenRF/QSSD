@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ExcelFile extends TabSeperatedFile{
+public class ExcelFile implements TabSeperatedFile{
     private List<XSSFSheet> sheets;
 
     public ExcelFile(String f) {
@@ -34,7 +34,7 @@ public class ExcelFile extends TabSeperatedFile{
         }
     }
 
-    public ExcelFile(ParseTable pT) {
+    public ExcelFile(ParseTable pT,String name) {
         XSSFWorkbook wb = new XSSFWorkbook();
         XSSFSheet s = wb.createSheet();
         String[] headers = pT.getHeaderNames();
@@ -58,9 +58,11 @@ public class ExcelFile extends TabSeperatedFile{
             }
         }
         try {
-            FileOutputStream outputStream = new FileOutputStream("output.xlsx");
+            FileOutputStream outputStream = new FileOutputStream(name + ".xlsx");
             wb.write(outputStream);
             wb.close();
+            outputStream.flush();
+            outputStream.close();
             System.out.println("DONE");
         } catch (Exception e) {
             System.out.println("ERROR");

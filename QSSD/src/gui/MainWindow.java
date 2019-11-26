@@ -1,7 +1,5 @@
 package gui;
 
-import parse.ParseTable;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -17,9 +15,6 @@ public class MainWindow {
         JFrame main = new JFrame("QSSD");
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setPreferredSize(new Dimension(500,700));
-        main.setLayout(null);
-        main.pack();
-        main.setVisible(true);
         OutputPanel oP = new OutputPanel();
         jTP = new JTabbedPane();
         jTP.setBounds(0,0, main.getWidth()-2, main.getHeight()-2);
@@ -31,6 +26,7 @@ public class MainWindow {
                 oP.update();
             }
         });
+        jTP.setVisible(true);
         main.add(jTP);
         ComponentAdapter cA = new ComponentAdapter(){
             public void componentResized(ComponentEvent e){
@@ -38,13 +34,16 @@ public class MainWindow {
             }
         };
         main.addComponentListener(cA);
+        //main.setLayout(null);
+        main.pack();
+        main.setVisible(true);
     }
 
     void toggleTab(int id, boolean state) {
         this.jTP.setEnabledAt(id,state);
     }
 
-    int tableCount() {
+    static int tableCount() {
         int count = 0;
         for(FileOption pT: files) {
             count = count + pT.tableCount();

@@ -55,7 +55,7 @@ class ImportingPanel extends JPanel {
 
     private void tableCheck() {
         boolean state = false;
-        if (this.mW.tableCount() > 1) {
+        if (MainWindow.tableCount() > 1) {
             state = true;
         }
         this.mW.toggleTab(1,state);
