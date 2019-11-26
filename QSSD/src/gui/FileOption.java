@@ -19,21 +19,31 @@ class FileOption extends JPanel {
     }
 
     FileOption(String fileLocation) {
-        ExcelFile f = new ExcelFile(fileLocation);
-        String name = "";
-        for (int i = fileLocation.length()-1; i > 0; i--) {
-            char c = fileLocation.charAt(i);
-            if (c != '\\') {
-                name = c + name;
-            } else {
-                break;
-            }
+        TabSeperatedFile f = null;
+        if (fileLocation.substring(fileLocation.length()-5).equals(".xlsx")) {
+            f = new ExcelFile(fileLocation);
+        } else if (fileLocation.substring(fileLocation.length()-4).equals(".csv")) {
+            f = new CSVFile(fileLocation);
         }
-        this.name = name;
-        this.tables = f.getTables();
-        //this.setSize(new Dimension(430,50 + (this.tables.size()*100)));
-        this.setOpaque(false);
-        this.draw();
+        System.out.println(fileLocation.substring(fileLocation.length()-4));
+        if (f != null) {
+            String name = "";
+            for (int i = fileLocation.length() - 1; i > 0; i--) {
+                char c = fileLocation.charAt(i);
+                if (c != '\\') {
+                    name = c + name;
+                } else {
+                    break;
+                }
+            }
+            this.name = name;
+            this.tables = f.getTables();
+            //this.setSize(new Dimension(430,50 + (this.tables.size()*100)));
+            this.setOpaque(false);
+            this.draw();
+        } else {
+            System.out.println("ERROR WITH CREATING FILE OBJECT");
+        }
     }
 
     private void draw() {

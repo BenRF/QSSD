@@ -10,17 +10,21 @@ import java.util.Arrays;
 
 public class CSVFile extends TabSeperatedFile {
     ArrayList<ArrayList<Object>> content;
-    public CSVFile(String fileName) throws IOException {
+    public CSVFile(String fileName) {
         this.content = new ArrayList<>();
-        BufferedReader csvReader = new BufferedReader(new FileReader(fileName));
-        String row;
-        while ((row = csvReader.readLine()) != null) {
-            String[] data = row.split(",");
-            ArrayList<Object> r = new ArrayList<>();
-            r.addAll(Arrays.asList(data));
-            this.content.add(r);
+        try {
+            BufferedReader csvReader = new BufferedReader(new FileReader(fileName));
+            String row;
+            while ((row = csvReader.readLine()) != null) {
+                String[] data = row.split(",");
+                ArrayList<Object> r = new ArrayList<>();
+                r.addAll(Arrays.asList(data));
+                this.content.add(r);
+            }
+            csvReader.close();
+        } catch (Exception e) {
+            System.out.println("FILE NOT FOUND");
         }
-        csvReader.close();
     }
 
     @Override
