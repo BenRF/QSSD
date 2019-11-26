@@ -33,7 +33,7 @@ public class ParseTable {
     public ParseTable(ParseTable p1, ParseTable p2) {
         ArrayList<ParseColumn> p1c = p1.getColumns();
         ArrayList<ParseColumn> p2c = p2.getColumns();
-        ArrayList<ArrayList<Object>> links = new ArrayList<>();
+        ArrayList<Link> links = new ArrayList<>();
         for (ParseColumn c1: p1c) {
             for (ParseColumn c2: p2c) {
                 int [] content = c1.checkContent(c2);
@@ -41,15 +41,8 @@ public class ParseTable {
                 boolean type = c1.checkType(c2);
                 boolean format = c1.format.equals(c2.format);
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
-                    ArrayList<Object> link = new ArrayList<>();
                     //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
-                    link.add(c1.getId());
-                    link.add(c2.getId());
-                    link.add(name);
-                    link.add(content[0]);
-                    link.add(content[1]);
-                    link.add(format);
-                    links.add(link);
+                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
                 }
             }
         }
@@ -58,19 +51,11 @@ public class ParseTable {
         boolean removed = false;
         int x = 0;
         while (x < links.size()) {
-            ArrayList<Object> link = links.get(x);
+            Link link = links.get(x);
             for (int y = 0; y < links.size(); y++) {
-                ArrayList<Object> link2 = links.get(y);
-                boolean commonCol1 = link.get(0) == link2.get(0) && link.get(1) != link2.get(1);
-                boolean commonCol2 = link.get(0) != link2.get(0) && link.get(1) == link2.get(1);
-                boolean higherSimilarity = (int) link.get(3) + (int) link.get(4) > (int) link2.get(3) + (int) link2.get(4);
-                boolean sameSimilarity = (int) link.get(3) + (int) link.get(4) == (int) link2.get(3) + (int) link2.get(4);
-                boolean sameNameVal = ((boolean) link.get(2)) == ((boolean) link2.get(2));
-                boolean overThreshold = (int) link.get(3) > 80 || (int) link.get(4) > 80;
-                boolean otherHasNameMatch = !((boolean) link.get(2)) && (boolean) link2.get(2);
-                boolean thisHasNameMatch = ((boolean) link.get(2)) && !(boolean) link2.get(2);
-                if (commonCol1 || commonCol2) {
-                    if ((sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameSimilarity)) {
+                Link link2 = links.get(y);
+                if (link.equal(link2)) {
+                    if (link.stronger(link2)) {
                         links.remove(y);
                         removed = true;
                     } else {
@@ -92,9 +77,10 @@ public class ParseTable {
 
         ArrayList<ParseColumn> t1 = new ArrayList<>();
         ArrayList<ParseColumn> t2 = new ArrayList<>();
-        for (ArrayList<Object> l: links) {
-            t1.add(p1.getCol((int) l.get(0)));
-            t2.add(p2.getCol((int) l.get(1)));
+        for (Link l: links) {
+            Integer[] cols = l.getColIds();
+            t1.add(p1.getCol(cols[0]));
+            t2.add(p2.getCol(cols[1]));
         }
         if (isUnique(t1) && !isUnique(t2)) {
             ParseTable temp = p2;
@@ -103,36 +89,36 @@ public class ParseTable {
         }
 
         this.columns = new ArrayList<>();
-        p1.sortBy(p1.getCol((int)links.get(0).get(0)).getName());
-        p2.sortBy(p2.getCol((int)links.get(0).get(1)).getName());
+        p1.sortBy(p1.getCol(links.get(0).getColIds()[0]).getName());
+        p2.sortBy(p2.getCol(links.get(0).getColIds()[1]).getName());
         for (ParseColumn c: p1.getColumns()) {
             this.newCol(c);
         }
         ArrayList<Integer> linkedT2Cols = new ArrayList<>();
-        for (ArrayList<Object> l: links) {
-            linkedT2Cols.add((int)l.get(1));
+        for (Link l: links) {
+            linkedT2Cols.add(l.getColIds()[1]);
         }
         for (ParseColumn c: p2.getColumns()) {
             if (!linkedT2Cols.contains(c.getId())) {
                 this.newCol(c.getName());
             }
         }
-        HashSet<Object> tab2Set = p2.getCol((int)links.get(0).get(1)).getContentAsSet();
+        HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
         for (int r = 0; r < this.rowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
             for (int r2 = 0; r2 < p2.rowCount(); r2++) {
                 row = p2.getRow(r2);
                 match = true;
-                for (ArrayList<Object> l: links) {
-                    if (row.get((int) l.get(1)) != this.getRow(r).get((int) l.get(0))) {
+                for (Link l: links) {
+                    if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
                         match = false;
                         break;
                     }
                 }
                 if (match) {
                     int count = 0;
-                    tab2Set.remove(row.get((int)links.get(0).get(1)));
+                    tab2Set.remove(row.get(links.get(0).getColIds()[1]));
                     for (Integer i : linkedT2Cols) {
                         row.remove(i - count);
                         count++;
@@ -146,7 +132,7 @@ public class ParseTable {
         }
         if (tab2Set.size() > 0) {
             for (Object o: tab2Set) {
-                ArrayList<Object> rowToAdd = p2.findRowByObject((int)links.get(0).get(1),o);
+                ArrayList<Object> rowToAdd = p2.findRowByObject(links.get(0).getColIds()[1],o);
                 this.newRow();
                 for (Integer i : linkedT2Cols) {
                     this.setCell(i,this.rowCount()-1,rowToAdd.get(i));
