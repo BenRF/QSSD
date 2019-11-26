@@ -1,6 +1,7 @@
 package gui;
 
 import parse.ParseTable;
+import sun.applet.Main;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,9 +11,11 @@ class ImportingPanel extends JPanel {
     private String previousFile;
     private JPanel files;
     private int counter;
-    public ArrayList<FileOption> fO;
+    ArrayList<FileOption> fO;
+    private MainWindow mW;
 
-    ImportingPanel() {
+    ImportingPanel(MainWindow mW) {
+        this.mW = mW;
         this.fO = new ArrayList<>();
         this.counter = 0;
         JButton addFile = new JButton("Add file");
@@ -37,6 +40,7 @@ class ImportingPanel extends JPanel {
                 this.fO.add(fo);
                 files.add(fo);
                 this.updateUI();
+                this.tableCheck();
             }
         });
         this.add(addFile);
@@ -48,5 +52,13 @@ class ImportingPanel extends JPanel {
         this.add(files);
 
         this.setLayout(null);
+    }
+
+    private void tableCheck() {
+        boolean state = false;
+        if (this.mW.tableCount() > 1) {
+            state = true;
+        }
+        this.mW.toggleTab(1,state);
     }
 }

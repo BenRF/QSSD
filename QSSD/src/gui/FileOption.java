@@ -113,4 +113,8 @@ class FileOption extends JPanel {
     ParseTable getTable(int i) {
         return this.tables.get(i);
     }
+
+    int tableCount() {
+        return this.tables.size();
+    }
 }
