@@ -50,7 +50,7 @@ public class ParseColumn {
         this.content.set(r,o);
     }
 
-    private void performChecks() {
+    void performChecks() {
         this.isEmpty();
         if (!this.empty) {
             this.findExpressions();
@@ -152,7 +152,6 @@ public class ParseColumn {
     int getId() { return this.id; }
 
     String getAttributes() {
-        this.performChecks();
         String output = "";
         if (this.empty) {
             return "EMPTY";

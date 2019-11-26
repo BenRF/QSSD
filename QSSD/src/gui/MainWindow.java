@@ -6,6 +6,9 @@ import parse.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.File;
 import java.util.ArrayList;
 
 public class MainWindow {
@@ -38,6 +41,7 @@ public class MainWindow {
                     }
                     System.out.println();
                 }
+                this.sp.setLayout(new GridLayout(this.files.size(),1));
                 this.files.add(fo);
                 this.sp.add(fo);
                 this.sp.updateUI();
@@ -64,13 +68,12 @@ public class MainWindow {
                     }
                 }
             }
-            if (output != null) {
-                for (int i = 0; i < output.rowCount(); i++) {
-                    System.out.println(output.getRow(i));
-                }
+            for (int i = 0; i < output.rowCount(); i++) {
+                System.out.println(output.getRow(i));
             }
             FileOption fo = new FileOption(output);
             this.files.add(fo);
+            this.sp.setLayout(new GridLayout(this.files.size(),1));
             this.sp.add(fo);
             this.sp.updateUI();
         });
@@ -103,12 +106,30 @@ public class MainWindow {
         this.sp = new JPanel();
         this.sp.setBounds(25,50,430,500);
         this.sp.setBackground(Color.WHITE);
-        this.sp.setLayout(new FlowLayout());
+        this.sp.setLayout(new GridLayout(1,1));
         main.add(this.sp);
 
         this.main.setPreferredSize(new Dimension(500,700));
         this.main.setLayout(null);
         this.main.pack();
         this.main.setVisible(true);
+        JFrame main = this.main;
+        JPanel sp = this.sp;
+        ArrayList<FileOption> fOS = this.files;
+        ComponentAdapter cA = new ComponentAdapter(){
+            public void componentResized(ComponentEvent e){
+                sp.setLayout(new GridLayout(fOS.size(),1));
+                sp.setBounds(25,50,main.getWidth()-70,500);
+                sp.removeAll();
+                for (FileOption fO: fOS) {
+                    fO.reSize(main.getWidth()-70);
+                    sp.add(fO);
+                }
+                sp.repaint();
+                sp.revalidate();
+                sp.updateUI();
+            }
+        };
+        this.main.addComponentListener(cA);
     }
 }

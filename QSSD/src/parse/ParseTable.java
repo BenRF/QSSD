@@ -19,6 +19,7 @@ public class ParseTable {
                 this.columns.get(x).addContent(content.get(y).get(x));
             }
         }
+        this.performChecks();
     }
 
     public ParseTable(ParseTable pT) {
@@ -26,6 +27,7 @@ public class ParseTable {
         for (ParseColumn pC: pT.getColumns()) {
             this.newCol(pC);
         }
+        this.performChecks();
     }
 
     public ParseTable(ParseTable p1, ParseTable p2) {
@@ -159,6 +161,7 @@ public class ParseTable {
                 }
             }
         }
+        this.performChecks();
     }
 
     ArrayList<Problem> getProblems() {
@@ -167,6 +170,12 @@ public class ParseTable {
             problems.addAll(pC.getProblems());
         }
         return problems;
+    }
+
+    private void performChecks() {
+        for (ParseColumn pC: this.columns) {
+            pC.performChecks();
+        }
     }
 
     boolean isUnique(ArrayList<ParseColumn> columns) {
