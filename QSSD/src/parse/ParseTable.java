@@ -164,7 +164,7 @@ public class ParseTable {
         this.performChecks();
     }
 
-    ArrayList<Problem> getProblems() {
+    public ArrayList<Problem> getProblems() {
         ArrayList<Problem> problems = new ArrayList<>();
         for (ParseColumn pC: this.columns) {
             problems.addAll(pC.getProblems());
