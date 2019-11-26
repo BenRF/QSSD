@@ -68,7 +68,7 @@ class FileOption extends JPanel {
             this.add(header);
             this.add(jT);
         }
-        //this.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.RED));
+        // this.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.RED));
         this.setPreferredSize(new Dimension(400,20 + (this.tables.size()*70)));
         this.setBackground(Color.white);
         this.setLayout(null);

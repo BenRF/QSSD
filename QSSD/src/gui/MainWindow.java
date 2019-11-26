@@ -41,7 +41,7 @@ public class MainWindow {
                     }
                     System.out.println();
                 }
-                this.sp.setLayout(new GridLayout(this.files.size(),1));
+                this.sp.setLayout(new GridLayout(this.files.size()+1,1));
                 this.files.add(fo);
                 this.sp.add(fo);
                 this.sp.updateUI();
@@ -73,7 +73,7 @@ public class MainWindow {
             }
             FileOption fo = new FileOption(output);
             this.files.add(fo);
-            this.sp.setLayout(new GridLayout(this.files.size(),1));
+            this.sp.setLayout(new GridLayout(this.files.size()+1,1));
             this.sp.add(fo);
             this.sp.updateUI();
         });
@@ -104,9 +104,9 @@ public class MainWindow {
         this.main.add(clear);
 
         this.sp = new JPanel();
-        this.sp.setBounds(25,50,430,500);
+        this.sp.setBounds(25,50,430,600);
         this.sp.setBackground(Color.WHITE);
-        this.sp.setLayout(new GridLayout(1,1));
+        this.sp.setLayout(new GridLayout(2,1));
         main.add(this.sp);
 
         this.main.setPreferredSize(new Dimension(500,700));
@@ -118,8 +118,8 @@ public class MainWindow {
         ArrayList<FileOption> fOS = this.files;
         ComponentAdapter cA = new ComponentAdapter(){
             public void componentResized(ComponentEvent e){
-                sp.setLayout(new GridLayout(fOS.size(),1));
-                sp.setBounds(25,50,main.getWidth()-70,500);
+                sp.setLayout(new GridLayout(fOS.size()+1,1));
+                sp.setBounds(25,50,main.getWidth()-70,main.getHeight()-110);
                 sp.removeAll();
                 for (FileOption fO: fOS) {
                     fO.reSize(main.getWidth()-70);
