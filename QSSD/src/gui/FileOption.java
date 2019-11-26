@@ -63,12 +63,12 @@ class FileOption extends JPanel {
             if (this.Width > headers.length * 160) {
                 decidedWidth = headers.length * 160;
             }
-            //header.setBounds(15, 45 + (i * 50), decidedWidth, 20);
+            header.setBounds(15, 45 + (i * 50), decidedWidth, 20);
             jT.setBounds(15, 65 + (i * 50), decidedWidth, 30);
             this.add(header);
             this.add(jT);
         }
-        this.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.RED));
+        //this.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.RED));
         this.setPreferredSize(new Dimension(400,20 + (this.tables.size()*70)));
         this.setBackground(Color.white);
         this.setLayout(null);
