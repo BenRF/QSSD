@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class MainWindow {
     static ArrayList<FileOption> files;
-    private JTabbedPane jTP;
+    private static JTabbedPane jTP;
 
     public MainWindow() {
         files = new ArrayList<>();
@@ -20,7 +20,7 @@ public class MainWindow {
         jTP.setBounds(0,0, main.getWidth()-2, main.getHeight()-2);
         jTP.add("Files",new ImportingPanel(this));
         jTP.add("Output", oP);
-        this.toggleTab(1,false);
+        toggleTab(1,false);
         jTP.addChangeListener(e -> {
             if (jTP.getSelectedIndex() == 1) {
                 oP.update();
@@ -39,15 +39,16 @@ public class MainWindow {
         main.setVisible(true);
     }
 
-    void toggleTab(int id, boolean state) {
-        this.jTP.setEnabledAt(id,state);
+    private static void toggleTab(int id, boolean state) {
+        jTP.setEnabledAt(id,state);
     }
 
     static int tableCount() {
         int count = 0;
-        for(FileOption pT: files) {
-            count = count + pT.tableCount();
+        for(FileOption fO: files) {
+            count = count + fO.tableCount();
         }
+        toggleTab(1,count > 1);
         return count;
     }
 }

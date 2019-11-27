@@ -7,10 +7,14 @@ import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 class FileOption extends JPanel {
     private String name;
     private ArrayList<ParseTable> tables;
+    private List<Boolean> active;
     private int Width;
     private int id,height;
     private ImportingPanel pane;
@@ -37,6 +41,9 @@ class FileOption extends JPanel {
             }
             this.name = name;
             this.tables = f.getTables();
+            this.active = new ArrayList<>(Arrays.asList(new Boolean[this.tables.size()]));
+            Collections.fill(this.active, Boolean.TRUE);
+            System.out.println(this.active.toString());
             this.setOpaque(false);
             this.draw();
         } else {
@@ -62,24 +69,35 @@ class FileOption extends JPanel {
         n.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         height = height + 40;
         this.add(n);
+        int count = 0;
         for (ParseTable pt: this.tables) {
+            JCheckBox enable = new JCheckBox();
+            final int finalCount = count;
+            enable.setSelected(true);
+            enable.addItemListener(e -> {
+                this.toggle(finalCount);
+            });
+            enable.setBounds(5,height+10,20,20);
+            enable.setBackground(Color.WHITE);
+            this.add(enable);
+            count++;
             String[] headers = pt.getHeaderNames();
             String[][] content = pt.getColumnAttributes();
             JTable jT = new JTable(content, headers);
             JTableHeader header = jT.getTableHeader();
-            int decidedWidth = this.Width-50;
-            if (this.pane.getWidth() > headers.length * 165) {
-                decidedWidth = headers.length * 160;
+            int decidedWidth = this.Width-80;
+            if (this.pane.getWidth()-30 > headers.length * 155) {
+                decidedWidth = headers.length * 150;
             }
-            header.setBounds(10, height, decidedWidth, 20);
-            jT.setBounds(10, height + 20, decidedWidth, 30);
+            header.setBounds(30, height, decidedWidth, 20);
+            jT.setBounds(30, height + 20, decidedWidth, 30);
             ArrayList<Problem> problems = pt.getProblems();
             if (problems.size() > 0) {
                 height = height + 45;
                 for (Problem p : problems) {
                     JLabel e = new JLabel();
                     e.setText(p.getTitle());
-                    e.setBounds(10, height, decidedWidth, 15);
+                    e.setBounds(30, height, decidedWidth, 15);
                     this.add(e);
                     height = height + 18;
                 }
@@ -96,6 +114,11 @@ class FileOption extends JPanel {
         this.setLayout(null);
         this.setVisible(true);
         this.height = height;
+    }
+
+    private void toggle(int id) {
+        this.active.set(id,!this.active.get(id));
+        MainWindow.tableCount();
     }
 
     String getFileName() {
@@ -115,6 +138,12 @@ class FileOption extends JPanel {
     }
 
     int tableCount() {
-        return this.tables.size();
+        int count = 0;
+        for (boolean b: this.active) {
+            if (b) {
+                count++;
+            }
+        }
+        return count;
     }
 }

@@ -36,10 +36,10 @@ class ImportingPanel extends JPanel {
                     System.out.println();
                 }
                 MainWindow.files.add(fo);
+                MainWindow.tableCount();
                 this.fO.add(fo);
                 files.add(fo);
                 this.updateUI();
-                this.tableCheck();
             }
         });
         this.add(addFile);
@@ -51,13 +51,5 @@ class ImportingPanel extends JPanel {
         this.add(files);
 
         this.setLayout(null);
-    }
-
-    private void tableCheck() {
-        boolean state = false;
-        if (MainWindow.tableCount() > 1) {
-            state = true;
-        }
-        this.mW.toggleTab(1,state);
     }
 }
