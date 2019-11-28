@@ -150,6 +150,19 @@ public class ParseTable {
         this.performChecks();
     }
 
+    public String[][] getContent() {
+        String[][] content = new String[this.rowCount()][this.colCount()];
+        for (int i = 0; i < this.rowCount(); i++) {
+            ArrayList<Object> r = this.getRow(i);
+            String[] row = new String[r.size()];
+            for (int y = 0; y < r.size(); y++) {
+                row[y] = r.get(y).toString();
+            }
+            content[i] = row;
+        }
+        return content;
+    }
+
     public ArrayList<Problem> getProblems() {
         ArrayList<Problem> problems = new ArrayList<>();
         for (ParseColumn pC: this.columns) {
