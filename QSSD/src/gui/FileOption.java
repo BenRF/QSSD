@@ -121,20 +121,22 @@ class FileOption extends JPanel {
         MainWindow.tableCount();
     }
 
-    String getFileName() {
-        return this.name;
-    }
-
-    int getH() {
-        return this.height;
-    }
-
     ArrayList<ParseTable> getTables() {
         return this.tables;
     }
 
     ParseTable getTable(int i) {
         return this.tables.get(i);
+    }
+
+    ArrayList<ParseTable> getActiveTables() {
+        ArrayList<ParseTable> result = new ArrayList<>();
+        for (int i = 0; i < this.active.size(); i++) {
+            if (this.active.get(i)) {
+                result.add(this.tables.get(i));
+            }
+        }
+        return result;
     }
 
     int tableCount() {

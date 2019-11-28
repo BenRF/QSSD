@@ -28,7 +28,7 @@ class OutputPanel extends JPanel {
         this.add(nameInput);
 
         JButton merge = new JButton("Merge");
-        merge.setBounds(180,550,100,30);
+        merge.setBounds(180,600,100,30);
         merge.addActionListener(e -> {
             ArrayList<ParseTable> pTS = new ArrayList<>();
             for (FileOption fO: MainWindow.files) {
