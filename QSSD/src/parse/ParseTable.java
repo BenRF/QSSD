@@ -32,48 +32,7 @@ public class ParseTable {
     }
 
     public ParseTable(ParseTable p1, ParseTable p2) {
-        ArrayList<ParseColumn> p1c = p1.getColumns();
-        ArrayList<ParseColumn> p2c = p2.getColumns();
-        ArrayList<Link> links = new ArrayList<>();
-        for (ParseColumn c1: p1c) {
-            for (ParseColumn c2: p2c) {
-                int [] content = c1.checkContent(c2);
-                boolean name = c1.getName().equals(c2.getName());
-                boolean type = c1.checkType(c2);
-                boolean format = c1.format.equals(c2.format);
-                if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
-                    //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
-                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
-                }
-            }
-        }
-        System.out.println("LINKS FOUND: " + links.toString());
-        boolean removed = false;
-        int x = 0;
-        while (x < links.size()) {
-            Link link = links.get(x);
-            for (int y = 0; y < links.size(); y++) {
-                Link link2 = links.get(y);
-                if (link.equal(link2)) {
-                    if (link.stronger(link2)) {
-                        links.remove(y);
-                        removed = true;
-                    } else {
-                        links.remove(x);
-                        removed = true;
-                        break;
-                    }
-                }
-            }
-            if (removed) {
-                removed = false;
-                x = 0;
-            } else {
-                x++;
-            }
-        }
-        System.out.println("LINKS TO BE USED: " + links.toString());
-
+        ArrayList<Link> links = p1.getLinks(p2);
         ArrayList<ParseColumn> t1 = new ArrayList<>();
         ArrayList<ParseColumn> t2 = new ArrayList<>();
         for (Link l: links) {
@@ -151,6 +110,51 @@ public class ParseTable {
             }
         }
         this.performChecks();
+    }
+
+    public ArrayList<Link> getLinks(ParseTable p2) {
+        ArrayList<ParseColumn> p1c = this.getColumns();
+        ArrayList<ParseColumn> p2c = p2.getColumns();
+        ArrayList<Link> links = new ArrayList<>();
+        for (ParseColumn c1: p1c) {
+            for (ParseColumn c2: p2c) {
+                int [] content = c1.checkContent(c2);
+                boolean name = c1.getName().equals(c2.getName());
+                boolean type = c1.checkType(c2);
+                boolean format = c1.format.equals(c2.format);
+                if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
+                    //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
+                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
+                }
+            }
+        }
+        System.out.println("LINKS FOUND: " + links.toString());
+        boolean removed = false;
+        int x = 0;
+        while (x < links.size()) {
+            Link link = links.get(x);
+            for (int y = 0; y < links.size(); y++) {
+                Link link2 = links.get(y);
+                if (link.equal(link2)) {
+                    if (link.stronger(link2)) {
+                        links.remove(y);
+                        removed = true;
+                    } else {
+                        links.remove(x);
+                        removed = true;
+                        break;
+                    }
+                }
+            }
+            if (removed) {
+                removed = false;
+                x = 0;
+            } else {
+                x++;
+            }
+        }
+        System.out.println("LINKS TO BE USED: " + links.toString());
+        return links;
     }
 
     public boolean containsRow(ArrayList<Object> row) {
