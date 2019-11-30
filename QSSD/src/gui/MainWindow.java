@@ -3,6 +3,8 @@ package gui;
 import parse.ParseTable;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -28,6 +30,11 @@ public class MainWindow {
         toggleTab(1,false);
         toggleTab(2,false);
         jTP.setVisible(true);
+        jTP.addChangeListener(changeEvent -> {
+            if (jTP.getSelectedIndex() == 1) {
+                mP.setup();
+            }
+        });
         main.add(jTP);
         ComponentAdapter cA = new ComponentAdapter(){
             public void componentResized(ComponentEvent e){
@@ -51,11 +58,6 @@ public class MainWindow {
         boolean state = count > 1;
         toggleTab(1,state);
         toggleTab(2,state);
-        if (state) {
-            mP.setup();
-        } else {
-            mP.pause();
-        }
         return count;
     }
 

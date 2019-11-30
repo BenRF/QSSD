@@ -3,6 +3,7 @@ package parse;
 import parse.problems.Problem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +47,6 @@ public class ParseTable {
                 }
             }
         }
-
         System.out.println("LINKS FOUND: " + links.toString());
         boolean removed = false;
         int x = 0;
@@ -59,7 +59,6 @@ public class ParseTable {
                         links.remove(y);
                         removed = true;
                     } else {
-                        System.out.println(x + " was removed");
                         links.remove(x);
                         removed = true;
                         break;
@@ -110,23 +109,27 @@ public class ParseTable {
             for (int r2 = 0; r2 < p2.rowCount(); r2++) {
                 row = p2.getRow(r2);
                 match = true;
-                for (Link l: links) {
-                    if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
-                        match = false;
+                if (!this.containsRow(row)) {
+                    for (Link l : links) {
+                        if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        int count = 0;
+                        tab2Set.remove(row.get(links.get(0).getColIds()[1]));
+                        for (Integer i : linkedT2Cols) {
+                            row.remove(i - count);
+                            count++;
+                        }
+                        for (int c = 0; c < row.size(); c++) {
+                            this.setCell(p1.colCount() + c, r, row.get(c));
+                        }
                         break;
                     }
-                }
-                if (match) {
-                    int count = 0;
+                } else {
                     tab2Set.remove(row.get(links.get(0).getColIds()[1]));
-                    for (Integer i : linkedT2Cols) {
-                        row.remove(i - count);
-                        count++;
-                    }
-                    for (int c = 0; c < row.size(); c++) {
-                        this.setCell(p1.colCount() + c, r, row.get(c));
-                    }
-                    break;
                 }
             }
         }
@@ -150,13 +153,26 @@ public class ParseTable {
         this.performChecks();
     }
 
+    public boolean containsRow(ArrayList<Object> row) {
+        for (int i = 0; i < this.rowCount(); i++) {
+            if (this.getRow(i).containsAll(row)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String[][] getContent() {
         String[][] content = new String[this.rowCount()][this.colCount()];
         for (int i = 0; i < this.rowCount(); i++) {
             ArrayList<Object> r = this.getRow(i);
             String[] row = new String[r.size()];
             for (int y = 0; y < r.size(); y++) {
-                row[y] = r.get(y).toString();
+                if (r.get(y) != null) {
+                    row[y] = r.get(y).toString();
+                } else {
+                    row[y] = "";
+                }
             }
             content[i] = row;
         }

@@ -1,10 +1,10 @@
 package parse;
 
-class Link {
+public class Link {
     private int col1,col2,col1Overlap,col2Overlap;
     private boolean sameName;
 
-    Link(int col1, int col2, boolean name, int col1Overlap, int col2Overlap) {
+    public Link(int col1, int col2, boolean name, int col1Overlap, int col2Overlap) {
         this.col1 = col1;
         this.col2 = col2;
         this.sameName = name;
@@ -16,14 +16,14 @@ class Link {
         return (this.col1 == l2.col1 && this.col2 != l2.col2) || (this.col1 != l2.col1 && this.col2 == l2.col2);
     }
 
-    boolean stronger(Link l2) {
+    public boolean stronger(Link l2) {
         boolean higherSimilarity = this.col1Overlap + this.col2Overlap > l2.col1Overlap + l2.col2Overlap;
-        boolean sameSimilarity = this.col1Overlap + this.col2Overlap == l2.col1Overlap + l2.col2Overlap;
+        boolean sameOrHigherSimilarity = this.col1Overlap + this.col2Overlap >= l2.col1Overlap + l2.col2Overlap;
         boolean sameNameVal = this.sameName == l2.sameName;
         boolean overThreshold = this.col1Overlap > 80 || this.col2Overlap > 80;
         boolean otherHasNameMatch = !this.sameName && l2.sameName;
         boolean thisHasNameMatch = this.sameName && !l2.sameName;
-        return (sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameSimilarity);
+        return (sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameOrHigherSimilarity);
     }
 
     public String toString() {
