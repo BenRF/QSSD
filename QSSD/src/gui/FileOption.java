@@ -4,8 +4,11 @@ import files.*;
 import parse.problems.Problem;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,6 +88,21 @@ class FileOption extends JPanel {
             String[][] content = pt.getColumnAttributes();
             JTable jT = new JTable(content, headers);
             JTableHeader header = jT.getTableHeader();
+            jT.setEnabled(false);
+            MouseListener mL = new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 2) {
+                        new TableViewWindow(pt);
+                    }
+                }
+                public void mousePressed(MouseEvent e) {}
+                public void mouseReleased(MouseEvent e) {}
+                public void mouseEntered(MouseEvent e) {}
+                public void mouseExited(MouseEvent e) {}
+            };
+            jT.addMouseListener(mL);
+            header.addMouseListener(mL);
             int decidedWidth = this.Width-80;
             if (this.pane.getWidth()-30 > headers.length * 155) {
                 decidedWidth = headers.length * 150;
