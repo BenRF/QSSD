@@ -111,7 +111,7 @@ class MergingPanel extends JPanel {
         JTable jT = new JTable(content, headers);
         JTableHeader header = jT.getTableHeader();
         int decidedWidth = this.getWidth()-80;
-        if (this.getWidth()-30 > headers.length * 155) {
+        if (this.getWidth() - 30 > headers.length * 155) {
             decidedWidth = headers.length * 150;
         }
         header.setBounds(30, 200, decidedWidth, 20);

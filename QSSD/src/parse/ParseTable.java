@@ -32,9 +32,9 @@ public class ParseTable {
     }
 
     public ParseTable(ParseTable p1, ParseTable p2) {
-        ArrayList<Link> links = p1.getLinks(p2);
         ArrayList<ParseColumn> t1 = new ArrayList<>();
         ArrayList<ParseColumn> t2 = new ArrayList<>();
+        ArrayList<Link> links = p1.getLinks(p2);
         for (Link l: links) {
             Integer[] cols = l.getColIds();
             t1.add(p1.getCol(cols[0]));
@@ -44,11 +44,9 @@ public class ParseTable {
             ParseTable temp = p2;
             p2 = p1;
             p1 = temp;
+            links = p1.getLinks(p2);
         }
-
         this.columns = new ArrayList<>();
-        p1.sortBy(p1.getCol(links.get(0).getColIds()[0]).getName());
-        p2.sortBy(p2.getCol(links.get(0).getColIds()[1]).getName());
         for (ParseColumn c: p1.getColumns()) {
             this.newCol(c);
         }
@@ -68,27 +66,23 @@ public class ParseTable {
             for (int r2 = 0; r2 < p2.rowCount(); r2++) {
                 row = p2.getRow(r2);
                 match = true;
-                if (!this.containsRow(row)) {
-                    for (Link l : links) {
-                        if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (match) {
-                        int count = 0;
-                        tab2Set.remove(row.get(links.get(0).getColIds()[1]));
-                        for (Integer i : linkedT2Cols) {
-                            row.remove(i - count);
-                            count++;
-                        }
-                        for (int c = 0; c < row.size(); c++) {
-                            this.setCell(p1.colCount() + c, r, row.get(c));
-                        }
+                for (Link l : links) {
+                    if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
+                        match = false;
                         break;
                     }
-                } else {
+                }
+                if (match) {
+                    int count = 0;
                     tab2Set.remove(row.get(links.get(0).getColIds()[1]));
+                    for (Integer i : linkedT2Cols) {
+                        row.remove(i - count);
+                        count++;
+                    }
+                    for (int c = 0; c < row.size(); c++) {
+                        this.setCell(p1.colCount() + c, r, row.get(c));
+                    }
+                    break;
                 }
             }
         }
