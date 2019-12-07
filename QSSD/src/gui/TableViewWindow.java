@@ -9,7 +9,7 @@ import java.awt.*;
 public class TableViewWindow extends JFrame {
     public TableViewWindow(ParseTable pT) {
         this.setTitle("TABLE VIEW");
-        this.setBounds(50,50,400,40 + (pT.rowCount() * 23));
+        this.setBounds(50,50,400,40 + (pT.rowCount() * 25));
         String[] headers = pT.getHeaderNames();
         String[][] content = pT.getContent();
         JTable jT = new JTable(content, headers);
@@ -18,8 +18,8 @@ public class TableViewWindow extends JFrame {
         if (this.getWidth()-30 > headers.length * 155) {
             decidedWidth = headers.length * 150;
         }
-        header.setBounds(30, 30, decidedWidth, 20);
-        jT.setBounds(30, 50, decidedWidth, 16 * content.length);
+        header.setBounds(10, 10, decidedWidth, 20);
+        jT.setBounds(10, 30, decidedWidth, 16 * content.length);
         this.setLayout(null);
         this.add(header);
         this.add(jT);
