@@ -267,7 +267,7 @@ public class ParseTable {
         }
     }
 
-    private int colCount() {
+    public int colCount() {
         try {
         return this.columns.size();
         } catch (Exception e) {

@@ -5,25 +5,49 @@ import parse.ParseTable;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class TableViewWindow extends JFrame {
+    ParseTable pT;
+    JTable tab;
+    JTableHeader tabHeader;
     public TableViewWindow(ParseTable pT) {
+        this.pT = pT;
         this.setTitle("TABLE VIEW");
-        this.setBounds(50,50,400,40 + (pT.rowCount() * 25));
+        int decidedWidth = 40 + (pT.colCount() * 150);
+        if (decidedWidth > 1600) {
+            decidedWidth = 1600;
+        }
+        int decidedHeight = 80 + (pT.rowCount() * 16);
+        this.setBounds(50,50,decidedWidth,decidedHeight);
+        this.setBackground(Color.WHITE);
+        this.setLayout(null);
+        this.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                resize();
+            }
+        });
         String[] headers = pT.getHeaderNames();
         String[][] content = pT.getContent();
-        JTable jT = new JTable(content, headers);
-        JTableHeader header = jT.getTableHeader();
-        int decidedWidth = this.getWidth()-80;
-        if (this.getWidth()-30 > headers.length * 155) {
-            decidedWidth = headers.length * 150;
-        }
-        header.setBounds(10, 10, decidedWidth, 20);
-        jT.setBounds(10, 30, decidedWidth, 16 * content.length);
-        this.setLayout(null);
-        this.add(header);
-        this.add(jT);
-        this.setBackground(Color.WHITE);
+        tab = new JTable(content, headers);
+        tabHeader = tab.getTableHeader();
+        tab.setBounds(10,30,decidedWidth-40,pT.rowCount()*16);
+        tabHeader.setBounds(10,10,decidedWidth-40,20);
+        this.add(tabHeader);
+        this.add(tab);
         this.setVisible(true);
+    }
+
+    public void resize() {
+        int decidedWidth = this.getWidth() - 40;
+        if (decidedWidth > pT.colCount() * 150) {
+            decidedWidth = pT.colCount() * 150;
+        }
+        tab.setBounds(10,30,decidedWidth,pT.rowCount()*16);
+        tabHeader.setBounds(10,10,decidedWidth,20);
+        this.revalidate();
     }
 }

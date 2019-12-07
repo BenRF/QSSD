@@ -141,8 +141,4 @@ class MergingPanel extends JPanel {
         }
         this.update();
     }
-
-    void pause() {
-        this.removeAll();
-    }
 }
