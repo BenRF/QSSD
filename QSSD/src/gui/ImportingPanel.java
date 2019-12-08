@@ -31,10 +31,6 @@ class ImportingPanel extends JPanel {
                 this.previousFile = fc.getSelectedFile().getAbsolutePath();
                 FileOption fo = new FileOption(this.previousFile,this,counter);
                 this.counter++;
-                for (ParseTable pT: fo.getTables()) {
-                    pT.toConsole();
-                    System.out.println();
-                }
                 MainWindow.files.add(fo);
                 MainWindow.tableCount();
                 this.fO.add(fo);
