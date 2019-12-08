@@ -273,4 +273,13 @@ public class ParseColumn {
         results[1] = (int)(((double)(p2.content.size()-c2.size()))/p2.content.size() * 100);
         return results;
     }
+
+    public boolean isProblemCell(int row) {
+        for (Problem p: this.errors) {
+            if (p.isProblem(row)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -260,19 +260,15 @@ public class ParseTable {
     }
 
     public int rowCount() {
-        try {
-            return this.columns.get(0).size();
-        } catch (Exception e) {
-            return 0;
-        }
+        return this.columns.get(0).size();
     }
 
     public int colCount() {
-        try {
         return this.columns.size();
-        } catch (Exception e) {
-            return 0;
-        }
+    }
+
+    public boolean isProblem(int col,int row) {
+        return this.columns.get(col).isProblemCell(row);
     }
 
     private void sortBy(String colName) {

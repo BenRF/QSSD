@@ -12,16 +12,7 @@ public abstract class Problem {
         return this.title;
     }
 
-    public String getDescription() {
-        return this.description;
+    public boolean isProblem(int row) {
+        return this.rows.contains(row);
     }
-
-    public String getCoords() {
-        return this.column + ": " + this.rows.toString();
-    }
-
-    public boolean isSevere() {
-        return Severe;
-    }
-
 }

@@ -3,11 +3,14 @@ package gui;
 import parse.ParseTable;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.text.DecimalFormat;
 
 public class TableViewWindow extends JFrame {
     ParseTable pT;
@@ -45,6 +48,14 @@ public class TableViewWindow extends JFrame {
         tabHeader.setBounds(10,10,decidedWidth-40,20);
         scrollPane.add(tabHeader);
         scrollPane.add(tab);
+        tab.setDefaultRenderer(Object.class, (table, value, isSelected, hasFocus, row, column) -> {
+            DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+            Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            if (this.pT.isProblem(column,row)) {
+                c.setFont(new Font("Courier", Font.BOLD, 12));
+            }
+            return c;
+        });
         this.getContentPane().add(scrollPane);
         this.setVisible(true);
     }
