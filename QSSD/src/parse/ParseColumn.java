@@ -82,11 +82,14 @@ public class ParseColumn {
         Set<Object> content = new HashSet<>(this.content);
         this.numOfUniqueVals = content.size();
         this.uniqueValues = content.size() == this.content.size();
-        ArrayList<Integer> flags = new ArrayList<>();
         if (content.size() > this.content.size() * 0.85 && content.size() < this.content.size()) {
+            ArrayList<Integer> flags = new ArrayList<>();
+            Set<Object> found = new HashSet<>();
             for (int i = 0; i < this.content.size(); i++) {
-                if (this.count(this.content.get(i)) > 1) {
+                if (found.contains(this.content.get(i))) {
                     flags.add(i);
+                } else {
+                    found.add(this.content.get(i));
                 }
             }
             this.errors.add(new NearlyUnique(this.id,flags,this.name));
