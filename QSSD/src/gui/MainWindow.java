@@ -12,17 +12,18 @@ public class MainWindow {
     static ArrayList<FileOption> files;
     private static JTabbedPane jTP;
     private static MergingPanel mP;
+    static JFrame main;
 
     public MainWindow() {
         files = new ArrayList<>();
-        JFrame main = new JFrame("QSSD");
+        main = new JFrame("QSSD");
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setPreferredSize(new Dimension(500,700));
         OutputPanel oP = new OutputPanel();
         mP = new MergingPanel();
         jTP = new JTabbedPane();
         jTP.setBounds(0,0, main.getWidth()-2, main.getHeight()-2);
-        jTP.add("Files",new ImportingPanel(this));
+        jTP.add("Files",new ImportingPanel());
         jTP.add("Merging",mP);
         jTP.add("Output", oP);
         toggleTab(1,false);

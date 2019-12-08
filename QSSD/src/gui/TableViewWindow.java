@@ -4,6 +4,7 @@ import parse.ParseTable;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
+
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -12,6 +13,8 @@ public class TableViewWindow extends JFrame {
     ParseTable pT;
     JTable tab;
     JTableHeader tabHeader;
+    JScrollPane scrollPane;
+
     public TableViewWindow(ParseTable pT) {
         this.pT = pT;
         this.setTitle("TABLE VIEW");
@@ -30,14 +33,19 @@ public class TableViewWindow extends JFrame {
                 resize();
             }
         });
+        scrollPane = new JScrollPane();
+        scrollPane.setLayout(null);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setBounds(0,0,decidedWidth-15,decidedHeight);
         String[] headers = pT.getHeaderNames();
         String[][] content = pT.getContent();
         tab = new JTable(content, headers);
         tabHeader = tab.getTableHeader();
         tab.setBounds(10,30,decidedWidth-40,pT.rowCount()*16);
         tabHeader.setBounds(10,10,decidedWidth-40,20);
-        this.add(tabHeader);
-        this.add(tab);
+        scrollPane.add(tabHeader);
+        scrollPane.add(tab);
+        this.getContentPane().add(scrollPane);
         this.setVisible(true);
     }
 
@@ -48,6 +56,7 @@ public class TableViewWindow extends JFrame {
         }
         tab.setBounds(10,30,decidedWidth,pT.rowCount()*16);
         tabHeader.setBounds(10,10,decidedWidth,20);
+        scrollPane.setBounds(0,0,this.getWidth(),this.getHeight());
         this.revalidate();
     }
 }

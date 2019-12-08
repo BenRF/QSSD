@@ -1,10 +1,10 @@
 package gui;
+import javafx.scene.control.Tab;
 import parse.*;
 import files.*;
 import parse.problems.Problem;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -18,11 +18,15 @@ class FileOption extends JPanel {
     private String name;
     private ArrayList<ParseTable> tables;
     private List<Boolean> active;
-    private int Width;
-    private int id,height;
+    private int Width,height;
+    private int id;
     private ImportingPanel pane;
+    private ArrayList<JTable> tab;
+    private ArrayList<JTableHeader> Tabheaders;
 
     FileOption(String fileLocation,ImportingPanel pane,int id) {
+        tab = new ArrayList<>();
+        Tabheaders = new ArrayList<>();
         this.id = id;
         this.pane = pane;
         this.Width = this.pane.getWidth();
@@ -77,18 +81,18 @@ class FileOption extends JPanel {
             JCheckBox enable = new JCheckBox();
             final int finalCount = count;
             enable.setSelected(true);
-            enable.addItemListener(e -> {
-                this.toggle(finalCount);
-            });
+            enable.addItemListener(e -> this.toggle(finalCount));
             enable.setBounds(5,height+10,20,20);
             enable.setBackground(Color.WHITE);
             this.add(enable);
             count++;
             String[] headers = pt.getHeaderNames();
             String[][] content = pt.getColumnAttributes();
-            JTable jT = new JTable(content, headers);
-            JTableHeader header = jT.getTableHeader();
-            jT.setEnabled(false);
+            JTable tab = new JTable(content, headers);
+            JTableHeader Tabheaders = tab.getTableHeader();
+            this.tab.add(tab);
+            this.Tabheaders.add(Tabheaders);
+            tab.setEnabled(false);
             MouseListener mL = new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -101,14 +105,14 @@ class FileOption extends JPanel {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseExited(MouseEvent e) {}
             };
-            jT.addMouseListener(mL);
-            header.addMouseListener(mL);
+            tab.addMouseListener(mL);
+            Tabheaders.addMouseListener(mL);
             int decidedWidth = this.Width-80;
             if (this.pane.getWidth()-30 > headers.length * 155) {
                 decidedWidth = headers.length * 150;
             }
-            header.setBounds(30, height, decidedWidth, 20);
-            jT.setBounds(30, height + 20, decidedWidth, 30);
+            Tabheaders.setBounds(30, height, decidedWidth, 20);
+            tab.setBounds(30, height + 20, decidedWidth, 30);
             ArrayList<Problem> problems = pt.getProblems();
             if (problems.size() > 0) {
                 height = height + 45;
@@ -122,16 +126,30 @@ class FileOption extends JPanel {
             } else {
                 height = height + 50;
             }
-            this.add(header);
-            this.add(jT);
+            this.add(Tabheaders);
+            this.add(tab);
             height = height + 10;
         }
+        this.height = height;
         //this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
         this.setBounds(0,0,this.pane.getWidth(),height);
         this.setBackground(Color.white);
         this.setLayout(null);
         this.setVisible(true);
-        this.height = height;
+    }
+
+    void resize() {
+        for (int i = 0; i < this.tab.size(); i++) {
+            int decidedWidth = this.pane.getWidth()-80;
+            if (this.pane.getWidth()-30 > this.tables.get(i).colCount() * 155) {
+                decidedWidth = this.tables.get(i).colCount() * 150;
+            }
+            JTable tab = this.tab.get(i);
+            JTableHeader header = this.Tabheaders.get(i);
+            tab.setBounds(tab.getX(), tab.getY(), decidedWidth, tab.getHeight());
+            header.setBounds(header.getX(), header.getY(), decidedWidth, header.getHeight());
+        }
+        this.setBounds(0,0,this.pane.getWidth(),height);
     }
 
     private void toggle(int id) {
@@ -141,10 +159,6 @@ class FileOption extends JPanel {
 
     ArrayList<ParseTable> getTables() {
         return this.tables;
-    }
-
-    ParseTable getTable(int i) {
-        return this.tables.get(i);
     }
 
     ArrayList<ParseTable> getActiveTables() {

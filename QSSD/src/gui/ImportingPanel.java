@@ -4,6 +4,8 @@ import parse.ParseTable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
 class ImportingPanel extends JPanel {
@@ -11,10 +13,8 @@ class ImportingPanel extends JPanel {
     private JPanel files;
     private int counter;
     ArrayList<FileOption> fO;
-    private MainWindow mW;
 
-    ImportingPanel(MainWindow mW) {
-        this.mW = mW;
+    ImportingPanel() {
         this.fO = new ArrayList<>();
         this.counter = 0;
         JButton addFile = new JButton("Add file");
@@ -49,7 +49,19 @@ class ImportingPanel extends JPanel {
         files.setBackground(Color.WHITE);
         files.setLayout(null);
         this.add(files);
-
         this.setLayout(null);
+        MainWindow.main.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                super.componentResized(e);
+                int w = MainWindow.main.getWidth();
+                int h = MainWindow.main.getHeight();
+                files.setBounds(10,40,w-40,h-140);
+                for (FileOption fO: fO) {
+                    fO.resize();
+                }
+                MainWindow.main.revalidate();
+            }
+        });
     }
 }
