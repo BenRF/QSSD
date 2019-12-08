@@ -21,15 +21,14 @@ class MergingPanel extends JPanel {
         this.updateUI();
         this.repaint();
         back = new JButton("Back");
-        back.setBounds(20,550,100,30);
+        back.setBounds(20,20,100,30);
         back.addActionListener(e -> stepBack());
         forward = new JButton("Forward");
         forward.setEnabled(false);
-        forward.setBounds(360,550,100,30);
+        forward.setBounds(150,20,100,30);
         forward.addActionListener(e -> stepForward());
         this.add(back);
         this.add(forward);
-
         this.tabs = MainWindow.getTables();
         this.step = this.tabs.size()-1;
         orderTables();
@@ -114,8 +113,8 @@ class MergingPanel extends JPanel {
         if (this.getWidth() - 30 > headers.length * 155) {
             decidedWidth = headers.length * 150;
         }
-        header.setBounds(30, 200, decidedWidth, 20);
-        jT.setBounds(30, 220, decidedWidth, 16 * content.length);
+        header.setBounds(30, 70, decidedWidth, 20);
+        jT.setBounds(30, 90, decidedWidth, 16 * content.length);
         this.add(header);
         this.add(jT);
     }

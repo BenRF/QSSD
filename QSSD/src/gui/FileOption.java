@@ -1,5 +1,4 @@
 package gui;
-import javafx.scene.control.Tab;
 import parse.*;
 import files.*;
 import parse.problems.Problem;
@@ -50,7 +49,6 @@ class FileOption extends JPanel {
             this.tables = f.getTables();
             this.active = new ArrayList<>(Arrays.asList(new Boolean[this.tables.size()]));
             Collections.fill(this.active, Boolean.TRUE);
-            System.out.println(this.active.toString());
             this.setOpaque(false);
             this.draw();
         } else {

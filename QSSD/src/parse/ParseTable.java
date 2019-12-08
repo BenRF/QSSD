@@ -3,7 +3,6 @@ package parse;
 import parse.problems.Problem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,14 +18,6 @@ public class ParseTable {
             for (int x = 0; x < this.columns.size(); x++) {
                 this.columns.get(x).addContent(content.get(y).get(x));
             }
-        }
-        this.performChecks();
-    }
-
-    public ParseTable(ParseTable pT) {
-        this.columns = new ArrayList<>();
-        for (ParseColumn pC: pT.getColumns()) {
-            this.newCol(pC);
         }
         this.performChecks();
     }
@@ -59,6 +50,7 @@ public class ParseTable {
                 this.newCol(c.getName());
             }
         }
+        System.out.println("Before: " + this.rowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
         for (int r = 0; r < this.rowCount(); r++) {
             ArrayList<Object> row;
@@ -67,7 +59,7 @@ public class ParseTable {
                 row = p2.getRow(r2);
                 match = true;
                 for (Link l : links) {
-                    if (row.get(l.getColIds()[1]) != this.getRow(r).get(l.getColIds()[0])) {
+                    if (!row.get(l.getColIds()[1]).equals(this.getRow(r).get(l.getColIds()[0]))) {
                         match = false;
                         break;
                     }
@@ -104,6 +96,7 @@ public class ParseTable {
             }
         }
         this.performChecks();
+        System.out.println("AFTER: " + this.rowCount());
     }
 
     public ArrayList<Link> getLinks(ParseTable p2) {
