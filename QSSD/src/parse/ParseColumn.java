@@ -125,8 +125,10 @@ public class ParseColumn {
         for (Map.Entry<Class, Integer> entry : types.entrySet()) {
             if (entry.getValue() >= size * 0.85 && entry.getValue() < size) {
                 for (int i = 0; i < this.content.size(); i++) {
-                    if (!this.content.get(i).getClass().equals(entry.getKey())) {
-                        flags.add(i);
+                    if (this.content.get(i) != null) {
+                        if (!this.content.get(i).getClass().equals(entry.getKey())) {
+                            flags.add(i);
+                        }
                     }
                 }
             }
