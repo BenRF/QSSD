@@ -151,21 +151,28 @@ public class ParseColumn {
 
     String getAttributes() {
         String output = "";
+        boolean first = true;
         if (this.empty) {
             return "EMPTY";
         } else {
             if (this.uniqueValues) {
                 output = output + "Unique";
-            } else {
-                output = output + "!Unique";
+                first = false;
             }
             if (this.sameType) {
-                output = output + "," + this.content.get(0).getClass().getSimpleName();
-            } else {
-                output = output + ",Mixed type";
+                if (first) {
+                    output = this.content.get(0).getClass().getSimpleName();
+                    first = false;
+                } else {
+                    output = output + "," + this.content.get(0).getClass().getSimpleName();
+                }
             }
             if (this.format.toString().length() > 0) {
-                output = output + ", Format found";
+                if (first) {
+                    output = "Format";
+                } else {
+                    output = output + ", Format";
+                }
             }
             return output;
         }
