@@ -5,7 +5,6 @@ import parse.ParseTable;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,8 +17,7 @@ public class CSVFile implements TabSeperatedFile {
             String row;
             while ((row = csvReader.readLine()) != null) {
                 String[] data = row.split(",");
-                ArrayList<Object> r = new ArrayList<>();
-                r.addAll(Arrays.asList(data));
+                ArrayList<Object> r = new ArrayList<>(Arrays.asList(data));
                 this.content.add(r);
             }
             csvReader.close();
