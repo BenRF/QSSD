@@ -35,24 +35,28 @@ class FileOption extends JPanel {
         } else if (fileLocation.substring(fileLocation.length()-4).equals(".csv")) {
             f = new CSVFile(fileLocation);
         }
-        if (f != null) {
-            String name = "";
-            for (int i = fileLocation.length() - 1; i > 0; i--) {
-                char c = fileLocation.charAt(i);
-                if (c != '\\') {
-                    name = c + name;
-                } else {
-                    break;
-                }
+        String name = "";
+        for (int i = fileLocation.length() - 1; i > 0; i--) {
+            char c = fileLocation.charAt(i);
+            if (c != '\\') {
+                name = c + name;
+            } else {
+                break;
             }
-            this.name = name;
+        }
+        this.name = name;
+        if (f != null) {
             this.tables = f.getTables();
             this.active = new ArrayList<>(Arrays.asList(new Boolean[this.tables.size()]));
             Collections.fill(this.active, Boolean.TRUE);
             this.setOpaque(false);
             this.draw();
         } else {
+            this.active = new ArrayList<>();
+            this.tables = new ArrayList<>();
             System.out.println("ERROR WITH CREATING FILE OBJECT");
+            this.setOpaque(false);
+            this.draw();
         }
     }
 
@@ -75,58 +79,78 @@ class FileOption extends JPanel {
         height = height + 40;
         this.add(n);
         int count = 0;
-        for (ParseTable pt: this.tables) {
-            JCheckBox enable = new JCheckBox();
-            final int finalCount = count;
-            enable.setSelected(true);
-            enable.addItemListener(e -> this.toggle(finalCount));
-            enable.setBounds(5,height+10,20,20);
-            enable.setBackground(Color.WHITE);
-            this.add(enable);
-            count++;
-            String[] headers = pt.getHeaderNames();
-            String[][] content = pt.getColumnAttributes();
-            JTable tab = new JTable(content, headers);
-            JTableHeader Tabheaders = tab.getTableHeader();
-            this.tab.add(tab);
-            this.Tabheaders.add(Tabheaders);
-            tab.setEnabled(false);
-            MouseListener mL = new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        new TableViewWindow(pt);
+        if (this.tables.size() < 1) {
+            JLabel noTables = new JLabel();
+            noTables.setText("No tables detected");
+            noTables.setBounds(15,height,this.Width,35);
+            noTables.setForeground(Color.RED);
+            Font f2 = new Font("Courier", Font.BOLD,13);
+            noTables.setFont(f2.deriveFont(f.getStyle() ^ Font.BOLD));
+            this.add(noTables);
+            height = height + 50;
+            System.out.println("No tables found");
+        } else {
+            for (ParseTable pt : this.tables) {
+                JCheckBox enable = new JCheckBox();
+                final int finalCount = count;
+                enable.setSelected(true);
+                enable.addItemListener(e -> this.toggle(finalCount));
+                enable.setBounds(5, height+10, 20, 20);
+                enable.setBackground(Color.WHITE);
+                this.add(enable);
+                count++;
+                String[] headers = pt.getHeaderNames();
+                String[][] content = pt.getColumnAttributes();
+                JTable tab = new JTable(content, headers);
+                JTableHeader Tabheaders = tab.getTableHeader();
+                this.tab.add(tab);
+                this.Tabheaders.add(Tabheaders);
+                tab.setEnabled(false);
+                MouseListener mL = new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (e.getClickCount() == 2) {
+                            new TableViewWindow(pt);
+                        }
                     }
+
+                    public void mousePressed(MouseEvent e) {
+                    }
+
+                    public void mouseReleased(MouseEvent e) {
+                    }
+
+                    public void mouseEntered(MouseEvent e) {
+                    }
+
+                    public void mouseExited(MouseEvent e) {
+                    }
+                };
+                tab.addMouseListener(mL);
+                Tabheaders.addMouseListener(mL);
+                int decidedWidth = this.Width - 80;
+                if (this.pane.getWidth() - 30 > headers.length * 155) {
+                    decidedWidth = headers.length * 150;
                 }
-                public void mousePressed(MouseEvent e) {}
-                public void mouseReleased(MouseEvent e) {}
-                public void mouseEntered(MouseEvent e) {}
-                public void mouseExited(MouseEvent e) {}
-            };
-            tab.addMouseListener(mL);
-            Tabheaders.addMouseListener(mL);
-            int decidedWidth = this.Width-80;
-            if (this.pane.getWidth()-30 > headers.length * 155) {
-                decidedWidth = headers.length * 150;
-            }
-            Tabheaders.setBounds(30, height, decidedWidth, 20);
-            tab.setBounds(30, height + 20, decidedWidth, 30);
-            ArrayList<Problem> problems = pt.getProblems();
-            if (problems.size() > 0) {
-                height = height + 45;
-                for (Problem p : problems) {
-                    JLabel e = new JLabel();
-                    e.setText(p.getTitle());
-                    e.setBounds(30, height, decidedWidth, 15);
-                    this.add(e);
-                    height = height + 18;
+                Tabheaders.setBounds(30, height, decidedWidth, 20);
+                tab.setBounds(30, height + 20, decidedWidth, 30);
+                ArrayList<Problem> problems = pt.getProblems();
+                if (problems.size() > 0) {
+                    height = height + 45;
+                    for (Problem p : problems) {
+                        JLabel e = new JLabel();
+                        e.setText(p.getTitle());
+                        e.setBounds(30, height, decidedWidth, 15);
+                        this.add(e);
+                        height = height + 18;
+                    }
+                } else {
+                    height = height + 50;
                 }
-            } else {
-                height = height + 50;
+                this.add(Tabheaders);
+                this.add(tab);
+                height = height + 10;
             }
-            this.add(Tabheaders);
-            this.add(tab);
-            height = height + 10;
         }
         this.height = height;
         //this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
@@ -137,17 +161,19 @@ class FileOption extends JPanel {
     }
 
     void resize() {
-        for (int i = 0; i < this.tab.size(); i++) {
-            int decidedWidth = this.pane.getWidth()-80;
-            if (this.pane.getWidth()-30 > this.tables.get(i).colCount() * 155) {
-                decidedWidth = this.tables.get(i).colCount() * 150;
+        if (this.tables.size() >= 1) {
+            for (int i = 0; i < this.tab.size(); i++) {
+                int decidedWidth = this.pane.getWidth() - 80;
+                if (this.pane.getWidth() - 30 > this.tables.get(i).colCount() * 155) {
+                    decidedWidth = this.tables.get(i).colCount() * 150;
+                }
+                JTable tab = this.tab.get(i);
+                JTableHeader header = this.Tabheaders.get(i);
+                tab.setBounds(tab.getX(), tab.getY(), decidedWidth, tab.getHeight());
+                header.setBounds(header.getX(), header.getY(), decidedWidth, header.getHeight());
             }
-            JTable tab = this.tab.get(i);
-            JTableHeader header = this.Tabheaders.get(i);
-            tab.setBounds(tab.getX(), tab.getY(), decidedWidth, tab.getHeight());
-            header.setBounds(header.getX(), header.getY(), decidedWidth, header.getHeight());
+            this.setBounds(0, 0, this.pane.getWidth(), height);
         }
-        this.setBounds(0,0,this.pane.getWidth(),height);
     }
 
     private void toggle(int id) {
