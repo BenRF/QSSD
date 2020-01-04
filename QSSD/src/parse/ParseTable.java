@@ -253,6 +253,14 @@ public class ParseTable extends AbstractTableModel {
         return this.columns;
     }
 
+    public String[] getColumnNames() {
+        String[] names = new String[this.columns.size()];
+        for (int i = 0; i < this.columns.size(); i++) {
+            names[i] = this.columns.get(i).getName();
+        }
+        return names;
+    }
+
     public ArrayList<Object> getRow(int i) {
         ArrayList<Object> r = new ArrayList<>();
         for (ParseColumn pC: this.columns) {

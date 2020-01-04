@@ -1,6 +1,7 @@
 package gui;
 
 import parse.ParseTable;
+import parse.problems.Problem;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -11,6 +12,7 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 
 public class TableViewWindow extends JFrame {
     ParseTable pT;
@@ -39,7 +41,7 @@ public class TableViewWindow extends JFrame {
         });
         viewProblems = new JCheckBox();
         viewProblems.setSelected(false);
-        viewProblems.addItemListener(e -> this.viewProbems());
+        viewProblems.addItemListener(e -> this.viewProblems());
         viewProblems.setBounds(10, 5, 20, 20);
         this.add(viewProblems);
         JLabel problemView = new JLabel();
@@ -70,12 +72,14 @@ public class TableViewWindow extends JFrame {
         this.setVisible(true);
     }
 
-    private void viewProbems() {
+    private void viewProblems() {
         if (this.viewProblems.isSelected()) {
             System.out.println("Problem rows only");
-
+            DefaultTableModel dTM = new DefaultTableModel(pT.getProblemContent(),pT.getColumnNames());
+            tab.setModel(dTM);
         } else {
             System.out.println("Normal view");
+            tab.setModel(pT);
         }
     }
 
