@@ -1,5 +1,6 @@
 package parse;
 
+import javafx.beans.binding.ObjectExpression;
 import parse.problems.MissingValues;
 import parse.problems.MixedTypes;
 import parse.problems.NearlyUnique;
@@ -84,19 +85,20 @@ public class ParseColumn {
         this.uniqueValues = content.size() == this.content.size();
         if (content.size() > this.content.size() * 0.85 && content.size() < this.content.size()) {
             ArrayList<Integer> flags = new ArrayList<>();
-            boolean dupe;
+            Map<Object,ArrayList<Integer>> valsWithPos = new HashMap<>();
             for (int i = 0; i < this.content.size(); i++) {
-                if (!flags.contains(this.content.get(i))) {
-                    dupe = false;
-                    for (int j = 0; j < this.content.size(); j++) {
-                        if (this.content.get(j).equals(this.content.get(i)) && i != j) {
-                            flags.add(j);
-                            dupe = true;
-                        }
-                    }
-                    if (dupe) {
-                        flags.add(i);
-                    }
+                Object o = this.content.get(i);
+                if (valsWithPos.containsKey(o)) {
+                    valsWithPos.get(o).add(i);
+                } else {
+                    ArrayList<Integer> pos = new ArrayList<>();
+                    pos.add(i);
+                    valsWithPos.put(o,pos);
+                }
+            }
+            for (ArrayList<Integer> o: valsWithPos.values()) {
+                if (o.size() > 1) {
+                    flags.addAll(o);
                 }
             }
             this.errors.add(new NearlyUnique(this.id,flags,this.name));
