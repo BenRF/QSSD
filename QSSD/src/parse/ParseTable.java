@@ -2,11 +2,13 @@ package parse;
 
 import parse.problems.Problem;
 
+import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ParseTable {
+public class ParseTable extends AbstractTableModel {
     private ArrayList<ParseColumn> columns;
 
     public ParseTable(ArrayList<ArrayList<Object>> content) {
@@ -50,12 +52,12 @@ public class ParseTable {
                 this.newCol(c.getName());
             }
         }
-        System.out.println("Before: " + this.rowCount());
+        System.out.println("Before: " + this.getRowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
-        for (int r = 0; r < this.rowCount(); r++) {
+        for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
-            for (int r2 = 0; r2 < p2.rowCount(); r2++) {
+            for (int r2 = 0; r2 < p2.getRowCount(); r2++) {
                 row = p2.getRow(r2);
                 match = true;
                 for (Link l : links) {
@@ -72,7 +74,7 @@ public class ParseTable {
                         count++;
                     }
                     for (int c = 0; c < row.size(); c++) {
-                        this.setCell(p1.colCount() + c, r, row.get(c));
+                        this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
                     break;
                 }
@@ -83,7 +85,7 @@ public class ParseTable {
                 ArrayList<Object> rowToAdd = p2.findRowByObject(links.get(0).getColIds()[1],o);
                 this.newRow();
                 for (Integer i : linkedT2Cols) {
-                    this.setCell(i,this.rowCount()-1,rowToAdd.get(i));
+                    this.setCell(i,this.getRowCount()-1,rowToAdd.get(i));
                 }
                 int count = 0;
                 for (Integer i : linkedT2Cols) {
@@ -91,12 +93,12 @@ public class ParseTable {
                     count++;
                 }
                 for (int c = 0; c < rowToAdd.size(); c++) {
-                    this.setCell(p1.colCount() + c, this.rowCount()-1, rowToAdd.get(c));
+                    this.setCell(p1.getColumnCount() + c, this.getRowCount()-1, rowToAdd.get(c));
                 }
             }
         }
         this.performChecks();
-        System.out.println("AFTER: " + this.rowCount());
+        System.out.println("AFTER: " + this.getRowCount());
     }
 
     public ArrayList<Link> getLinks(ParseTable p2) {
@@ -145,7 +147,7 @@ public class ParseTable {
     }
 
     public boolean containsRow(ArrayList<Object> row) {
-        for (int i = 0; i < this.rowCount(); i++) {
+        for (int i = 0; i < this.getRowCount(); i++) {
             if (this.getRow(i).containsAll(row)) {
                 return true;
             }
@@ -154,19 +156,38 @@ public class ParseTable {
     }
 
     public String[][] getContent() {
-        String[][] content = new String[this.rowCount()][this.colCount()];
-        for (int i = 0; i < this.rowCount(); i++) {
-            ArrayList<Object> r = this.getRow(i);
-            String[] row = new String[r.size()];
-            for (int y = 0; y < r.size(); y++) {
-                if (r.get(y) != null) {
-                    row[y] = r.get(y).toString();
-                } else {
-                    row[y] = "";
-                }
-            }
-            content[i] = row;
+        String[][] content = new String[this.getRowCount()][this.getColumnCount()];
+        for (int i = 0; i < this.getRowCount(); i++) {
+            content[i] = this.getRowAsString(i);
         }
+        return content;
+    }
+
+    String[] getRowAsString(int i) {
+        ArrayList<Object> r = this.getRow(i);
+        String[] row = new String[r.size()];
+        for (int y = 0; y < r.size(); y++) {
+            if (r.get(y) != null) {
+                row[y] = r.get(y).toString();
+            } else {
+                row[y] = "";
+            }
+        }
+        return row;
+    }
+
+    public String[][] getProblemContent() {
+        HashSet<Integer> problemRowIds = new HashSet<>();
+        for (Problem p: this.getProblems()) {
+            problemRowIds.addAll(p.getRows());
+        }
+        String[][] content = new String[problemRowIds.size()][this.getColumnCount()];
+        int count = 0;
+        for (Integer i: problemRowIds) {
+            content[count] = this.getRowAsString(i);
+            count++;
+        }
+        System.out.println(Arrays.deepToString(content));
         return content;
     }
 
@@ -210,7 +231,7 @@ public class ParseTable {
     }
 
     public void toConsole() {
-        for (int i = 0; i < this.rowCount(); i++) {
+        for (int i = 0; i < this.getRowCount(); i++) {
             System.out.println(this.getRow(i));
         }
     }
@@ -250,14 +271,6 @@ public class ParseTable {
         for(ParseColumn pC: this.columns) {
             pC.normalise(max);
         }
-    }
-
-    public int rowCount() {
-        return this.columns.get(0).size();
-    }
-
-    public int colCount() {
-        return this.columns.size();
     }
 
     public boolean isProblem(int col,int row) {
@@ -361,5 +374,30 @@ public class ParseTable {
             }
         }
         return output + ")";
+    }
+
+    @Override
+    public String getColumnName(int col) {
+        return this.columns.get(col).getName();
+    }
+
+    @Override
+    public int getRowCount() {
+        return this.columns.get(0).size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return this.columns.size();
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        return this.columns.get(columnIndex).get(rowIndex);
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        return false;
     }
 }

@@ -105,16 +105,14 @@ class MergingPanel extends JPanel {
         for (int i = 1; i <= this.step; i++) {
             pT = new ParseTable(pT,this.tabs.get(i));
         }
-        String[] headers = pT.getHeaderNames();
-        String[][] content = pT.getContent();
-        JTable jT = new JTable(content, headers);
+        JTable jT = new JTable(pT);
         JTableHeader header = jT.getTableHeader();
         int decidedWidth = this.getWidth()-80;
-        if (this.getWidth() - 30 > headers.length * 155) {
-            decidedWidth = headers.length * 150;
+        if (this.getWidth() - 30 > pT.getColumnCount() * 155) {
+            decidedWidth = pT.getColumnCount() * 150;
         }
         header.setBounds(30, 70, decidedWidth, 20);
-        jT.setBounds(30, 90, decidedWidth, 16 * content.length);
+        jT.setBounds(30, 90, decidedWidth, 16 * pT.getRowCount());
         this.add(header);
         this.add(jT);
     }

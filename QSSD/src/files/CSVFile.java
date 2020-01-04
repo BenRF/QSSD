@@ -39,7 +39,7 @@ public class CSVFile implements TabSeperatedFile {
                 fW.append(h);
             }
             fW.append("\n");
-            for (int r = 0; r < pt.rowCount(); r++) {
+            for (int r = 0; r < pt.getRowCount(); r++) {
                 ArrayList<Object> row = pt.getRow(r);
                 first = true;
                 for (Object c: row) {

@@ -164,8 +164,8 @@ class FileOption extends JPanel {
         if (this.tables.size() >= 1) {
             for (int i = 0; i < this.tab.size(); i++) {
                 int decidedWidth = this.pane.getWidth() - 80;
-                if (this.pane.getWidth() - 30 > this.tables.get(i).colCount() * 155) {
-                    decidedWidth = this.tables.get(i).colCount() * 150;
+                if (this.pane.getWidth() - 30 > this.tables.get(i).getColumnCount() * 155) {
+                    decidedWidth = this.tables.get(i).getColumnCount() * 150;
                 }
                 JTable tab = this.tab.get(i);
                 JTableHeader header = this.Tabheaders.get(i);

@@ -43,7 +43,7 @@ public class ExcelFile implements TabSeperatedFile{
             Cell c = r.createCell(i);
             c.setCellValue(headers[i]);
         }
-        for (int i = 0; i < pT.rowCount(); i++) {
+        for (int i = 0; i < pT.getRowCount(); i++) {
             r = s.createRow(i+1);
             ArrayList<Object> pTo = pT.getRow(i);
             for (int j = 0; j < pTo.size(); j++) {

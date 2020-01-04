@@ -15,4 +15,8 @@ public abstract class Problem {
     public boolean isProblem(int row) {
         return this.rows.contains(row);
     }
+
+    public ArrayList<Integer> getRows() {
+        return rows;
+    }
 }

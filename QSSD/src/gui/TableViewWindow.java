@@ -4,28 +4,29 @@ import parse.ParseTable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.text.DecimalFormat;
 
 public class TableViewWindow extends JFrame {
     ParseTable pT;
     JTable tab;
     JTableHeader tabHeader;
-    JScrollPane scrollPane;
+    JCheckBox viewProblems;
+    int decidedWidth;
 
     public TableViewWindow(ParseTable pT) {
         this.pT = pT;
         this.setTitle("TABLE VIEW");
-        int decidedWidth = 40 + (pT.colCount() * 150);
+        decidedWidth = 40 + (pT.getColumnCount() * 150);
         if (decidedWidth > 1600) {
             decidedWidth = 1600;
         }
-        int decidedHeight = 80 + (pT.rowCount() * 16);
+        int decidedHeight = 100 + (pT.getRowCount() * 16);
         this.setBounds(50,50,decidedWidth,decidedHeight);
         this.setBackground(Color.WHITE);
         this.setLayout(null);
@@ -36,18 +37,28 @@ public class TableViewWindow extends JFrame {
                 resize();
             }
         });
-        scrollPane = new JScrollPane();
-        scrollPane.setLayout(null);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-        scrollPane.setBounds(0,0,decidedWidth-15,decidedHeight);
+        viewProblems = new JCheckBox();
+        viewProblems.setSelected(false);
+        viewProblems.addItemListener(e -> this.viewProbems());
+        viewProblems.setBounds(10, 5, 20, 20);
+        this.add(viewProblems);
+        JLabel problemView = new JLabel();
+        problemView.setText("Problems only");
+        problemView.setBounds(35,5,100,20);
+        this.add(problemView);
+
+
         String[] headers = pT.getHeaderNames();
         String[][] content = pT.getContent();
-        tab = new JTable(content, headers);
+        TableModel tm = new DefaultTableModel();
+        tab = new JTable(pT);
         tabHeader = tab.getTableHeader();
-        tab.setBounds(10,30,decidedWidth-40,pT.rowCount()*16);
-        tabHeader.setBounds(10,10,decidedWidth-40,20);
-        scrollPane.add(tabHeader);
-        scrollPane.add(tab);
+        tabHeader.setBounds(10,30,decidedWidth-40,20);
+        tab.setBounds(10,50,decidedWidth-40,pT.getRowCount()*16);
+        this.add(tabHeader);
+        this.add(tab);
+
+
         tab.setDefaultRenderer(Object.class, (table, value, isSelected, hasFocus, row, column) -> {
             DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
             Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -56,18 +67,25 @@ public class TableViewWindow extends JFrame {
             }
             return c;
         });
-        this.getContentPane().add(scrollPane);
         this.setVisible(true);
+    }
+
+    private void viewProbems() {
+        if (this.viewProblems.isSelected()) {
+            System.out.println("Problem rows only");
+
+        } else {
+            System.out.println("Normal view");
+        }
     }
 
     public void resize() {
         int decidedWidth = this.getWidth() - 40;
-        if (decidedWidth > pT.colCount() * 150) {
-            decidedWidth = pT.colCount() * 150;
+        if (decidedWidth > pT.getColumnCount() * 150) {
+            decidedWidth = pT.getColumnCount() * 150;
         }
-        tab.setBounds(10,30,decidedWidth,pT.rowCount()*16);
-        tabHeader.setBounds(10,10,decidedWidth,20);
-        scrollPane.setBounds(0,0,this.getWidth(),this.getHeight());
+        tabHeader.setBounds(10,30,decidedWidth,20);
+        tab.setBounds(10,50,decidedWidth,pT.getRowCount()*16);
         this.revalidate();
     }
 }
