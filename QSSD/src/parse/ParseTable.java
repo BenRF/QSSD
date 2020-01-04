@@ -187,7 +187,6 @@ public class ParseTable extends AbstractTableModel {
             content[count] = this.getRowAsString(i);
             count++;
         }
-        System.out.println(Arrays.deepToString(content));
         return content;
     }
 

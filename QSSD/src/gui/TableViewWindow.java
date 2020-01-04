@@ -74,11 +74,9 @@ public class TableViewWindow extends JFrame {
 
     private void viewProblems() {
         if (this.viewProblems.isSelected()) {
-            System.out.println("Problem rows only");
             DefaultTableModel dTM = new DefaultTableModel(pT.getProblemContent(),pT.getColumnNames());
             tab.setModel(dTM);
         } else {
-            System.out.println("Normal view");
             tab.setModel(pT);
         }
     }
