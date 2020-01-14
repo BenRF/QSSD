@@ -89,31 +89,31 @@ class Part {
         String type = "";
         boolean first = true;
         if (this.alphabetical) {
-            type = "Letter";
+            type = "Let";
             first = false;
         }
         if (this.digit) {
             if (first) {
-                type = "Number";
+                type = "Num";
                 first = false;
             } else {
-                type = type + "+Number";
+                type = type + "+Num";
             }
         }
         if (this.symbol) {
             if (first) {
-                type = "Symbol";
+                type = "Sym";
                 first = false;
             } else {
-                type = type + "+Symbol";
+                type = type + "+Sym";
             }
         }
         if (this.space) {
             if (first) {
-                type = "Space";
+                type = "Spa";
                 first = false;
             } else {
-                type = type + "+Space";
+                type = type + "+Spa";
             }
         }
         if (this.count == 1) {

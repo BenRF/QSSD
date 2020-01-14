@@ -4,7 +4,6 @@ import parse.problems.Problem;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -110,7 +109,7 @@ public class ParseTable extends AbstractTableModel {
                 int [] content = c1.checkContent(c2);
                 boolean name = c1.getName().equals(c2.getName());
                 boolean type = c1.checkType(c2);
-                boolean format = c1.format.equals(c2.format);
+                boolean format = c1.getFormat().equals(c2.getFormat());
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
                     //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
                     links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
@@ -361,11 +360,14 @@ public class ParseTable extends AbstractTableModel {
 
     public String[][] getColumnAttributes() {
         String[] attributes = new String[this.columns.size()];
+        String[] formats = new String[this.columns.size()];
         for (int i = 0; i < this.columns.size(); i++) {
             attributes[i] = this.columns.get(i).getAttributes();
+            formats[i] = this.columns.get(i).getFormat().toString();
         }
-        String[][] result = new String[1][this.columns.size()];
+        String[][] result = new String[2][this.columns.size()];
         result[0] = attributes;
+        result[1] = formats;
         return result;
     }
 

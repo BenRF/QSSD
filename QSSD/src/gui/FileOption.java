@@ -88,7 +88,6 @@ class FileOption extends JPanel {
             noTables.setFont(f2.deriveFont(f.getStyle() ^ Font.BOLD));
             this.add(noTables);
             height = height + 50;
-            System.out.println("No tables found");
         } else {
             for (ParseTable pt : this.tables) {
                 JCheckBox enable = new JCheckBox();
@@ -133,7 +132,7 @@ class FileOption extends JPanel {
                     decidedWidth = headers.length * 150;
                 }
                 Tabheaders.setBounds(30, height, decidedWidth, 20);
-                tab.setBounds(30, height + 20, decidedWidth, 30);
+                tab.setBounds(30, height + 20, decidedWidth, 35);
                 ArrayList<Problem> problems = pt.getProblems();
                 if (problems.size() > 0) {
                     height = height + 45;
@@ -145,7 +144,7 @@ class FileOption extends JPanel {
                         height = height + 18;
                     }
                 } else {
-                    height = height + 50;
+                    height = height + 70;
                 }
                 this.add(Tabheaders);
                 this.add(tab);
@@ -153,7 +152,7 @@ class FileOption extends JPanel {
             }
         }
         this.height = height;
-        //this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
+        this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
         this.setBounds(0,0,this.pane.getWidth(),height);
         this.setBackground(Color.white);
         this.setLayout(null);

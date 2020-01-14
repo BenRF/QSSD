@@ -6,12 +6,12 @@ public class Expression {
     private ArrayList<Part> expression;
     private Object o;
 
-    Expression(Object o) {
+    public Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
         String s = o.toString();
         StringBuilder basic = new StringBuilder();
-        String symbols = "/*!@#$%^&*()\"{}_[]|\\?/<>,.";
+        String symbols = "/*!@#$£%^&*()\"{}_[]|\\?/<>,.";
         for (int i = 0; i < s.length(); i++) {
             if (Character.isLetter(s.charAt(i))) {
                 basic.append("L");
@@ -45,7 +45,7 @@ public class Expression {
         }
     }
 
-    Expression(Expression e1, Expression e2) {
+    public Expression(Expression e1, Expression e2) {
         this.expression = new ArrayList<>();
         this.o = e2.o;
         ArrayList<ArrayList<Integer>> links = e1.compare(e2);

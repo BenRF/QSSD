@@ -1,6 +1,5 @@
 package parse;
 
-import javafx.beans.binding.ObjectExpression;
 import parse.problems.MissingValues;
 import parse.problems.MixedTypes;
 import parse.problems.NearlyUnique;
@@ -16,7 +15,7 @@ public class ParseColumn {
     private int numOfUniqueVals;
     private boolean sameType;
     private boolean empty;
-    Expression format;
+    private Expression format;
     private ArrayList<Problem> errors;
 
     ParseColumn(String name, int id) {
@@ -105,20 +104,10 @@ public class ParseColumn {
         }
     }
 
+    Expression getFormat() { return this.format; }
+
     ArrayList<Problem> getProblems() {
         return this.errors;
-    }
-
-    private int count(Object o) {
-        int count = 0;
-        for (Object c: this.content) {
-            if (c != null) {
-                if (c.equals(o)) {
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 
     private void checkTypes() {
