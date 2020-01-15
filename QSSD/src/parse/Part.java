@@ -1,7 +1,8 @@
 package parse;
 
-class Part {
+public class Part {
     private int count;
+    private boolean multiPart;
     private boolean alphabetical;
     private boolean digit;
     private boolean space;
@@ -16,35 +17,54 @@ class Part {
         this.max = -1;
         this.typeCalc(type);
         this.startPos = startPos;
+        this.multiPart = false;
     }
 
-    Part(int type, int count, int startPos) {
+    public Part(int type, int count, int startPos) {
         this.count = count;
         this.min = -1;
         this.max = -1;
         this.startPos = startPos;
+        this.multiPart = false;
         this.typeCalc(type);
     }
 
-    private void typeCalc(int t) {
-        this.alphabetical = false;
-        this.digit = false;
-        this.space = false;
-        this.symbol = false;
-        switch (t) {
-            case 76:
-                this.alphabetical = true;
-                break;
-            case 78:
-                this.digit = true;
-                break;
-            case 35:
-                this.symbol = true;
-                break;
-            case 83:
-                this.space = true;
-                break;
+    public Part(Part p1, Part p2) {
+        this.multiPart = true;
+        this.alphabetical = p1.alphabetical || p2.alphabetical;
+        this.digit = p1.digit || p2.digit;
+        this.space = p1.space || p2.space;
+        this.symbol = p1.symbol || p2.symbol;
+        if (!p1.multiPart && !p2.multiPart) {
+            if (p1.count < p2.count) {
+                this.min = p1.count;
+                this.max = p2.count;
+            } else {
+                this.min = p2.count;
+                this.max = p1.count;
+            }
+        } else if (p1.multiPart && p2.multiPart) {
+            this.min = Math.min(p1.min, p2.min);
+            this.max = Math.max(p1.max,p2.max);
+        } else {
+            Part multiPart,notMulti;
+            if (p1.multiPart) {
+                multiPart = p1;
+                notMulti = p2;
+            } else {
+                multiPart = p2;
+                notMulti = p1;
+            }
+            this.min = Math.min(notMulti.count, multiPart.min);
+            this.max = Math.max(notMulti.count, multiPart.max);
         }
+    }
+
+    private void typeCalc(int t) {
+        this.alphabetical = t == 76;
+        this.digit = t == 78;
+        this.space = t == 83;
+        this.symbol = t == 35;
     }
 
     private boolean sameTypes(Part p) {
@@ -111,14 +131,13 @@ class Part {
         if (this.space) {
             if (first) {
                 type = "Spa";
-                first = false;
             } else {
                 type = type + "+Spa";
             }
         }
-        if (this.count == 1) {
+        if (this.count == 1 && !this.multiPart) {
             return "" + type;
-        } else if (this.count != -1) {
+        } else if (this.count != -1 && !this.multiPart) {
             return this.count + "" + type;
         } else {
             return "(" + this.min + "-" + this.max + ")" + type;

@@ -1,5 +1,5 @@
 import gui.MainWindow;
-import parse.Expression;
+import parse.*;
 
 public class Main {
     public static void main(String[] args) {

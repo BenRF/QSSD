@@ -11,7 +11,6 @@ public class Expression {
         this.expression = new ArrayList<>();
         String s = o.toString();
         StringBuilder basic = new StringBuilder();
-        String symbols = "/*!@#$£%^&*()\"{}_[]|\\?/<>,.";
         for (int i = 0; i < s.length(); i++) {
             if (Character.isLetter(s.charAt(i))) {
                 basic.append("L");
@@ -19,7 +18,7 @@ public class Expression {
                 basic.append("N");
             } else if (Character.isSpaceChar(s.charAt(i))) {
                 basic.append("S");
-            } else if (symbols.contains("" + s.charAt(i))) {
+            } else {
                 basic.append("#");
             }
         }
@@ -49,8 +48,63 @@ public class Expression {
         this.expression = new ArrayList<>();
         this.o = e2.o;
         ArrayList<ArrayList<Integer>> links = e1.compare(e2);
-        for (ArrayList<Integer> link : links) {
-            this.expression.add(e2.getPart(link.get(1)));
+        int pos1 = 0;
+        int pos2 = 0;
+        Part temp1,temp2;
+        for (ArrayList<Integer> l: links) {
+            temp1 = null;
+            while (pos1 < l.get(0)) {
+                if (temp1 == null) {
+                    temp1 = e1.getPart(pos1);
+                } else {
+                    temp1 = new Part(temp1,e1.getPart(pos1));
+                }
+                pos1++;
+            }
+            temp2 = null;
+            while (pos2 < l.get(1)) {
+                if (temp2 == null) {
+                    temp2 = e2.getPart(pos2);
+                } else {
+                    temp2 = new Part(temp2,e2.getPart(pos2));
+                }
+                pos2++;
+            }
+            if (temp1 != null && temp2 != null) {
+                this.expression.add(new Part(temp1,temp2));
+            } else if (temp1 != null) {
+                this.expression.add(temp1);
+            } else if (temp2 != null) {
+                this.expression.add(temp2);
+            }
+            this.expression.add(e2.getPart(l.get(1)));
+            pos1++;
+            pos2++;
+        }
+        temp1 = null;
+        temp2 = null;
+        while (pos1 < e1.getSize()) {
+            if (temp1 == null) {
+                temp1 = e1.getPart(pos1);
+            } else {
+                temp1 = new Part(temp1,e1.getPart(pos1));
+            }
+            pos1++;
+        }
+        while (pos2 < e2.getSize()) {
+            if (temp2 == null) {
+                temp2 = e2.getPart(pos2);
+            } else {
+                temp2 = e2.getPart(pos2);
+            }
+            pos2++;
+        }
+        if (temp1 != null && temp2 != null) {
+            this.expression.add(new Part(temp1,temp2));
+        } else if (temp1 != null) {
+            this.expression.add(temp1);
+        } else if (temp2 != null) {
+            this.expression.add(temp2);
         }
     }
 
@@ -114,15 +168,32 @@ public class Expression {
             s2 = -1;
             strength = 0;
             for (int i2 = 0; i2 < e.getSize(); i2++) {
-                //duplicate
-                if (this.getPartString(i1).equals(e.getPartString(i2)) && !found.contains(i2)) {
-                    s2 = i2;
-                    strength = 2;
-                    break;
-                //same structure and size
-                } else if (this.getPart(i1).compare(e.getPart(i2)) == 0 && strength < 1 && !found.contains(i2)) {
-                    s2 = i2;
-                    strength = 1;
+                //check if link has already been found for part
+                int linkStrength = -1;
+                int linkPos = -1;
+                for (int i = 0; i < links.size(); i++) {
+                    ArrayList<Integer> l = links.get(i);
+                    if (l.get(1) == i2) {
+                        linkStrength = l.get(2);
+                        linkPos = i;
+                        break;
+                    }
+                }
+                //if previous link was not perfect match
+                if (linkStrength != 2) {
+                    //duplicate
+                    if (this.getPartString(i1).equals(e.getPartString(i2))) {
+                        s2 = i2;
+                        strength = 2;
+                        if (linkStrength != -1) {
+                            links.remove(linkPos);
+                        }
+                        break;
+                        //same structure and size
+                    } else if (this.getPart(i1).compare(e.getPart(i2)) == 0 && strength < 1) {
+                        s2 = i2;
+                        strength = 1;
+                    }
                 }
             }
             if (strength != 0) {
@@ -133,6 +204,27 @@ public class Expression {
                 l.add(strength);
                 links.add(l);
             }
+        }
+        boolean remove;
+        ArrayList<Integer> removing = new ArrayList<>();
+        for (int i = 0; i < links.size(); i++) {
+            ArrayList<Integer> l = links.get(i);
+            remove = false;
+            for (int y = i; y < links.size(); y++) {
+                ArrayList<Integer> l2 = links.get(y);
+                if (l.get(1) > l2.get(1)) {
+                    remove = true;
+                    break;
+                }
+            }
+            if (remove) {
+                removing.add(i);
+            }
+        }
+        int count = 0;
+        for (Integer i: removing) {
+            links.remove(i-count);
+            count++;
         }
         return links;
     }

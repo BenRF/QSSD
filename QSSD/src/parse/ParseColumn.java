@@ -170,13 +170,6 @@ public class ParseColumn {
                     output = output + "," + this.content.get(0).getClass().getSimpleName();
                 }
             }
-            if (this.format.toString().length() > 0) {
-                if (first) {
-                    output = "Format";
-                } else {
-                    output = output + ", Format";
-                }
-            }
             return output;
         }
     }

@@ -152,7 +152,7 @@ class FileOption extends JPanel {
             }
         }
         this.height = height;
-        this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
+        //this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
         this.setBounds(0,0,this.pane.getWidth(),height);
         this.setBackground(Color.white);
         this.setLayout(null);
