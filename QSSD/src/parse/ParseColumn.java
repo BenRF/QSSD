@@ -1,9 +1,7 @@
 package parse;
 
-import parse.problems.MissingValues;
-import parse.problems.MixedTypes;
-import parse.problems.NearlyUnique;
-import parse.problems.Problem;
+import org.apache.commons.math3.analysis.function.Exp;
+import parse.problems.*;
 
 import java.util.*;
 
@@ -226,6 +224,24 @@ public class ParseColumn {
                 temp.add(i);
                 expressions.put(currentExpression,temp);
             }
+        }
+        boolean problem = false;
+        Expression majority = null;
+        for (Map.Entry<Expression,ArrayList<Integer>> e: expressions.entrySet()) {
+            majority = e.getKey();
+            if (e.getValue().size() >= this.content.size()*0.8) {
+                problem = true;
+                break;
+            }
+        }
+        if (problem) {
+            ArrayList<Integer> problemrows = new ArrayList<>();
+            for (Map.Entry<Expression,ArrayList<Integer>> e: expressions.entrySet()) {
+                if (e.getKey() != majority) {
+                    problemrows.addAll(e.getValue());
+                }
+            }
+            this.errors.add(new InconsistentFormat(this.id,problemrows,this.name));
         }
         this.format = overallExpression;
     }
