@@ -1,9 +1,10 @@
 package files;
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -11,7 +12,7 @@ import parse.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 public class ExcelFile implements TabSeperatedFile{
@@ -66,33 +67,40 @@ public class ExcelFile implements TabSeperatedFile{
             System.out.println("DONE");
         } catch (Exception e) {
             System.out.println("ERROR");
-            System.out.println(e);
         }
     }
 
-    private ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
-        ArrayList<ArrayList<Object>> content = new ArrayList<>();
+    public ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
+        ArrayList<ArrayList<Cell>> content = new ArrayList<>();
+        int x = 0;
+        int y = 0;
         for (Row r : this.sheets.get(sheetIndex)) {
-            Iterator<Cell> cI = r.iterator();
-            ArrayList<Object> row = new ArrayList<>();
-            while (cI.hasNext()) {
-                Cell c = cI.next();
-                if (c.getCellType() == CellType.STRING) {
-                    row.add(c.getStringCellValue());
-                } else if (c.getCellType() == CellType.NUMERIC) {
-                    double d = c.getNumericCellValue();
-                    if (HSSFDateUtil.isCellDateFormatted(c)) {
-                        row.add(c.getDateCellValue());
-                    } else if (d % 1 == 0) {
-                        row.add((int) d);
-                    } else {
-                        row.add(d);
+            for (Cell c : r) {
+                if (c.getCellType() != CellType.BLANK) {
+                    CellAddress address = c.getAddress();
+                    while (x <= address.getRow()) {
+                        ArrayList<Cell> newRow = new ArrayList<>();
+                        if (content.size() > 0) {
+                            for (int i = 0; i < content.get(0).size(); i++) {
+                                newRow.add(null);
+                            }
+                        }
+                        content.add(newRow);
+                        x++;
                     }
-                } else if (c.getCellType() == CellType.BOOLEAN) {
-                    row.add(c.getBooleanCellValue());
+                    while (y <= address.getColumn()) {
+                        for (ArrayList<Cell> rows : content) {
+                            rows.add(null);
+                        }
+                        y++;
+                    }
+                    x = Math.max(x, address.getRow());
+                    y = Math.max(y, address.getColumn());
+                    ArrayList<Cell> row = content.get(address.getRow());
+                    row.set(address.getColumn(), c);
+                    content.set(address.getRow(), row);
                 }
             }
-            content.add(row);
         }
         for (int i = 0; i < content.size(); i++) {
             if (content.get(i).size() < 1) {
@@ -100,15 +108,86 @@ public class ExcelFile implements TabSeperatedFile{
                 i = 0;
             }
         }
-        return content;
+        boolean emptyRow = true;
+        boolean removed = false;
+        int i = 0;
+        while (i < content.size()) {
+            ArrayList<Cell> row = content.get(i);
+            if (Collections.frequency(row,null) == row.size()) {
+                content.set(i,new ArrayList<>());
+                if (emptyRow) {
+                    content.remove(i);
+                    removed = true;
+                }
+                emptyRow = true;
+            } else {
+                emptyRow = false;
+            }
+            if (removed) {
+                i = 0;
+                removed = false;
+            } else {
+                i++;
+            }
+        }
+        int start,finish;
+        for (int z = 0; z < content.size(); z++) {
+            ArrayList<Cell> row = content.get(z);
+            if (row.size() > 0) {
+                start = 0;
+                finish = row.size() - 1;
+                while (row.get(start) == null) {
+                    start++;
+                }
+                while (row.get(finish) == null) {
+                    finish--;
+                }
+                ArrayList<Cell> subset = new ArrayList<>(row.subList(start,finish+1));
+                content.set(z,subset);
+            }
+        }
+        ArrayList<ArrayList<Object>> results = new ArrayList<>();
+        for (ArrayList<Cell> row: content) {
+            ArrayList<Object> r = new ArrayList<>();
+            for (Cell c: row) {
+                Object cellVal = null;
+                if (c.getCellType() == CellType.STRING) {
+                    cellVal = c.getStringCellValue();
+                } else if (c.getCellType() == CellType.NUMERIC) {
+                    double d = c.getNumericCellValue();
+                    if (DateUtil.isCellDateFormatted(c)) {
+                        cellVal = c.getDateCellValue();
+                    } else if (d % 1 == 0) {
+                        cellVal = (int) d;
+                    } else {
+                        cellVal = d;
+                    }
+                } else if (c.getCellType() == CellType.BOOLEAN) {
+                    cellVal = c.getBooleanCellValue();
+                }
+                r.add(cellVal);
+            }
+            results.add(r);
+        }
+        return results;
     }
 
     @Override
     public ArrayList<ParseTable> getTables() {
-        ArrayList<ParseTable> content = new ArrayList<>();
+        ArrayList<ParseTable> tabs = new ArrayList<>();
         for (int i = 0; i < this.sheets.size(); i++) {
-            content.add(new ParseTable(this.readFile(i)));
+            ArrayList<ArrayList<Object>> sheet = this.readFile(i);
+            ArrayList<ArrayList<Object>> tableContent = new ArrayList<>();
+            for (ArrayList<Object> row: sheet) {
+                if (row.size() > 0) {
+                    tableContent.add(row);
+                } else {
+                    tabs.add(new ParseTable(tableContent));
+                    tableContent = new ArrayList<>();
+                }
+            }
+            tabs.add(new ParseTable(tableContent));
         }
-        return content;
+        return tabs;
     }
 }
