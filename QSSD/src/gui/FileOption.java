@@ -135,13 +135,13 @@ class FileOption extends JPanel {
                 tab.setBounds(30, height + 20, decidedWidth, 35);
                 ArrayList<Problem> problems = pt.getProblems();
                 if (problems.size() > 0) {
-                    height = height + 45;
+                    height = height + 60;
                     for (Problem p : problems) {
                         JLabel e = new JLabel();
                         e.setText(p.getTitle());
                         e.setBounds(30, height, decidedWidth, 15);
                         this.add(e);
-                        height = height + 18;
+                        height = height + 20;
                     }
                 } else {
                     height = height + 70;
