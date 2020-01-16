@@ -125,7 +125,7 @@ public class Expression {
 
     private String getPartString(int partNum) {
         int[] pos = this.expression.get(partNum).getPos();
-        return this.o.toString().substring(pos[0],pos[0]+pos[1]);
+        return this.o.toString().substring(pos[0], pos[0] + pos[1]);
     }
 
     private Part getPart(int partNum) {
@@ -161,7 +161,7 @@ public class Expression {
     //  1 = same pattern (size and type)
     private ArrayList<ArrayList<Integer>> compare(Expression e) {
         ArrayList<ArrayList<Integer>> links = new ArrayList<>();
-        int s1,s2,strength;
+        int s1,s2,strength,progess = 0;
         ArrayList<Integer> found = new ArrayList<>();
         for (int i1 = 0; i1 < this.getSize(); i1++) {
             s1 = i1;
@@ -180,7 +180,7 @@ public class Expression {
                     }
                 }
                 //if previous link was not perfect match
-                if (linkStrength != 2) {
+                if (linkStrength != 2 && i2 > progess) {
                     //duplicate
                     if (this.getPartString(i1).equals(e.getPartString(i2))) {
                         s2 = i2;
@@ -188,6 +188,7 @@ public class Expression {
                         if (linkStrength != -1) {
                             links.remove(linkPos);
                         }
+                        progess = i2;
                         break;
                         //same structure and size
                     } else if (this.getPart(i1).compare(e.getPart(i2)) == 0 && strength < 1) {
@@ -212,7 +213,7 @@ public class Expression {
             remove = false;
             for (int y = i; y < links.size(); y++) {
                 ArrayList<Integer> l2 = links.get(y);
-                if (l.get(1) > l2.get(1)) {
+                if (l.get(1) > l2.get(1) && l.get(2) <= l.get(0)) {
                     remove = true;
                     break;
                 }

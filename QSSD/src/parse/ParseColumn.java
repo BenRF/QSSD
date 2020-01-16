@@ -209,18 +209,25 @@ public class ParseColumn {
     }
 
     private void findExpressions() {
-        int i = 0;
-        while(this.content.get(i) == null) {
-            i++;
-        }
-        Expression e = new Expression(this.content.get(i));
-        while (i < this.content.size()) {
-            if (this.content.get(i) != null) {
-                e = new Expression(e, new Expression(this.content.get(i)));
+        Expression overallExpression = null;
+        Expression currentExpression;
+        HashMap<Expression, ArrayList<Integer>> expressions = new HashMap<>();
+        for (int i = 0; i < this.content.size(); i++) {
+            currentExpression = new Expression(this.content.get(i));
+            if (overallExpression == null) {
+                overallExpression = currentExpression;
+            } else {
+                overallExpression = new Expression(overallExpression,currentExpression);
             }
-            i++;
+            if (expressions.containsKey(currentExpression)) {
+                expressions.get(currentExpression).add(i);
+            } else {
+                ArrayList<Integer> temp = new ArrayList<>();
+                temp.add(i);
+                expressions.put(currentExpression,temp);
+            }
         }
-        this.format = e;
+        this.format = overallExpression;
     }
 
     boolean checkType(ParseColumn p2) {
