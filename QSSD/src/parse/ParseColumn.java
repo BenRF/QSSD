@@ -229,7 +229,7 @@ public class ParseColumn {
         Expression majority = null;
         for (Map.Entry<Expression,ArrayList<Integer>> e: expressions.entrySet()) {
             majority = e.getKey();
-            if (e.getValue().size() >= this.content.size()*0.8) {
+            if (e.getValue().size() >= this.content.size()*0.8 && e.getValue().size() != this.content.size()) {
                 problem = true;
                 break;
             }
