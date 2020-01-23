@@ -9,38 +9,40 @@ public class Expression {
     public Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
-        String s = o.toString();
-        StringBuilder basic = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            if (Character.isLetter(s.charAt(i))) {
-                basic.append("L");
-            } else if (Character.isDigit(s.charAt(i))) {
-                basic.append("N");
-            } else if (Character.isSpaceChar(s.charAt(i))) {
-                basic.append("S");
-            } else {
-                basic.append("#");
-            }
-        }
-        char c = basic.charAt(0);
-        int count = 1;
-        for (int i = 1; i < basic.length(); i++) {
-            if (basic.charAt(i) == c) {
-                count++;
-            } else {
-                if (count > 1) {
-                    this.expression.add(new Part(c, count,i-count));
+        if (o != null) {
+            String s = o.toString();
+            StringBuilder basic = new StringBuilder();
+            for (int i = 0; i < s.length(); i++) {
+                if (Character.isLetter(s.charAt(i))) {
+                    basic.append("L");
+                } else if (Character.isDigit(s.charAt(i))) {
+                    basic.append("N");
+                } else if (Character.isSpaceChar(s.charAt(i))) {
+                    basic.append("S");
                 } else {
-                    this.expression.add(new Part(c,i-1));
+                    basic.append("#");
                 }
-                count = 1;
             }
-            c = basic.charAt(i);
-        }
-        if (count > 1) {
-            this.expression.add(new Part(c, count, basic.length()-count));
-        } else {
-            this.expression.add(new Part(c,basic.length()-1));
+            char c = basic.charAt(0);
+            int count = 1;
+            for (int i = 1; i < basic.length(); i++) {
+                if (basic.charAt(i) == c) {
+                    count++;
+                } else {
+                    if (count > 1) {
+                        this.expression.add(new Part(c, count, i - count));
+                    } else {
+                        this.expression.add(new Part(c, i - 1));
+                    }
+                    count = 1;
+                }
+                c = basic.charAt(i);
+            }
+            if (count > 1) {
+                this.expression.add(new Part(c, count, basic.length() - count));
+            } else {
+                this.expression.add(new Part(c, basic.length() - 1));
+            }
         }
     }
 

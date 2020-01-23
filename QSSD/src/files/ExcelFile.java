@@ -70,7 +70,7 @@ public class ExcelFile implements TabSeperatedFile{
         }
     }
 
-    public ArrayList<ArrayList<Object>> readFile(int sheetIndex) {
+    public ArrayList<ArrayList<ArrayList<Object>>> readFile(int sheetIndex) {
         ArrayList<ArrayList<Cell>> content = new ArrayList<>();
         int x = 0;
         int y = 0;
@@ -130,44 +130,68 @@ public class ExcelFile implements TabSeperatedFile{
                 i++;
             }
         }
-        int start,finish;
-        for (int z = 0; z < content.size(); z++) {
-            ArrayList<Cell> row = content.get(z);
-            if (row.size() > 0) {
-                start = 0;
-                finish = row.size() - 1;
-                while (row.get(start) == null) {
-                    start++;
-                }
-                while (row.get(finish) == null) {
-                    finish--;
-                }
-                ArrayList<Cell> subset = new ArrayList<>(row.subList(start,finish+1));
-                content.set(z,subset);
-            }
-        }
-        ArrayList<ArrayList<Object>> results = new ArrayList<>();
+        ArrayList<ArrayList<Object>> rawResults = new ArrayList<>();
         for (ArrayList<Cell> row: content) {
             ArrayList<Object> r = new ArrayList<>();
             for (Cell c: row) {
                 Object cellVal = null;
-                if (c.getCellType() == CellType.STRING) {
-                    cellVal = c.getStringCellValue();
-                } else if (c.getCellType() == CellType.NUMERIC) {
-                    double d = c.getNumericCellValue();
-                    if (DateUtil.isCellDateFormatted(c)) {
-                        cellVal = c.getDateCellValue();
-                    } else if (d % 1 == 0) {
-                        cellVal = (int) d;
-                    } else {
-                        cellVal = d;
+                if (c != null) {
+                    if (c.getCellType() == CellType.STRING) {
+                        cellVal = c.getStringCellValue();
+                    } else if (c.getCellType() == CellType.NUMERIC) {
+                        double d = c.getNumericCellValue();
+                        if (DateUtil.isCellDateFormatted(c)) {
+                            cellVal = c.getDateCellValue();
+                        } else if (d % 1 == 0) {
+                            cellVal = (int) d;
+                        } else {
+                            cellVal = d;
+                        }
+                    } else if (c.getCellType() == CellType.BOOLEAN) {
+                        cellVal = c.getBooleanCellValue();
                     }
-                } else if (c.getCellType() == CellType.BOOLEAN) {
-                    cellVal = c.getBooleanCellValue();
                 }
                 r.add(cellVal);
+
             }
-            results.add(r);
+            rawResults.add(r);
+        }
+        int xPos;
+        int yPos = 0;
+        int colSize = rawResults.get(0).size();
+        int rowSize = rawResults.size();
+        ArrayList<ArrayList<ArrayList<Object>>> results = new ArrayList<>();
+        ArrayList<Object> tempRow;
+        ArrayList<ArrayList<Object>> tempsection;
+        int tempRowPos,tempColPos;
+        while (yPos < rowSize-1) {
+            xPos = 0;
+            while (xPos < colSize) {
+                if (rawResults.get(yPos).get(xPos) != null) {
+                    tempsection = new ArrayList<>();
+                    tempRowPos = 0;
+                    while (rawResults.get(yPos+tempRowPos).get(xPos) != null) {
+                        tempRow = new ArrayList<>();
+                        tempColPos = 0;
+                        while (rawResults.get(yPos+tempRowPos).get(xPos + tempColPos) != null) {
+                            tempRow.add(rawResults.get(yPos+tempRowPos).get(xPos + tempColPos));
+                            ArrayList<Object> row = rawResults.get(yPos + tempRowPos);
+                            row.set(xPos + tempColPos, null);
+                            rawResults.set(yPos + tempRowPos, row);
+                            if (xPos + tempColPos < colSize - 1) {
+                                tempColPos++;
+                            }
+                        }
+                        tempsection.add(tempRow);
+                        if (yPos + tempRowPos < rowSize - 1) {
+                            tempRowPos++;
+                        }
+                    }
+                    results.add(tempsection);
+                }
+                xPos++;
+            }
+            yPos++;
         }
         return results;
     }
@@ -176,17 +200,10 @@ public class ExcelFile implements TabSeperatedFile{
     public ArrayList<ParseTable> getTables() {
         ArrayList<ParseTable> tabs = new ArrayList<>();
         for (int i = 0; i < this.sheets.size(); i++) {
-            ArrayList<ArrayList<Object>> sheet = this.readFile(i);
-            ArrayList<ArrayList<Object>> tableContent = new ArrayList<>();
-            for (ArrayList<Object> row: sheet) {
-                if (row.size() > 0) {
-                    tableContent.add(row);
-                } else {
-                    tabs.add(new ParseTable(tableContent));
-                    tableContent = new ArrayList<>();
-                }
+            ArrayList<ArrayList<ArrayList<Object>>> sheet = this.readFile(i);
+            for (ArrayList<ArrayList<Object>> table: sheet) {
+                tabs.add(new ParseTable(table));
             }
-            tabs.add(new ParseTable(tableContent));
         }
         return tabs;
     }
