@@ -1,10 +1,8 @@
 package files;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -17,12 +15,15 @@ import java.util.List;
 
 public class ExcelFile implements TabSeperatedFile{
     private List<XSSFSheet> sheets;
+    private XSSFWorkbook wb;
 
     public ExcelFile(String f) {
         File myFile = new File(f);
         try {
             FileInputStream fis = new FileInputStream(myFile);
-            XSSFWorkbook wb = new XSSFWorkbook(fis);
+            wb = new XSSFWorkbook(fis);
+            new XSSFFormulaEvaluator(wb);
+            XSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
             this.sheets = new ArrayList<>();
             for (int i = 0; i < wb.getNumberOfSheets(); i++) {
                 this.sheets.add(wb.getSheetAt(i));
@@ -138,6 +139,17 @@ public class ExcelFile implements TabSeperatedFile{
                 if (c != null) {
                     if (c.getCellType() == CellType.STRING) {
                         cellVal = c.getStringCellValue();
+                    } else if (c.getCellType() == CellType.FORMULA) {
+                        if (c.getCachedFormulaResultType() == CellType.STRING) {
+                            cellVal = c.getStringCellValue();
+                        } else {
+                            double d = c.getNumericCellValue();
+                            if (d % 1 == 0) {
+                                cellVal = (int) d;
+                            } else {
+                                cellVal = d;
+                            }
+                        }
                     } else if (c.getCellType() == CellType.NUMERIC) {
                         double d = c.getNumericCellValue();
                         if (DateUtil.isCellDateFormatted(c)) {
@@ -202,7 +214,9 @@ public class ExcelFile implements TabSeperatedFile{
         for (int i = 0; i < this.sheets.size(); i++) {
             ArrayList<ArrayList<ArrayList<Object>>> sheet = this.readFile(i);
             for (ArrayList<ArrayList<Object>> table: sheet) {
-                tabs.add(new ParseTable(table));
+                if (table.size() >= 2) {
+                    tabs.add(new ParseTable(table));
+                }
             }
         }
         return tabs;

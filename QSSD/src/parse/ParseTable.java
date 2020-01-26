@@ -13,7 +13,7 @@ public class ParseTable extends AbstractTableModel {
     public ParseTable(ArrayList<ArrayList<Object>> content) {
         this.columns = new ArrayList<>();
         for (Object header: content.get(0)) {
-            this.newCol((String) header);
+            this.newCol(header.toString());
         }
         for (int y = 1; y < content.size(); y++) {
             for (int x = 0; x < this.columns.size(); x++) {
@@ -229,6 +229,11 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public void toConsole() {
+        ArrayList<String> headers = new ArrayList<>();
+        for (ParseColumn col: this.columns) {
+            headers.add(col.getName());
+        }
+        System.out.println(headers.toString());
         for (int i = 0; i < this.getRowCount(); i++) {
             System.out.println(this.getRow(i));
         }
