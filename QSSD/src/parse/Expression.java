@@ -9,7 +9,7 @@ public class Expression {
     public Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
-        if (o != null) {
+        if (o != null && o.toString().length() > 0) {
             String s = o.toString();
             StringBuilder basic = new StringBuilder();
             for (int i = 0; i < s.length(); i++) {

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ExcelFile implements TabSeperatedFile{
+public class ExcelFile extends TabSeperatedFile{
     private List<XSSFSheet> sheets;
     private XSSFWorkbook wb;
 
@@ -71,35 +71,60 @@ public class ExcelFile implements TabSeperatedFile{
         }
     }
 
-    public ArrayList<ArrayList<ArrayList<Object>>> readFile(int sheetIndex) {
+    public ArrayList<ArrayList<Object>> getContent() {
         ArrayList<ArrayList<Cell>> content = new ArrayList<>();
-        int x = 0;
-        int y = 0;
-        for (Row r : this.sheets.get(sheetIndex)) {
-            for (Cell c : r) {
-                if (c.getCellType() != CellType.BLANK) {
-                    CellAddress address = c.getAddress();
-                    while (x <= address.getRow()) {
-                        ArrayList<Cell> newRow = new ArrayList<>();
-                        if (content.size() > 0) {
-                            for (int i = 0; i < content.get(0).size(); i++) {
-                                newRow.add(null);
+        ArrayList<ArrayList<Cell>> temp;
+        int x,y;
+        for (XSSFSheet sheet: this.sheets) {
+            temp = new ArrayList<>();
+            x = 0;
+            y = 0;
+            for (Row r : sheet) {
+                for (Cell c : r) {
+                    if (c.getCellType() != CellType.BLANK) {
+                        CellAddress address = c.getAddress();
+                        while (x <= address.getRow()) {
+                            ArrayList<Cell> newRow = new ArrayList<>();
+                            if (temp.size() > 0) {
+                                for (int i = 0; i < temp.get(0).size(); i++) {
+                                    newRow.add(null);
+                                }
                             }
+                            temp.add(newRow);
+                            x++;
                         }
-                        content.add(newRow);
-                        x++;
-                    }
-                    while (y <= address.getColumn()) {
-                        for (ArrayList<Cell> rows : content) {
-                            rows.add(null);
+                        while (y <= address.getColumn()) {
+                            for (ArrayList<Cell> rows : temp) {
+                                rows.add(null);
+                            }
+                            y++;
                         }
-                        y++;
+                        x = Math.max(x, address.getRow());
+                        y = Math.max(y, address.getColumn());
+                        ArrayList<Cell> row = temp.get(address.getRow());
+                        row.set(address.getColumn(), c);
+                        temp.set(address.getRow(), row);
                     }
-                    x = Math.max(x, address.getRow());
-                    y = Math.max(y, address.getColumn());
-                    ArrayList<Cell> row = content.get(address.getRow());
-                    row.set(address.getColumn(), c);
-                    content.set(address.getRow(), row);
+                }
+            }
+            content.addAll(temp);
+            content.add(new ArrayList<>());
+        }
+        if (this.sheets.size() > 1) {
+            int max = 0;
+            for (ArrayList<Cell> row: content) {
+                if (row.size() > max) {
+                    max = row.size();
+                }
+            }
+            for (int i = 0; i < content.size(); i++) {
+                ArrayList<Cell> row = content.get(i);
+                if (row.size() < max) {
+                    ArrayList<Cell> t = row;
+                    while (t.size() < max) {
+                        t.add(null);
+                    }
+                    content.set(i,t);
                 }
             }
         }
@@ -168,57 +193,6 @@ public class ExcelFile implements TabSeperatedFile{
             }
             rawResults.add(r);
         }
-        int xPos;
-        int yPos = 0;
-        int colSize = rawResults.get(0).size();
-        int rowSize = rawResults.size();
-        ArrayList<ArrayList<ArrayList<Object>>> results = new ArrayList<>();
-        ArrayList<Object> tempRow;
-        ArrayList<ArrayList<Object>> tempsection;
-        int tempRowPos,tempColPos;
-        while (yPos < rowSize-1) {
-            xPos = 0;
-            while (xPos < colSize) {
-                if (rawResults.get(yPos).get(xPos) != null) {
-                    tempsection = new ArrayList<>();
-                    tempRowPos = 0;
-                    while (rawResults.get(yPos+tempRowPos).get(xPos) != null) {
-                        tempRow = new ArrayList<>();
-                        tempColPos = 0;
-                        while (rawResults.get(yPos+tempRowPos).get(xPos + tempColPos) != null) {
-                            tempRow.add(rawResults.get(yPos+tempRowPos).get(xPos + tempColPos));
-                            ArrayList<Object> row = rawResults.get(yPos + tempRowPos);
-                            row.set(xPos + tempColPos, null);
-                            rawResults.set(yPos + tempRowPos, row);
-                            if (xPos + tempColPos < colSize - 1) {
-                                tempColPos++;
-                            }
-                        }
-                        tempsection.add(tempRow);
-                        if (yPos + tempRowPos < rowSize - 1) {
-                            tempRowPos++;
-                        }
-                    }
-                    results.add(tempsection);
-                }
-                xPos++;
-            }
-            yPos++;
-        }
-        return results;
-    }
-
-    @Override
-    public ArrayList<ParseTable> getTables() {
-        ArrayList<ParseTable> tabs = new ArrayList<>();
-        for (int i = 0; i < this.sheets.size(); i++) {
-            ArrayList<ArrayList<ArrayList<Object>>> sheet = this.readFile(i);
-            for (ArrayList<ArrayList<Object>> table: sheet) {
-                if (table.size() >= 2) {
-                    tabs.add(new ParseTable(table));
-                }
-            }
-        }
-        return tabs;
+        return rawResults;
     }
 }

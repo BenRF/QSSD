@@ -1,5 +1,6 @@
 package files;
 
+import org.apache.poi.ss.usermodel.Row;
 import parse.ParseTable;
 
 import java.io.BufferedReader;
@@ -8,22 +9,11 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class CSVFile implements TabSeperatedFile {
-    private ArrayList<ArrayList<Object>> content;
+public class CSVFile extends TabSeperatedFile {
+    private String fileName;
+
     public CSVFile(String fileName) {
-        this.content = new ArrayList<>();
-        try {
-            BufferedReader csvReader = new BufferedReader(new FileReader(fileName));
-            String row;
-            while ((row = csvReader.readLine()) != null) {
-                String[] data = row.split(",");
-                ArrayList<Object> r = new ArrayList<>(Arrays.asList(data));
-                this.content.add(r);
-            }
-            csvReader.close();
-        } catch (Exception e) {
-            System.out.println("FILE NOT FOUND");
-        }
+        this.fileName = fileName;
     }
 
     public CSVFile(ParseTable pt,String fileName) {
@@ -61,10 +51,42 @@ public class CSVFile implements TabSeperatedFile {
     }
 
     @Override
-    public ArrayList<ParseTable> getTables() {
-        ArrayList<ParseTable> tables = new ArrayList<>();
-        ParseTable pT = new ParseTable(this.content);
-        tables.add(pT);
-        return tables;
+    public ArrayList<ArrayList<Object>> getContent() {
+        ArrayList<ArrayList<Object>> content = new ArrayList<>();
+        try {
+            BufferedReader csvReader = new BufferedReader(new FileReader(fileName));
+            String row;
+            while ((row = csvReader.readLine()) != null) {
+                String[] data = row.split(",");
+                ArrayList<Object> r = new ArrayList<>(Arrays.asList(data));
+                content.add(r);
+            }
+            csvReader.close();
+        } catch (Exception e) {
+            System.out.println("FILE NOT FOUND");
+        }
+        ArrayList<Object> row;
+        int max = 0;
+        for (int y = 0; y < content.size(); y++) {
+            row = content.get(y);
+            max = Math.max(max,content.get(y).size());
+            for (int x = 0; x < row.size(); x++) {
+                if (content.get(y).get(x).toString().length() == 0) {
+                    ArrayList<Object> temp = content.get(y);
+                    temp.set(x,null);
+                    content.set(y,temp);
+                }
+            }
+        }
+        for (int y = 0; y < content.size(); y++) {
+            row = content.get(y);
+            for (int x = 0; x < row.size(); x++) {
+                while (row.size() < max) {
+                    row.add(null);
+                }
+                content.set(y,row);
+            }
+        }
+        return content;
     }
 }
