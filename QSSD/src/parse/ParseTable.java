@@ -80,15 +80,12 @@ public class ParseTable extends AbstractTableModel {
                     tab2Set.remove(row.get(links.get(0).getColIds()[1]));
                     for (int[] i : linkedT2Cols) {
                         if (this.isCellEmpty(i[1],r)) {
-                            System.out.println("SET col:" + i[1] + " with " + (i[0] - count));
                             this.setCell(i[1],r,row.get(i[0]-count));
                         }
                         row.remove(i[0] - count);
                         count++;
                     }
-                    System.out.println(row);
                     for (int c = 0; c < row.size(); c++) {
-                        System.out.println("ADDED col:" + (c + p1.getColumnCount()) + " with " + row.get(c));
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
                     break;
