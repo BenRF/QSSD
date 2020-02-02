@@ -42,17 +42,25 @@ public class ParseTable extends AbstractTableModel {
         for (ParseColumn c: p1.getColumns()) {
             this.newCol(c);
         }
-        ArrayList<Integer> linkedT2Cols = new ArrayList<>();
+        ArrayList<int[]> linkedT2Cols = new ArrayList<>();
         for (Link l: links) {
-            linkedT2Cols.add(l.getColIds()[1]);
+            linkedT2Cols.add(new int[]{l.getColIds()[1],l.getColIds()[0]});
         }
         for (ParseColumn c: p2.getColumns()) {
-            if (!linkedT2Cols.contains(c.getId())) {
+            boolean match = false;
+            for (int[] l: linkedT2Cols) {
+                if (l[0] == c.getId()) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
                 this.newCol(c.getName());
             }
         }
         System.out.println("Before: " + this.getRowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
+        Object o1,o2;
         for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
@@ -60,7 +68,9 @@ public class ParseTable extends AbstractTableModel {
                 row = p2.getRow(r2);
                 match = true;
                 for (Link l : links) {
-                    if (!row.get(l.getColIds()[1]).equals(this.getRow(r).get(l.getColIds()[0]))) {
+                    o1 = row.get(l.getColIds()[1]);
+                    o2 = this.getRow(r).get(l.getColIds()[0]);
+                    if (!o1.equals(o2) && o1 != null && o2 != null) {
                         match = false;
                         break;
                     }
@@ -68,14 +78,21 @@ public class ParseTable extends AbstractTableModel {
                 if (match) {
                     int count = 0;
                     tab2Set.remove(row.get(links.get(0).getColIds()[1]));
-                    for (Integer i : linkedT2Cols) {
-                        row.remove(i - count);
+                    for (int[] i : linkedT2Cols) {
+                        if (this.isCellEmpty(i[1],r)) {
+                            System.out.println("SET col:" + i[1] + " with " + (i[0] - count));
+                            this.setCell(i[1],r,row.get(i[0]-count));
+                        }
+                        row.remove(i[0] - count);
                         count++;
                     }
+                    System.out.println(row);
                     for (int c = 0; c < row.size(); c++) {
+                        System.out.println("ADDED col:" + (c + p1.getColumnCount()) + " with " + row.get(c));
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
                     break;
+
                 }
             }
         }
@@ -83,12 +100,12 @@ public class ParseTable extends AbstractTableModel {
             for (Object o: tab2Set) {
                 ArrayList<Object> rowToAdd = p2.findRowByObject(links.get(0).getColIds()[1],o);
                 this.newRow();
-                for (Integer i : linkedT2Cols) {
-                    this.setCell(i,this.getRowCount()-1,rowToAdd.get(i));
+                for (int[] i : linkedT2Cols) {
+                    this.setCell(i[0],this.getRowCount()-1,rowToAdd.get(i[0]));
                 }
                 int count = 0;
-                for (Integer i : linkedT2Cols) {
-                    rowToAdd.remove(i - count);
+                for (int[] i : linkedT2Cols) {
+                    rowToAdd.remove(i[0] - count);
                     count++;
                 }
                 for (int c = 0; c < rowToAdd.size(); c++) {
@@ -97,7 +114,7 @@ public class ParseTable extends AbstractTableModel {
             }
         }
         this.performChecks();
-        System.out.println("AFTER: " + this.getRowCount());
+        System.out.println("After: " + this.getRowCount());
     }
 
     public ArrayList<Link> getLinks(ParseTable p2) {
@@ -346,8 +363,16 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
-    private void setCell(int c, int r, Object o) {
-        this.columns.get(c).set(r,o);
+    private void setCell(int column, int row, Object o) {
+        this.columns.get(column).set(row,o);
+    }
+
+    private Object getCell(int column, int row) {
+        return this.columns.get(column).get(row);
+    }
+
+    private Boolean isCellEmpty(int column, int row) {
+        return this.getCell(column,row) == null;
     }
 
     public String[] getHeaderNames() {
