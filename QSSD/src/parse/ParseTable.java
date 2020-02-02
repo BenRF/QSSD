@@ -53,7 +53,6 @@ public class ParseTable extends AbstractTableModel {
         }
         System.out.println("Before: " + this.getRowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
-        int matchOfFirst = 0;
         for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
@@ -76,7 +75,6 @@ public class ParseTable extends AbstractTableModel {
                     for (int c = 0; c < row.size(); c++) {
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
-                    matchOfFirst++;
                     break;
                 }
             }
@@ -111,7 +109,10 @@ public class ParseTable extends AbstractTableModel {
                 int [] content = c1.checkContent(c2);
                 boolean name = c1.getName().equals(c2.getName());
                 boolean type = c1.checkType(c2);
-                boolean format = c1.getFormat().equals(c2.getFormat());
+                boolean format = false;
+                if (c1.getFormat() != null && c2.getFormat() != null) {
+                    format = c1.getFormat().equals(c2.getFormat());
+                }
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
                     //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
                     links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
@@ -362,7 +363,9 @@ public class ParseTable extends AbstractTableModel {
         String[] formats = new String[this.columns.size()];
         for (int i = 0; i < this.columns.size(); i++) {
             attributes[i] = this.columns.get(i).getAttributes();
-            formats[i] = this.columns.get(i).getFormat().toString();
+            if (!this.columns.get(i).isEmpty()) {
+                formats[i] = this.columns.get(i).getFormat().toString();
+            }
         }
         String[][] result = new String[2][this.columns.size()];
         result[0] = attributes;

@@ -58,7 +58,7 @@ public class ParseColumn {
         } else {
             this.format = null;
             this.uniqueValues = false;
-            this.sameType = false;
+            this.sameType = true;
         }
     }
 
@@ -102,7 +102,13 @@ public class ParseColumn {
         }
     }
 
-    Expression getFormat() { return this.format; }
+    Expression getFormat() {
+        if (this.format != null) {
+            return this.format;
+        } else {
+            return null;
+        }
+    }
 
     ArrayList<Problem> getProblems() {
         return this.errors;
@@ -195,7 +201,7 @@ public class ParseColumn {
         this.content.set(b,temp);
     }
 
-    private void isEmpty() {
+    public boolean isEmpty() {
         boolean empty = true;
         for (Object o: this.content) {
             if (o != null) {
@@ -204,6 +210,7 @@ public class ParseColumn {
             }
         }
         this.empty = empty;
+        return empty;
     }
 
     private void findExpressions() {
@@ -247,28 +254,7 @@ public class ParseColumn {
     }
 
     boolean checkType(ParseColumn p2) {
-        Object o1 = null;
-        Object o2 = null;
-        boolean found1 = false, found2 = false;
-        for (Object o: this.content) {
-            if (o != null) {
-                o1 = o;
-                found1 = true;
-                break;
-            }
-        }
-        for (Object o: p2.content) {
-            if (o != null) {
-                o2 = o;
-                found2 = true;
-                break;
-            }
-        }
-        if (found1 && found2) {
-            return this.sameType && p2.sameType && o1.getClass().equals(o2.getClass());
-        } else {
-            return false;
-        }
+        return this.sameType & p2.sameType;
     }
 
     int[] checkContent(ParseColumn p2) {

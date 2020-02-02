@@ -59,6 +59,17 @@ public abstract class TabSeperatedFile {
             }
             yPos++;
         }
+        ArrayList<Object> row;
+        for (ArrayList<ArrayList<Object>> table: results) {
+            int rowGoal = table.get(0).size();
+            for (int i = 0; i < table.size(); i++) {
+                row = table.get(i);
+                while (row.size() < rowGoal) {
+                    row.add(null);
+                }
+                table.set(i,row);
+            }
+        }
         return results;
     }
 }
