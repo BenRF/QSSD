@@ -53,6 +53,7 @@ public class ParseTable extends AbstractTableModel {
         }
         System.out.println("Before: " + this.getRowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
+        int matchOfFirst = 0;
         for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
@@ -75,6 +76,7 @@ public class ParseTable extends AbstractTableModel {
                     for (int c = 0; c < row.size(); c++) {
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
+                    matchOfFirst++;
                     break;
                 }
             }
@@ -143,15 +145,6 @@ public class ParseTable extends AbstractTableModel {
         }
         System.out.println("LINKS TO BE USED: " + links.toString());
         return links;
-    }
-
-    public boolean containsRow(ArrayList<Object> row) {
-        for (int i = 0; i < this.getRowCount(); i++) {
-            if (this.getRow(i).containsAll(row)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public String[][] getContent() {
@@ -300,50 +293,51 @@ public class ParseTable extends AbstractTableModel {
             ParseColumn mainCol = this.columns.get(primaryCol);
             while (!sorted) {
                 sorted = true;
-                for (int i = 0; i < mainCol.size()-1; i++) {
+                for (int i = 0; i < mainCol.size() - 1; i++) {
                     Object o1 = mainCol.get(i);
-                    Object o2 = mainCol.get(i+1);
+                    Object o2 = mainCol.get(i + 1);
                     boolean swapping = false;
                     //detecting if a swap is required
                     if (o1 == null && o2 != null) {
                         //move all null values to the bottom
                         swapping = true;
-                    } else if (o1 != null && o2 == null) {
-                        swapping = false;
-                    } else if (!o1.getClass().equals(o2.getClass())) {
-                        //objects are not of the same type, ordered alphabetically by class name
-                        String c1 = o1.getClass().getSimpleName();
-                        String c2 = o2.getClass().getSimpleName();
-                        if (c1.compareTo(c2) > 0) {
-                            swapping = true;
-                        }
                     } else {
-                        //Objects are of same type,
-                        if (o1 instanceof String) {
-                            String s1 = (String) o1;
-                            String s2 = (String) o2;
-                            if (s1.compareTo(s2) > 0) {
+                        assert o2 != null;
+                        if (!o1.getClass().equals(o2.getClass())) {
+                            //objects are not of the same type, ordered alphabetically by class name
+                            String c1 = o1.getClass().getSimpleName();
+                            String c2 = o2.getClass().getSimpleName();
+                            if (c1.compareTo(c2) > 0) {
                                 swapping = true;
                             }
-                        } else if (o1 instanceof Integer) {
-                            int i1 = (int) o1;
-                            int i2 = (int) o2;
-                            if (i1 > i2) {
-                                swapping = true;
-                            }
-                        } else if (o1 instanceof Double) {
-                            Double d1 = (Double) o1;
-                            Double d2 = (Double) o2;
-                            if (d1 > d2) {
-                                swapping = true;
+                        } else {
+                            //Objects are of same type,
+                            if (o1 instanceof String) {
+                                String s1 = (String) o1;
+                                String s2 = (String) o2;
+                                if (s1.compareTo(s2) > 0) {
+                                    swapping = true;
+                                }
+                            } else if (o1 instanceof Integer) {
+                                int i1 = (int) o1;
+                                int i2 = (int) o2;
+                                if (i1 > i2) {
+                                    swapping = true;
+                                }
+                            } else if (o1 instanceof Double) {
+                                Double d1 = (Double) o1;
+                                Double d2 = (Double) o2;
+                                if (d1 > d2) {
+                                    swapping = true;
+                                }
                             }
                         }
                     }
                     //swap the items if needed
                     if (swapping) {
                         sorted = false;
-                        for (ParseColumn c: this.columns) {
-                            c.swap(i, i+1);
+                        for (ParseColumn c : this.columns) {
+                            c.swap(i, i + 1);
                         }
                     }
                 }
@@ -377,14 +371,14 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public String toString() {
-        String output = "ParseTable(";
+        StringBuilder output = new StringBuilder("ParseTable(");
         boolean first = true;
         for (ParseColumn pC: this.columns) {
             if (first) {
-                output = output + pC.toString();
+                output.append(pC.toString());
                 first = false;
             } else {
-                output = output + "," + pC.toString();
+                output.append(",").append(pC.toString());
             }
         }
         return output + ")";
