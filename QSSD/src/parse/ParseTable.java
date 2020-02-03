@@ -70,7 +70,7 @@ public class ParseTable extends AbstractTableModel {
                 for (Link l : links) {
                     o1 = row.get(l.getColIds()[1]);
                     o2 = this.getRow(r).get(l.getColIds()[0]);
-                    if (!o1.equals(o2) && o1 != null && o2 != null) {
+                    if (!o1.equals(o2) && o2 != null) {
                         match = false;
                         break;
                     }
@@ -170,7 +170,7 @@ public class ParseTable extends AbstractTableModel {
         return content;
     }
 
-    String[] getRowAsString(int i) {
+    private String[] getRowAsString(int i) {
         ArrayList<Object> r = this.getRow(i);
         String[] row = new String[r.size()];
         for (int y = 0; y < r.size(); y++) {
@@ -211,7 +211,7 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
-    boolean isUnique(ArrayList<ParseColumn> columns) {
+    private boolean isUnique(ArrayList<ParseColumn> columns) {
         ArrayList<ArrayList<Object>> values = new ArrayList<>();
         for (int i = 0; i < columns.get(0).size(); i++) {
             ArrayList<Object> row = new ArrayList<>();
@@ -224,7 +224,7 @@ public class ParseTable extends AbstractTableModel {
         return results.size() == values.size();
     }
 
-    ArrayList<Object> findRowByObject(int columnId, Object searchFor) {
+    private ArrayList<Object> findRowByObject(int columnId, Object searchFor) {
         ParseColumn selected = this.getCol(columnId);
         int row = selected.findRowByObject(searchFor);
         return this.getRow(row);
@@ -294,70 +294,6 @@ public class ParseTable extends AbstractTableModel {
 
     public boolean isProblem(int col,int row) {
         return this.columns.get(col).isProblemCell(row);
-    }
-
-    private void sortBy(String colName) {
-        int primaryCol = -1;
-        for (int i = 0; i < this.columns.size(); i++) {
-            if (this.columns.get(i).getName().equals(colName)) {
-                primaryCol = i;
-            }
-        }
-        if (primaryCol != -1) {
-            boolean sorted = false;
-            ParseColumn mainCol = this.columns.get(primaryCol);
-            while (!sorted) {
-                sorted = true;
-                for (int i = 0; i < mainCol.size() - 1; i++) {
-                    Object o1 = mainCol.get(i);
-                    Object o2 = mainCol.get(i + 1);
-                    boolean swapping = false;
-                    //detecting if a swap is required
-                    if (o1 == null && o2 != null) {
-                        //move all null values to the bottom
-                        swapping = true;
-                    } else {
-                        assert o2 != null;
-                        if (!o1.getClass().equals(o2.getClass())) {
-                            //objects are not of the same type, ordered alphabetically by class name
-                            String c1 = o1.getClass().getSimpleName();
-                            String c2 = o2.getClass().getSimpleName();
-                            if (c1.compareTo(c2) > 0) {
-                                swapping = true;
-                            }
-                        } else {
-                            //Objects are of same type,
-                            if (o1 instanceof String) {
-                                String s1 = (String) o1;
-                                String s2 = (String) o2;
-                                if (s1.compareTo(s2) > 0) {
-                                    swapping = true;
-                                }
-                            } else if (o1 instanceof Integer) {
-                                int i1 = (int) o1;
-                                int i2 = (int) o2;
-                                if (i1 > i2) {
-                                    swapping = true;
-                                }
-                            } else if (o1 instanceof Double) {
-                                Double d1 = (Double) o1;
-                                Double d2 = (Double) o2;
-                                if (d1 > d2) {
-                                    swapping = true;
-                                }
-                            }
-                        }
-                    }
-                    //swap the items if needed
-                    if (swapping) {
-                        sorted = false;
-                        for (ParseColumn c : this.columns) {
-                            c.swap(i, i + 1);
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void setCell(int column, int row, Object o) {

@@ -35,7 +35,7 @@ class MergingPanel extends JPanel {
         update();
     }
 
-    void orderTables() {
+    private void orderTables() {
         ArrayList<ParseTable> before = new ArrayList<>(this.tabs);
         ArrayList<ParseTable> tabs = new ArrayList<>();
         int[][] scores = new int[before.size()][before.size()];
@@ -94,7 +94,7 @@ class MergingPanel extends JPanel {
         this.tabs = tabs;
     }
 
-    void update() {
+    private void update() {
         this.removeAll();
         this.revalidate();
         this.updateUI();

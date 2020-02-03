@@ -1,6 +1,5 @@
 package parse;
 
-import org.apache.commons.math3.analysis.function.Exp;
 import parse.problems.*;
 
 import java.util.*;
@@ -169,7 +168,6 @@ public class ParseColumn {
             if (this.sameType) {
                 if (first) {
                     output = this.content.get(0).getClass().getSimpleName();
-                    first = false;
                 } else {
                     output = output + "," + this.content.get(0).getClass().getSimpleName();
                 }
@@ -201,7 +199,7 @@ public class ParseColumn {
         this.content.set(b,temp);
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         boolean empty = true;
         for (Object o: this.content) {
             if (o != null) {
@@ -286,7 +284,7 @@ public class ParseColumn {
         return results;
     }
 
-    public boolean isProblemCell(int row) {
+    boolean isProblemCell(int row) {
         for (Problem p: this.errors) {
             if (p.isProblem(row)) {
                 return true;

@@ -6,7 +6,7 @@ public class Expression {
     private ArrayList<Part> expression;
     private Object o;
 
-    public Expression(Object o) {
+    Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
         if (o != null && o.toString().length() > 0) {
@@ -46,7 +46,7 @@ public class Expression {
         }
     }
 
-    public Expression(Expression e1, Expression e2) {
+    Expression(Expression e1, Expression e2) {
         this.expression = new ArrayList<>();
         this.o = e2.o;
         ArrayList<ArrayList<Integer>> links = e1.compare(e2);
@@ -164,7 +164,6 @@ public class Expression {
     private ArrayList<ArrayList<Integer>> compare(Expression e) {
         ArrayList<ArrayList<Integer>> links = new ArrayList<>();
         int s1,s2,strength,progess = 0;
-        ArrayList<Integer> found = new ArrayList<>();
         for (int i1 = 0; i1 < this.getSize(); i1++) {
             s1 = i1;
             s2 = -1;
@@ -203,7 +202,6 @@ public class Expression {
                 ArrayList<Integer> l = new ArrayList<>();
                 l.add(s1);
                 l.add(s2);
-                found.add(s2);
                 l.add(strength);
                 links.add(l);
             }

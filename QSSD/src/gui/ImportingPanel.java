@@ -1,7 +1,5 @@
 package gui;
 
-import parse.ParseTable;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;

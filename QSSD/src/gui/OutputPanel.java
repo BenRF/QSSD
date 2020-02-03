@@ -5,9 +5,6 @@ import files.ExcelFile;
 import parse.ParseTable;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 class OutputPanel extends JPanel {
@@ -20,7 +17,7 @@ class OutputPanel extends JPanel {
         nameInput.setFont(nameInput.getFont().deriveFont(15.0f));
         nameInput.setBounds(115,10,200,30);
         String[] options = {".xlsx",".csv"};
-        JComboBox extension = new JComboBox(options);
+        JComboBox<String> extension = new JComboBox<>(options);
         extension.setFont(extension.getFont().deriveFont(15.0f));
         extension.setBounds(325,10,100,30);
         this.add(extension);
@@ -52,11 +49,5 @@ class OutputPanel extends JPanel {
         });
         this.add(merge);
         this.setLayout(null);
-    }
-
-    void update() {
-        if (MainWindow.tableCount() > 1) {
-            System.out.println("UPDATE INFO");
-        }
     }
 }

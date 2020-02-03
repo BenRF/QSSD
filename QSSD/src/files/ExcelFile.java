@@ -15,13 +15,12 @@ import java.util.List;
 
 public class ExcelFile extends TabSeperatedFile{
     private List<XSSFSheet> sheets;
-    private XSSFWorkbook wb;
 
     public ExcelFile(String f) {
         File myFile = new File(f);
         try {
             FileInputStream fis = new FileInputStream(myFile);
-            wb = new XSSFWorkbook(fis);
+            XSSFWorkbook wb = new XSSFWorkbook(fis);
             new XSSFFormulaEvaluator(wb);
             XSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
             this.sheets = new ArrayList<>();
@@ -120,11 +119,10 @@ public class ExcelFile extends TabSeperatedFile{
             for (int i = 0; i < content.size(); i++) {
                 ArrayList<Cell> row = content.get(i);
                 if (row.size() < max) {
-                    ArrayList<Cell> t = row;
-                    while (t.size() < max) {
-                        t.add(null);
+                    while (row.size() < max) {
+                        row.add(null);
                     }
-                    content.set(i,t);
+                    content.set(i, row);
                 }
             }
         }

@@ -4,7 +4,7 @@ public class Link {
     private int col1,col2,col1Overlap,col2Overlap;
     private boolean sameName;
 
-    public Link(int col1, int col2, boolean name, int col1Overlap, int col2Overlap) {
+    Link(int col1, int col2, boolean name, int col1Overlap, int col2Overlap) {
         this.col1 = col1;
         this.col2 = col2;
         this.sameName = name;
@@ -16,7 +16,7 @@ public class Link {
         return (this.col1 == l2.col1 && this.col2 != l2.col2) || (this.col1 != l2.col1 && this.col2 == l2.col2);
     }
 
-    public boolean stronger(Link l2) {
+    boolean stronger(Link l2) {
         boolean higherSimilarity = this.col1Overlap + this.col2Overlap > l2.col1Overlap + l2.col2Overlap;
         boolean sameOrHigherSimilarity = this.col1Overlap + this.col2Overlap >= l2.col1Overlap + l2.col2Overlap;
         boolean sameNameVal = this.sameName == l2.sameName;
