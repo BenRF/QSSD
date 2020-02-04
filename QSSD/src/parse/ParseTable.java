@@ -125,7 +125,7 @@ public class ParseTable extends AbstractTableModel {
 
     public JTableHeader getJTableHeader(JTable tab) {
         JTableHeader result = tab.getTableHeader();
-        result.addMouseListener(tab.getMouseListeners()[0]);
+        result.addMouseListener(new TableMouseListener(this));
         return result;
     }
 
