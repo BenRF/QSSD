@@ -2,7 +2,9 @@ package parse;
 
 import parse.problems.Problem;
 
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,6 +114,19 @@ public class ParseTable extends AbstractTableModel {
         }
         this.performChecks();
         System.out.println("After: " + this.getRowCount());
+    }
+
+    public JTable getSummaryJTable() {
+        JTable result = new JTable(this.getColumnAttributes(),this.getHeaderNames());
+        result.setEnabled(false);
+        result.addMouseListener(new TableMouseListener(this));
+        return result;
+    }
+
+    public JTableHeader getJTableHeader(JTable tab) {
+        JTableHeader result = tab.getTableHeader();
+        result.addMouseListener(tab.getMouseListeners()[0]);
+        return result;
     }
 
     public ArrayList<Link> getLinks(ParseTable p2) {

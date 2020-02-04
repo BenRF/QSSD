@@ -11,13 +11,13 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-class TableViewWindow extends JFrame {
+public class TableViewWindow extends JFrame {
     private ParseTable pT;
     private JTable tab;
     private JTableHeader tabHeader;
     private JCheckBox viewProblems;
 
-    TableViewWindow(ParseTable pT) {
+    public TableViewWindow(ParseTable pT) {
         this.pT = pT;
         this.setTitle("TABLE VIEW");
         int decidedWidth = 40 + (pT.getColumnCount() * 150);
