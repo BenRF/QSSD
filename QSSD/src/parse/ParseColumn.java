@@ -33,6 +33,19 @@ public class ParseColumn {
         this.errors = new ArrayList<>();
     }
 
+    public ParseColumn(ParseColumn column) {
+        this.name = column.name;
+        this.id = column.id;
+        this.content = new ArrayList<>(column.content);
+        this.uniqueValues = column.uniqueValues;
+        this.numOfUniqueVals = column.numOfUniqueVals;
+        this.sameType = column.sameType;
+        this.format = column.format;
+        this.errors = new ArrayList<>();
+        this.errors.addAll(column.errors);
+        this.empty = column.empty;
+    }
+
     void addContent(Object c) {
         content.add(c);
     }

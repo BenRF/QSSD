@@ -60,7 +60,6 @@ public class ParseTable extends AbstractTableModel {
                 this.newCol(c.getName());
             }
         }
-        System.out.println("Before: " + this.getRowCount());
         HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
         Object o1,o2;
         for (int r = 0; r < this.getRowCount(); r++) {
@@ -113,7 +112,13 @@ public class ParseTable extends AbstractTableModel {
             }
         }
         this.performChecks();
-        System.out.println("After: " + this.getRowCount());
+    }
+
+    public ParseTable(ParseTable table) {
+        this.columns = new ArrayList<>();
+        for (ParseColumn pC: table.columns) {
+            this.columns.add(new ParseColumn(pC));
+        }
     }
 
     public JTable getSummaryJTable() {

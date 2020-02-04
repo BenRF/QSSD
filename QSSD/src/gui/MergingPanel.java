@@ -20,19 +20,22 @@ class MergingPanel extends JPanel {
         this.revalidate();
         this.updateUI();
         this.repaint();
-        back = new JButton("Back");
-        back.setBounds(20,20,100,30);
-        back.addActionListener(e -> stepBack());
-        forward = new JButton("Forward");
-        forward.setEnabled(false);
-        forward.setBounds(150,20,100,30);
-        forward.addActionListener(e -> stepForward());
-        this.add(back);
-        this.add(forward);
+        this.back = new JButton("Back");
+        this.back.setBounds(20,20,100,30);
+        this.back.addActionListener(e -> stepBack());
+        this.forward = new JButton("Forward");
+        this.forward.setBounds(150,20,100,30);
+        this.forward.addActionListener(e -> stepForward());
+        this.forward.setEnabled(false);
+        this.add(this.back);
+        this.add(this.forward);
         this.tabs = MainWindow.getTables();
         this.step = this.tabs.size()-1;
-        orderTables();
-        update();
+        if (this.step == 1) {
+            this.back.setEnabled(false);
+        }
+        this.orderTables();
+        this.update();
     }
 
     private void orderTables() {
@@ -99,22 +102,35 @@ class MergingPanel extends JPanel {
         this.revalidate();
         this.updateUI();
         this.repaint();
-        this.add(back);
-        this.add(forward);
-        ParseTable pT = this.tabs.get(0);
+        this.add(this.back);
+        this.add(this.forward);
+        ParseTable[] tables = new ParseTable[3];
+        tables[0] = this.tabs.get(0);
+        tables[2] = this.tabs.get(0);
         for (int i = 1; i <= this.step; i++) {
-            pT = new ParseTable(pT,this.tabs.get(i));
+            tables[2] = new ParseTable(tables[2],this.tabs.get(i));
+            if (i == this.step - 1) {
+                tables[0] = new ParseTable(tables[2]);
+            } else if (i == this.step) {
+                tables[1] = this.tabs.get(i);
+            }
         }
-        JTable jT = new JTable(pT);
-        JTableHeader header = jT.getTableHeader();
-        int decidedWidth = this.getWidth()-80;
-        if (this.getWidth() - 30 > pT.getColumnCount() * 155) {
-            decidedWidth = pT.getColumnCount() * 150;
+        int[] positions = new int[]{60,150,300};
+        ParseTable tab;
+        int decidedWidth;
+        for (int i = 0; i < tables.length; i++) {
+            decidedWidth = this.getWidth() - 80;
+            tab = tables[i];
+            JTable jT = tab.getSummaryJTable();
+            JTableHeader header = tab.getJTableHeader(jT);
+            if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
+                decidedWidth = tab.getColumnCount() * 150;
+            }
+            header.setBounds(30, positions[i], decidedWidth, 20);
+            jT.setBounds(30, positions[i]+20, decidedWidth, 33);
+            this.add(header);
+            this.add(jT);
         }
-        header.setBounds(30, 70, decidedWidth, 20);
-        jT.setBounds(30, 90, decidedWidth, 16 * pT.getRowCount());
-        this.add(header);
-        this.add(jT);
     }
 
     private void stepForward() {
@@ -133,7 +149,7 @@ class MergingPanel extends JPanel {
         if (this.step < this.tabs.size()-1) {
             this.forward.setEnabled(true);
         }
-        if (this.step <= 0) {
+        if (this.step <= 1) {
             this.back.setEnabled(false);
         }
         this.update();
