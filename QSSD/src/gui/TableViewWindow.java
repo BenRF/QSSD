@@ -25,7 +25,8 @@ public class TableViewWindow extends JFrame {
             decidedWidth = 1600;
         }
         int decidedHeight = 100 + (pT.getRowCount() * 16);
-        this.setBounds(50,50, decidedWidth,decidedHeight);
+        System.out.println(MainWindow.getProgramXPos());
+        this.setBounds(MainWindow.getProgramXPos() + 20, MainWindow.getProgramYPos() + 150, decidedWidth,decidedHeight);
         this.setBackground(Color.WHITE);
         this.setLayout(null);
         this.addComponentListener(new ComponentAdapter() {

@@ -49,7 +49,7 @@ public class MainWindow {
         jTP.setEnabledAt(id,state);
     }
 
-    static int tableCount() {
+    static void tableCount() {
         int count = 0;
         for(FileOption fO: files) {
             count = count + fO.tableCount();
@@ -57,7 +57,6 @@ public class MainWindow {
         boolean state = count > 1;
         toggleTab(1,state);
         toggleTab(2,state);
-        return count;
     }
 
     static ArrayList<ParseTable> getTables() {
@@ -66,5 +65,13 @@ public class MainWindow {
             result.addAll(fO.getActiveTables());
         }
         return result;
+    }
+
+    static int getProgramXPos() {
+        return main.getX();
+    }
+
+    static int getProgramYPos() {
+        return main.getY();
     }
 }

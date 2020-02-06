@@ -19,11 +19,14 @@ class ImportingPanel extends JPanel {
         addFile.setBounds(10,10,85,25);
         addFile.addActionListener(e -> {
             JFileChooser fc;
+            int x = SwingUtilities.getWindowAncestor(this).getX();
+            int y = SwingUtilities.getWindowAncestor(this).getY();
             if (this.previousFile == null) {
-                fc = new JFileChooser();
+                fc = new CustomFileChooser(x,y);
             } else {
-                fc = new JFileChooser(this.previousFile);
+                fc = new CustomFileChooser(x,y,this.previousFile);
             }
+            fc.setLocation(20,20);
             int choice = fc.showOpenDialog(null);
             if (choice == JFileChooser.APPROVE_OPTION) {
                 this.previousFile = fc.getSelectedFile().getAbsolutePath();
