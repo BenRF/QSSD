@@ -149,11 +149,11 @@ public class ParseTable extends AbstractTableModel {
                 }
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
                     //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
-                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
+                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1],c1.getName(),c2.getName()));
                 }
             }
         }
-        System.out.println("LINKS FOUND: " + links.toString());
+        //System.out.println("LINKS FOUND: " + links.toString());
         boolean removed = false;
         int x = 0;
         while (x < links.size()) {
@@ -178,7 +178,7 @@ public class ParseTable extends AbstractTableModel {
                 x++;
             }
         }
-        System.out.println("LINKS TO BE USED: " + links.toString());
+        //System.out.println("LINKS TO BE USED: " + links.toString());
         return links;
     }
 

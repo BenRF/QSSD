@@ -1,5 +1,6 @@
 package gui;
 
+import parse.Link;
 import parse.ParseTable;
 
 import javax.swing.*;
@@ -115,7 +116,7 @@ class MergingPanel extends JPanel {
                 tables[1] = this.tabs.get(i);
             }
         }
-        int[] positions = new int[]{60,150,300};
+        int[] positions = new int[]{60, 230, 480};
         ParseTable tab;
         int decidedWidth;
         for (int i = 0; i < tables.length; i++) {
@@ -130,6 +131,16 @@ class MergingPanel extends JPanel {
             jT.setBounds(30, positions[i]+20, decidedWidth, 33);
             this.add(header);
             this.add(jT);
+        }
+        int y = 110;
+        ArrayList<JLabel> labels = new ArrayList<>();
+        ArrayList<Link> links = tables[0].getLinks(tables[1]);
+        for (Link l: links) {
+            JLabel temp = l.getLabel();
+            temp.setBounds(40,y,this.getWidth(),30);
+            labels.add(temp);
+            this.add(labels.get(labels.size()-1));
+            y = y + 20;
         }
     }
 
