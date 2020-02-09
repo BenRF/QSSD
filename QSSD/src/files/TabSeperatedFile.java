@@ -19,7 +19,7 @@ public abstract class TabSeperatedFile {
         return tabs;
     }
 
-    public ArrayList<ArrayList<ArrayList<Object>>> breakIntoContent(ArrayList<ArrayList<Object>> content) {
+    private ArrayList<ArrayList<ArrayList<Object>>> breakIntoContent(ArrayList<ArrayList<Object>> content) {
         int xPos;
         int yPos = 0;
         int colSize = content.get(0).size();

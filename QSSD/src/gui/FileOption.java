@@ -6,8 +6,6 @@ import parse.problems.Problem;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -98,38 +96,13 @@ class FileOption extends JPanel {
                 enable.setBackground(Color.WHITE);
                 this.add(enable);
                 count++;
-                String[] headers = pt.getHeaderNames();
-                String[][] content = pt.getColumnAttributes();
-                JTable tab = new JTable(content, headers);
-                JTableHeader Tabheaders = tab.getTableHeader();
+                JTable tab = pt.getSummaryJTable();
+                JTableHeader Tabheaders = pt.getJTableHeader(tab);
                 this.tab.add(tab);
                 this.Tabheaders.add(Tabheaders);
-                tab.setEnabled(false);
-                MouseListener mL = new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if (e.getClickCount() == 2) {
-                            new TableViewWindow(pt);
-                        }
-                    }
-
-                    public void mousePressed(MouseEvent e) {
-                    }
-
-                    public void mouseReleased(MouseEvent e) {
-                    }
-
-                    public void mouseEntered(MouseEvent e) {
-                    }
-
-                    public void mouseExited(MouseEvent e) {
-                    }
-                };
-                tab.addMouseListener(mL);
-                Tabheaders.addMouseListener(mL);
                 int decidedWidth = this.Width - 80;
-                if (this.pane.getWidth() - 30 > headers.length * 155) {
-                    decidedWidth = headers.length * 150;
+                if (this.pane.getWidth() - 30 > pt.getColumnCount() * 155) {
+                    decidedWidth = pt.getColumnCount() * 150;
                 }
                 Tabheaders.setBounds(30, height, decidedWidth, 20);
                 tab.setBounds(30, height + 20, decidedWidth, 35);

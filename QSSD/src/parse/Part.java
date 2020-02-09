@@ -20,7 +20,7 @@ public class Part {
         this.multiPart = false;
     }
 
-    public Part(int type, int count, int startPos) {
+    Part(int type, int count, int startPos) {
         this.count = count;
         this.min = -1;
         this.max = -1;
@@ -29,7 +29,7 @@ public class Part {
         this.typeCalc(type);
     }
 
-    public Part(Part p1, Part p2) {
+    Part(Part p1, Part p2) {
         this.multiPart = true;
         this.alphabetical = p1.alphabetical || p2.alphabetical;
         this.digit = p1.digit || p2.digit;

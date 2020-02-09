@@ -1,6 +1,5 @@
 package parse;
 
-import org.apache.commons.math3.analysis.function.Exp;
 import parse.problems.*;
 
 import java.util.*;
@@ -32,6 +31,19 @@ public class ParseColumn {
         this.sameType = c.sameType;
         this.format = c.format;
         this.errors = new ArrayList<>();
+    }
+
+    public ParseColumn(ParseColumn column) {
+        this.name = column.name;
+        this.id = column.id;
+        this.content = new ArrayList<>(column.content);
+        this.uniqueValues = column.uniqueValues;
+        this.numOfUniqueVals = column.numOfUniqueVals;
+        this.sameType = column.sameType;
+        this.format = column.format;
+        this.errors = new ArrayList<>();
+        this.errors.addAll(column.errors);
+        this.empty = column.empty;
     }
 
     void addContent(Object c) {
@@ -169,7 +181,6 @@ public class ParseColumn {
             if (this.sameType) {
                 if (first) {
                     output = this.content.get(0).getClass().getSimpleName();
-                    first = false;
                 } else {
                     output = output + "," + this.content.get(0).getClass().getSimpleName();
                 }
@@ -201,7 +212,7 @@ public class ParseColumn {
         this.content.set(b,temp);
     }
 
-    public boolean isEmpty() {
+    boolean isEmpty() {
         boolean empty = true;
         for (Object o: this.content) {
             if (o != null) {
@@ -286,12 +297,16 @@ public class ParseColumn {
         return results;
     }
 
-    public boolean isProblemCell(int row) {
+    boolean isProblemCell(int row) {
         for (Problem p: this.errors) {
             if (p.isProblem(row)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public ArrayList<Object> getContent() {
+        return this.content;
     }
 }
