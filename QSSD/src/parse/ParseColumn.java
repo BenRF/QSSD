@@ -305,4 +305,8 @@ public class ParseColumn {
         }
         return false;
     }
+
+    public ArrayList<Object> getContent() {
+        return this.content;
+    }
 }

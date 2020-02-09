@@ -34,7 +34,7 @@ public class ParseTable extends AbstractTableModel {
             t1.add(p1.getCol(cols[0]));
             t2.add(p2.getCol(cols[1]));
         }
-        if (isUnique(t1) && !isUnique(t2)) {
+        if (this.isUnique(t1) && !this.isUnique(t2)) {
             ParseTable temp = p2;
             p2 = p1;
             p1 = temp;
@@ -121,6 +121,45 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
+    public void sortBy(int columnNumber) {
+        this.quickSort(columnNumber,0,this.columns.get(columnNumber).size());
+    }
+
+    private void quickSort(int columnNumber, int l, int r) {
+        if (l >= r) {
+            return;
+        }
+        Object pivot = this.getCell(columnNumber,r);
+        int cnt = l;
+        for (int i = l; i <= r; i++) {
+            if (this.objectLessThanOrEqualTo(this.getCell(columnNumber,i),pivot)) {
+                swapRows(cnt,i);
+                cnt++;
+            }
+        }
+        quickSort(columnNumber,l,cnt-2);
+        quickSort(columnNumber,cnt,r);
+    }
+
+    private boolean objectLessThanOrEqualTo(Object o1, Object o2) {
+        if (o1 instanceof String && o2 instanceof String) {
+            String s1 = (String) o1;
+            String s2 = (String) o2;
+            return s1.compareTo(s2) <= 0;
+        } else if (o1 instanceof Integer && o2 instanceof Integer) {
+            Integer i1 = (Integer) o1;
+            Integer i2 = (Integer) o2;
+            return i1.compareTo(i2) <= 0;
+        }
+        return false;
+    }
+
+    private void swapRows(int rowPos1, int rowPos2) {
+        for (ParseColumn c: this.columns) {
+            c.swap(rowPos1,rowPos2);
+        }
+    }
+
     public JTable getSummaryJTable() {
         JTable result = new JTable(this.getColumnAttributes(),this.getHeaderNames());
         result.setEnabled(false);
@@ -180,14 +219,6 @@ public class ParseTable extends AbstractTableModel {
         }
         //System.out.println("LINKS TO BE USED: " + links.toString());
         return links;
-    }
-
-    public String[][] getContent() {
-        String[][] content = new String[this.getRowCount()][this.getColumnCount()];
-        for (int i = 0; i < this.getRowCount(); i++) {
-            content[i] = this.getRowAsString(i);
-        }
-        return content;
     }
 
     private String[] getRowAsString(int i) {

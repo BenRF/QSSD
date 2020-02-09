@@ -10,6 +10,7 @@ import java.util.ArrayList;
 class MergingPanel extends JPanel {
     private int step;
     private ArrayList<ParseTable> tabs;
+    private ParseTable[] results;
     private JButton forward,back;
 
     MergingPanel() {
@@ -31,16 +32,21 @@ class MergingPanel extends JPanel {
         this.add(this.back);
         this.add(this.forward);
         this.tabs = MainWindow.getTables();
+        this.results = new ParseTable[this.tabs.size()-1];
         this.step = this.tabs.size()-1;
         if (this.step == 1) {
             this.back.setEnabled(false);
         }
         this.orderTables();
+        this.results[0] = new ParseTable(this.tabs.get(0),this.tabs.get(1));
+        for (int i = 2; i < this.tabs.size(); i++) {
+            this.results[i-1] = new ParseTable(this.results[i-2],this.tabs.get(i));
+        }
         this.update();
     }
 
     private void orderTables() {
-        ArrayList<ParseTable> before = new ArrayList<>(this.tabs);
+        ArrayList<ParseTable> before = new ArrayList<>(tabs);
         ArrayList<ParseTable> tabs = new ArrayList<>();
         int[][] scores = new int[before.size()][before.size()];
         for (int i = 0; i < before.size(); i++) {
@@ -106,16 +112,13 @@ class MergingPanel extends JPanel {
         this.add(this.back);
         this.add(this.forward);
         ParseTable[] tables = new ParseTable[3];
-        tables[0] = this.tabs.get(0);
-        tables[2] = this.tabs.get(0);
-        for (int i = 1; i <= this.step; i++) {
-            tables[2] = new ParseTable(tables[2],this.tabs.get(i));
-            if (i == this.step - 1) {
-                tables[0] = new ParseTable(tables[2]);
-            } else if (i == this.step) {
-                tables[1] = this.tabs.get(i);
-            }
+        if (this.step - 2 < 0) {
+            tables[0] = this.tabs.get(0);
+        } else {
+            tables[0] = this.results[this.step - 2];
         }
+        tables[1] = this.tabs.get(step);
+        tables[2] = this.results[this.step-1];
         int[] positions = new int[]{60, 230, 480};
         ParseTable tab;
         int decidedWidth;
@@ -149,7 +152,7 @@ class MergingPanel extends JPanel {
         if (this.step >= 1) {
             this.back.setEnabled(true);
         }
-        if (this.step == this.tabs.size()-1) {
+        if (this.step == tabs.size()-1) {
             this.forward.setEnabled(false);
         }
         this.update();
@@ -157,7 +160,7 @@ class MergingPanel extends JPanel {
 
     private void stepBack() {
         this.step--;
-        if (this.step < this.tabs.size()-1) {
+        if (this.step < tabs.size()-1) {
             this.forward.setEnabled(true);
         }
         if (this.step <= 1) {
