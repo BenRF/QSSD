@@ -22,9 +22,9 @@ class ImportingPanel extends JPanel {
             int x = SwingUtilities.getWindowAncestor(this).getX();
             int y = SwingUtilities.getWindowAncestor(this).getY();
             if (this.previousFile == null) {
-                fc = new CustomFileChooser(x,y);
+                fc = new CustomFileChooser();
             } else {
-                fc = new CustomFileChooser(x,y,this.previousFile);
+                fc = new CustomFileChooser(this.previousFile);
             }
             fc.setLocation(20,20);
             int choice = fc.showOpenDialog(null);

@@ -26,7 +26,7 @@ public class TableViewWindow extends JFrame {
         }
         int decidedHeight = 100 + (pT.getRowCount() * 16);
         System.out.println(MainWindow.getProgramXPos());
-        this.setBounds(MainWindow.getProgramXPos() + 20, MainWindow.getProgramYPos() + 150, decidedWidth,decidedHeight);
+        this.setBounds(MainWindow.getProgramXPos() + (MainWindow.getWidth()/2) - (decidedWidth/2), MainWindow.getProgramYPos() + (MainWindow.getHeight()/2) - (decidedHeight/2), decidedWidth,decidedHeight);
         this.setBackground(Color.WHITE);
         this.setLayout(null);
         this.addComponentListener(new ComponentAdapter() {
@@ -36,19 +36,19 @@ public class TableViewWindow extends JFrame {
                 resize();
             }
         });
-        viewProblems = new JCheckBox();
-        viewProblems.setSelected(false);
-        viewProblems.addItemListener(e -> this.viewProblems());
-        viewProblems.setBounds(10, 5, 20, 20);
+        this.viewProblems = new JCheckBox();
+        this.viewProblems.setSelected(false);
+        this.viewProblems.addItemListener(e -> this.viewProblems());
+        this.viewProblems.setBounds(10, 5, 20, 20);
         this.add(viewProblems);
         JLabel problemView = new JLabel();
         problemView.setText("Problems only");
         problemView.setBounds(35,5,100,20);
         this.add(problemView);
-        tab = new JTable(pT);
-        tabHeader = tab.getTableHeader();
-        tabHeader.setBounds(10,30, decidedWidth -40,20);
-        tab.setBounds(10,50, decidedWidth -40,pT.getRowCount()*16);
+        this.tab = new JTable(pT);
+        this.tabHeader = tab.getTableHeader();
+        this.tabHeader.setBounds(10,30, decidedWidth -40,20);
+        this.tab.setBounds(10,50, decidedWidth -40,pT.getRowCount()*16);
         this.add(tabHeader);
         this.add(tab);
 
@@ -66,20 +66,20 @@ public class TableViewWindow extends JFrame {
 
     private void viewProblems() {
         if (this.viewProblems.isSelected()) {
-            DefaultTableModel dTM = new DefaultTableModel(pT.getProblemContent(),pT.getColumnNames());
-            tab.setModel(dTM);
+            DefaultTableModel dTM = new DefaultTableModel(this.pT.getProblemContent(),this.pT.getColumnNames());
+            this.tab.setModel(dTM);
         } else {
-            tab.setModel(pT);
+            this.tab.setModel(this.pT);
         }
     }
 
     private void resize() {
         int decidedWidth = this.getWidth() - 40;
-        if (decidedWidth > pT.getColumnCount() * 150) {
-            decidedWidth = pT.getColumnCount() * 150;
+        if (decidedWidth > this.pT.getColumnCount() * 150) {
+            decidedWidth = this.pT.getColumnCount() * 150;
         }
-        tabHeader.setBounds(10,30,decidedWidth,20);
-        tab.setBounds(10,50,decidedWidth,pT.getRowCount()*16);
+        this.tabHeader.setBounds(10,30,decidedWidth,20);
+        this.tab.setBounds(10,50,decidedWidth,pT.getRowCount()*16);
         this.revalidate();
     }
 }

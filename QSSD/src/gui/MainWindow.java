@@ -74,4 +74,12 @@ public class MainWindow {
     static int getProgramYPos() {
         return main.getY();
     }
+
+    static int getWidth() {
+        return main.getWidth();
+    }
+
+    static int getHeight() {
+        return main.getHeight();
+    }
 }

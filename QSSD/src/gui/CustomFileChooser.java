@@ -4,22 +4,18 @@ import javax.swing.*;
 import java.awt.*;
 
 public class CustomFileChooser extends JFileChooser {
-    private int x,y;
 
-    public CustomFileChooser(int x, int y, String previousFile) {
-        super(previousFile);
-        this.x = x;
-        this.y = y;
+    public CustomFileChooser(String prevFile) {
+        super(prevFile);
     }
 
-    public CustomFileChooser(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public CustomFileChooser() {
+        super();
     }
 
     protected JDialog createDialog(Component parent) {
         JDialog dlg = super.createDialog(parent);
-        dlg.setLocation(this.x + 20, this.y + 150);
+        dlg.setLocation(MainWindow.getProgramXPos() + (MainWindow.getWidth()/2) - (this.getWidth()/2),MainWindow.getProgramYPos() + (MainWindow.getHeight()/2) - (this.getHeight()/2));
         return dlg;
     }
 }
