@@ -5,37 +5,37 @@ import files.ExcelFile;
 import parse.ParseTable;
 
 import javax.swing.*;
-import java.util.ArrayList;
+import javax.swing.table.JTableHeader;
 
 class OutputPanel extends JPanel {
 
-    OutputPanel() {
+    void setup() {
+        this.removeAll();
         JLabel name = new JLabel("File name:");
-        name.setBounds(20,10,100,30);
+        name.setBounds(20,500,100,30);
         name.setFont(name.getFont().deriveFont(15.0f));
         JTextField nameInput = new JTextField();
         nameInput.setFont(nameInput.getFont().deriveFont(15.0f));
-        nameInput.setBounds(115,10,200,30);
+        nameInput.setBounds(115,500,200,30);
         String[] options = {".xlsx",".csv"};
         JComboBox<String> extension = new JComboBox<>(options);
         extension.setFont(extension.getFont().deriveFont(15.0f));
-        extension.setBounds(325,10,100,30);
+        extension.setBounds(325,500,100,30);
         this.add(extension);
         this.add(name);
         this.add(nameInput);
-
-        JButton merge = new JButton("Merge");
-        merge.setBounds(180,600,100,30);
+        ParseTable result = MergingPanel.getResult();
+        JTable table = result.getSummaryJTable();
+        JTableHeader header = result.getJTableHeader(table);
+        int pos = 200;
+        int decidedWidth = getWidth() - 80;
+        header.setBounds(30, pos, decidedWidth, 20);
+        table.setBounds(30, pos+20, decidedWidth, 33);
+        add(table);
+        add(header);
+        JButton merge = new JButton("Save");
+        merge.setBounds(150,550,100,30);
         merge.addActionListener(e -> {
-            ArrayList<ParseTable> pTS = new ArrayList<>();
-            for (FileOption fO: MainWindow.files) {
-                pTS.addAll(fO.getTables());
-            }
-            ParseTable result = new ParseTable(pTS.get(0),pTS.get(1));
-            for (int i = 2; i < pTS.size(); i++) {
-                result = new ParseTable(result,pTS.get(i));
-            }
-            result.toConsole();
             switch (extension.getSelectedIndex()) {
                 case (0):
                     //EXCEL

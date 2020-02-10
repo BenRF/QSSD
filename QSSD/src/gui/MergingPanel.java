@@ -2,6 +2,7 @@ package gui;
 
 import parse.Link;
 import parse.ParseTable;
+import parse.problems.Problem;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -12,6 +13,7 @@ class MergingPanel extends JPanel {
     private ArrayList<ParseTable> tabs;
     private ParseTable[] results;
     private JButton forward,back;
+    private static ParseTable result;
 
     MergingPanel() {
         this.setLayout(null);
@@ -42,6 +44,7 @@ class MergingPanel extends JPanel {
         for (int i = 2; i < this.tabs.size(); i++) {
             this.results[i-1] = new ParseTable(this.results[i-2],this.tabs.get(i));
         }
+        result = this.results[this.results.length-1];
         this.update();
     }
 
@@ -119,7 +122,7 @@ class MergingPanel extends JPanel {
         }
         tables[1] = this.tabs.get(step);
         tables[2] = this.results[this.step-1];
-        int[] positions = new int[]{60, 230, 480};
+        int[] positions = new int[]{60, 200, 450};
         ParseTable tab;
         int decidedWidth;
         for (int i = 0; i < tables.length; i++) {
@@ -135,7 +138,16 @@ class MergingPanel extends JPanel {
             this.add(header);
             this.add(jT);
         }
-        int y = 110;
+        int y = 510;
+        decidedWidth = this.getWidth() - 80;
+        for (Problem p : tables[2].getProblems()) {
+            JLabel e = new JLabel();
+            e.setText(p.getTitle());
+            e.setBounds(30, y, decidedWidth, 15);
+            this.add(e);
+            y = y + 20;
+        }
+        y = 110;
         ArrayList<JLabel> labels = new ArrayList<>();
         ArrayList<Link> links = tables[0].getLinks(tables[1]);
         for (Link l: links) {
@@ -145,6 +157,10 @@ class MergingPanel extends JPanel {
             this.add(labels.get(labels.size()-1));
             y = y + 20;
         }
+    }
+
+    public static ParseTable getResult() {
+        return result;
     }
 
     private void stepForward() {
