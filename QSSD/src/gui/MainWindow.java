@@ -32,6 +32,8 @@ public class MainWindow {
         jTP.addChangeListener(changeEvent -> {
             if (jTP.getSelectedIndex() == 1) {
                 mP.setup();
+            } else if (jTP.getSelectedIndex() == 2) {
+                oP.setup();
             }
         });
         main.add(jTP);

@@ -13,6 +13,7 @@ class MergingPanel extends JPanel {
     private ArrayList<ParseTable> tabs;
     private ParseTable[] results;
     private JButton forward,back;
+    private static ParseTable result;
 
     MergingPanel() {
         this.setLayout(null);
@@ -43,6 +44,7 @@ class MergingPanel extends JPanel {
         for (int i = 2; i < this.tabs.size(); i++) {
             this.results[i-1] = new ParseTable(this.results[i-2],this.tabs.get(i));
         }
+        result = this.results[this.results.length-1];
         this.update();
     }
 
@@ -155,6 +157,10 @@ class MergingPanel extends JPanel {
             this.add(labels.get(labels.size()-1));
             y = y + 20;
         }
+    }
+
+    public static ParseTable getResult() {
+        return result;
     }
 
     private void stepForward() {
