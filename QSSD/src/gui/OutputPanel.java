@@ -31,8 +31,8 @@ class OutputPanel extends JPanel {
         int decidedWidth = getWidth() - 80;
         header.setBounds(30, pos, decidedWidth, 20);
         table.setBounds(30, pos+20, decidedWidth, 33);
-        add(table);
-        add(header);
+        this.add(table);
+        this.add(header);
         JButton merge = new JButton("Save");
         merge.setBounds(150,550,100,30);
         merge.addActionListener(e -> {

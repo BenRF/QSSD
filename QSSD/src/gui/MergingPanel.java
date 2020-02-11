@@ -5,8 +5,14 @@ import parse.ParseTable;
 import parse.problems.Problem;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.TableColumnModelEvent;
+import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
@@ -114,7 +120,6 @@ class MergingPanel extends JPanel {
         this.removeAll();
         this.revalidate();
         this.updateUI();
-        this.repaint();
         this.add(this.back);
         this.add(this.forward);
         ParseTable[] tables = new ParseTable[3];
@@ -133,6 +138,28 @@ class MergingPanel extends JPanel {
             tab = tables[i];
             JTable jT = tab.getSummaryJTable();
             JTableHeader header = tab.getJTableHeader(jT);
+            final boolean[] dragComplete = {false};
+            int finalI = i;
+            header.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (dragComplete[0]) {
+                        tables[finalI].orderCols(jT.getColumnModel().getColumns());
+                        links = tables[0].getLinks(tables[1]);
+                        repaint();
+                    }
+                    dragComplete[0] = false;
+                }
+            });
+            jT.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+                public void columnMoved(TableColumnModelEvent e) {
+                    dragComplete[0] = true;
+                }
+                public void columnAdded(TableColumnModelEvent e) { }
+                public void columnRemoved(TableColumnModelEvent e) { }
+                public void columnMarginChanged(ChangeEvent e) { }
+                public void columnSelectionChanged(ListSelectionEvent e) { }
+            });
             if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
                 decidedWidth = tab.getColumnCount() * 150;
             }
@@ -175,12 +202,11 @@ class MergingPanel extends JPanel {
         } else {
             col2Width = (width / mergingWith.getColumnCount());
         }
-        for (Link li: links) {
+        for (Link li: this.links) {
             Integer[] cols = li.getColIds();
             Line2D l = new Line2D.Float((float) (30 + (cols[0] * col1Width) + (0.5 * col1Width)), 113, (float) (30 + (cols[1] * col2Width) + (0.5 * col2Width)), 200);
             g2.draw(l);
         }
-        this.update();
     }
 
     public static ParseTable getResult() {

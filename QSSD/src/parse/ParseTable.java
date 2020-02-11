@@ -5,9 +5,8 @@ import parse.problems.Problem;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.JTableHeader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import javax.swing.table.TableColumn;
+import java.util.*;
 
 public class ParseTable extends AbstractTableModel {
     private ArrayList<ParseColumn> columns;
@@ -121,6 +120,25 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
+    public void orderCols(Enumeration<TableColumn> newOrder) {
+        String[] newOrderNames = new String[this.columns.size()];
+        int pos = 0;
+        while(newOrder.hasMoreElements()) {
+            newOrderNames[pos] = newOrder.nextElement().getHeaderValue().toString();
+            pos++;
+        }
+        ArrayList<ParseColumn> result = new ArrayList<>();
+        for (String name: newOrderNames) {
+            for (ParseColumn col: this.columns) {
+                if (col.getName().equals(name)) {
+                    col.setId(result.size());
+                    result.add(col);
+                }
+            }
+        }
+        this.columns = result;
+    }
+
     public void sortBy(int columnNumber) {
         this.quickSort(columnNumber,0,this.columns.get(columnNumber).size());
     }
@@ -174,8 +192,8 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public ArrayList<Link> getLinks(ParseTable p2) {
-        ArrayList<ParseColumn> p1c = this.getColumns();
-        ArrayList<ParseColumn> p2c = p2.getColumns();
+        ArrayList<ParseColumn> p1c = this.columns;
+        ArrayList<ParseColumn> p2c = p2.columns;
         ArrayList<Link> links = new ArrayList<>();
         for (ParseColumn c1: p1c) {
             for (ParseColumn c2: p2c) {

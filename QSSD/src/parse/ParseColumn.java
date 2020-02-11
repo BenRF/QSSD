@@ -157,7 +157,7 @@ public class ParseColumn {
     }
 
     public String toString() {
-        return this.name + "[" + this.getAttributes() + "]";
+        return this.name;
     }
 
     int size() {
@@ -167,6 +167,8 @@ public class ParseColumn {
     String getName() { return this.name; }
 
     int getId() { return this.id; }
+
+    void setId(int newId) { this.id = newId; }
 
     String getAttributes() {
         String output = "";
