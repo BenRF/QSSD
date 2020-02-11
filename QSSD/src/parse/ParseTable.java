@@ -10,8 +10,10 @@ import java.util.*;
 
 public class ParseTable extends AbstractTableModel {
     private ArrayList<ParseColumn> columns;
+    private int sortedBy;
 
     public ParseTable(ArrayList<ArrayList<Object>> content) {
+        sortedBy = -1;
         this.columns = new ArrayList<>();
         for (Object header: content.get(0)) {
             this.newCol(header.toString());
@@ -110,11 +112,13 @@ public class ParseTable extends AbstractTableModel {
                 }
             }
         }
+        this.sortedBy = -1;
         this.performChecks();
     }
 
     public ParseTable(ParseTable table) {
         this.columns = new ArrayList<>();
+        this.sortedBy = table.sortedBy;
         for (ParseColumn pC: table.columns) {
             this.columns.add(new ParseColumn(pC));
         }
@@ -131,6 +135,9 @@ public class ParseTable extends AbstractTableModel {
         for (String name: newOrderNames) {
             for (ParseColumn col: this.columns) {
                 if (col.getName().equals(name)) {
+                    if (this.sortedBy == col.getId()) {
+                        this.sortedBy = result.size();
+                    }
                     col.setId(result.size());
                     result.add(col);
                 }
@@ -139,24 +146,40 @@ public class ParseTable extends AbstractTableModel {
         this.columns = result;
     }
 
-    public void sortBy(int columnNumber) {
-        this.quickSort(columnNumber,0,this.columns.get(columnNumber).size());
+    public int getColIdFromName(String name) {
+        int result = -1;
+        for (ParseColumn col: this.columns) {
+            if (name.equals(col.getName())) {
+                result = col.getId();
+                break;
+            }
+        }
+        return result;
     }
 
-    private void quickSort(int columnNumber, int l, int r) {
-        if (l >= r) {
+    public void sortByColName(String name) {
+        this.sortByColId(this.getColIdFromName(name));
+    }
+
+    private void sortByColId(int columnNumber) {
+        this.sortedBy = columnNumber;
+        this.quickSort(columnNumber,0,this.columns.get(columnNumber).size()-1);
+    }
+
+    private void quickSort(int columnNumber, int low, int high) {
+        if (low >= high) {
             return;
         }
-        Object pivot = this.getCell(columnNumber,r);
-        int cnt = l;
-        for (int i = l; i <= r; i++) {
+        Object pivot = this.getCell(columnNumber,high);
+        int cnt = low;
+        for (int i = low; i <= high; i++) {
             if (this.objectLessThanOrEqualTo(this.getCell(columnNumber,i),pivot)) {
                 swapRows(cnt,i);
                 cnt++;
             }
         }
-        quickSort(columnNumber,l,cnt-2);
-        quickSort(columnNumber,cnt,r);
+        quickSort(columnNumber,low,cnt-2);
+        quickSort(columnNumber,cnt,high);
     }
 
     private boolean objectLessThanOrEqualTo(Object o1, Object o2) {
@@ -185,6 +208,20 @@ public class ParseTable extends AbstractTableModel {
         return result;
     }
 
+    public JTable getFullJTable() {
+        JTable result = new JTable(this.getContent(),this.getHeaderNames());
+        result.setEnabled(false);
+        return result;
+    }
+
+    public Object[][] getContent() {
+        Object[][] content = new Object[this.getRowCount()][this.getColumnCount()];
+        for (int i = 0; i < this.getRowCount(); i++) {
+            content[i] = this.getRow(i).toArray();
+        }
+        return content;
+    }
+
     public JTableHeader getJTableHeader(JTable tab) {
         JTableHeader result = tab.getTableHeader();
         result.addMouseListener(new TableMouseListener(this));
@@ -210,7 +247,6 @@ public class ParseTable extends AbstractTableModel {
                 }
             }
         }
-        //System.out.println("LINKS FOUND: " + links.toString());
         boolean removed = false;
         int x = 0;
         while (x < links.size()) {
@@ -235,7 +271,6 @@ public class ParseTable extends AbstractTableModel {
                 x++;
             }
         }
-        //System.out.println("LINKS TO BE USED: " + links.toString());
         return links;
     }
 
@@ -264,6 +299,15 @@ public class ParseTable extends AbstractTableModel {
             count++;
         }
         return content;
+    }
+
+    public boolean hasProblems() {
+        for (ParseColumn pC: this.columns) {
+            if (pC.getProblems().size() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public ArrayList<Problem> getProblems() {
@@ -302,17 +346,6 @@ public class ParseTable extends AbstractTableModel {
     private void newRow() {
         for (ParseColumn c: this.columns) {
             c.addContent(null);
-        }
-    }
-
-    public void toConsole() {
-        ArrayList<String> headers = new ArrayList<>();
-        for (ParseColumn col: this.columns) {
-            headers.add(col.getName());
-        }
-        System.out.println(headers.toString());
-        for (int i = 0; i < this.getRowCount(); i++) {
-            System.out.println(this.getRow(i));
         }
     }
 
@@ -380,7 +413,12 @@ public class ParseTable extends AbstractTableModel {
     public String[] getHeaderNames() {
         String[] names = new String[this.columns.size()];
         for (int i = 0; i < this.columns.size(); i++) {
-            names[i] = this.columns.get(i).getName();
+            ParseColumn col = this.columns.get(i);
+            if (this.sortedBy == col.getId()) {
+                names[i] = col.getName() + "*";
+            } else {
+                names[i] = col.getName();
+            }
         }
         return names;
     }

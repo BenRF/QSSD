@@ -6,6 +6,8 @@ import parse.ParseTable;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 class OutputPanel extends JPanel {
 
@@ -27,6 +29,14 @@ class OutputPanel extends JPanel {
         ParseTable result = MergingPanel.getResult();
         JTable table = result.getSummaryJTable();
         JTableHeader header = result.getJTableHeader(table);
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int col = table.columnAtPoint(e.getPoint());
+                String name = table.getColumnName(col);
+                result.sortByColName(name);
+            }
+        });
         int pos = 200;
         int decidedWidth = getWidth() - 80;
         header.setBounds(30, pos, decidedWidth, 20);
