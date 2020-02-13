@@ -162,8 +162,10 @@ public class ParseTable extends AbstractTableModel {
     }
 
     private void sortByColId(int columnNumber) {
-        this.sortedBy = columnNumber;
-        this.quickSort(columnNumber,0,this.columns.get(columnNumber).size()-1);
+        if (this.columns.size() != 0) {
+            this.sortedBy = columnNumber;
+            this.quickSort(columnNumber, 0, this.columns.get(columnNumber).size() - 1);
+        }
     }
 
     private void quickSort(int columnNumber, int low, int high) {
@@ -174,7 +176,7 @@ public class ParseTable extends AbstractTableModel {
         int cnt = low;
         for (int i = low; i <= high; i++) {
             if (this.objectLessThanOrEqualTo(this.getCell(columnNumber,i),pivot)) {
-                swapRows(cnt,i);
+                this.swapRows(cnt,i);
                 cnt++;
             }
         }

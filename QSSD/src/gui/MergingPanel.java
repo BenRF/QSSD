@@ -13,7 +13,6 @@ import javax.swing.table.JTableHeader;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 class MergingPanel extends JPanel {
@@ -23,6 +22,7 @@ class MergingPanel extends JPanel {
     private JButton forward,back;
     private static ParseTable result;
     private ArrayList<Link> links;
+    private LinkPanel lP;
 
     MergingPanel() {
         this.setLayout(null);
@@ -40,6 +40,8 @@ class MergingPanel extends JPanel {
         this.forward.setBounds(150,20,100,30);
         this.forward.addActionListener(e -> stepForward());
         this.forward.setEnabled(false);
+        this.lP = new LinkPanel();
+        this.add(this.lP);
         this.add(this.back);
         this.add(this.forward);
         this.tabs = MainWindow.getTables();
@@ -117,9 +119,10 @@ class MergingPanel extends JPanel {
     }
 
     private void update() {
-        this.removeAll();
         this.revalidate();
-        this.updateUI();
+        this.repaint();
+        this.removeAll();
+        this.add(this.lP);
         this.add(this.back);
         this.add(this.forward);
         ParseTable[] tables = new ParseTable[3];
@@ -202,11 +205,8 @@ class MergingPanel extends JPanel {
         } else {
             col2Width = (width / mergingWith.getColumnCount());
         }
-        for (Link li: this.links) {
-            Integer[] cols = li.getColIds();
-            Line2D l = new Line2D.Float((float) (30 + (cols[0] * col1Width) + (0.5 * col1Width)), 113, (float) (30 + (cols[1] * col2Width) + (0.5 * col2Width)), 200);
-            g2.draw(l);
-        }
+        g2.setStroke(new BasicStroke(2));
+        this.lP.paint(g,col1Width,col2Width,this.links,Math.max(col1Width*before.getColumnCount(),col2Width*mergingWith.getColumnCount()));
     }
 
     public static ParseTable getResult() {
