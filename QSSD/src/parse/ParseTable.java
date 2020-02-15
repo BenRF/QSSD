@@ -27,9 +27,16 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public ParseTable(ParseTable p1, ParseTable p2) {
+        this.SetupFromTwoTables(p1,p2,p1.getLinks(p2));
+    }
+
+    public ParseTable(ParseTable p1, ParseTable p2, ArrayList<Link> links) {
+        this.SetupFromTwoTables(p1,p2,links);
+    }
+
+    private void SetupFromTwoTables(ParseTable p1, ParseTable p2, ArrayList<Link> links) {
         ArrayList<ParseColumn> t1 = new ArrayList<>();
         ArrayList<ParseColumn> t2 = new ArrayList<>();
-        ArrayList<Link> links = p1.getLinks(p2);
         for (Link l: links) {
             Integer[] cols = l.getColIds();
             t1.add(p1.getCol(cols[0]));

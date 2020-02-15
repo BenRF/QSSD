@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class LinkPanel extends JPanel {
     private ArrayList<Link> links;
+    private boolean altered;
 
     public LinkPanel() {
         this.setLayout(null);
@@ -41,18 +42,27 @@ public class LinkPanel extends JPanel {
         }
         if (remove != -1) {
             this.links.remove(remove);
-            System.out.println("REMOVED");
+            this.altered = true;
             SwingUtilities.getWindowAncestor(this).repaint();
         }
     }
 
     public void paint(Graphics g, int col1Width, int col2Width, ArrayList<Link> links, int newWidth) {
         this.links = links;
+        this.altered = false;
         this.setBounds(30,113,newWidth,87);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(2));
         for (Link li: links) {
             g2.draw(li.getLine(col1Width,col2Width));
         }
+    }
+
+    public boolean hasAltered() {
+        return this.altered;
+    }
+
+    public ArrayList<Link> getLinks() {
+        return this.links;
     }
 }

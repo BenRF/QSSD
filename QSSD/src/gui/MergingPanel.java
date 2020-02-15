@@ -14,7 +14,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 class MergingPanel extends JPanel {
     private int step;
@@ -72,6 +71,7 @@ class MergingPanel extends JPanel {
     }
 
     public void calcLinksAtCurrent() {
+        this.updateLinksAtCurrentStep();
         ParseTable before;
         if (this.step - 2 < 0) {
             before = this.tabs.get(0);
@@ -83,10 +83,19 @@ class MergingPanel extends JPanel {
     }
 
     public void reCalcResultsFromCurrent() {
-        System.out.println("AT STEP " + (this.step-1));
+        this.updateLinksAtCurrentStep();
         for (int i = this.step; i < this.tabs.size(); i++) {
-            System.out.println("set result " + (i-1) + " as merge between result" + (i-2) + " and table" + i);
-            this.results[i-1] = new ParseTable(this.results[i-2],this.tabs.get(i));
+            if (i - 2 > 0) {
+                this.results[i - 1] = new ParseTable(this.results[i - 2], this.tabs.get(i), this.links.get(i-1));
+            } else {
+                this.results[i - 1] = new ParseTable(this.tabs.get(0), this.tabs.get(i), this.links.get(i-1));
+            }
+        }
+    }
+
+    public void updateLinksAtCurrentStep() {
+        if (this.lP.hasAltered()) {
+            this.links.set(this.step - 1, this.lP.getLinks());
         }
     }
 
@@ -217,6 +226,10 @@ class MergingPanel extends JPanel {
 
     public void paint (Graphics g) {
         super.paint(g);
+        if (this.lP.hasAltered()) {
+            this.reCalcResultsFromCurrent();
+            this.update();
+        }
         Graphics2D g2 = (Graphics2D) g;
         ParseTable before;
         if (this.step - 2 < 0) {
@@ -246,6 +259,7 @@ class MergingPanel extends JPanel {
     }
 
     private void stepForward() {
+        this.updateLinksAtCurrentStep();
         this.step++;
         if (this.step >= 1) {
             this.back.setEnabled(true);
@@ -257,6 +271,7 @@ class MergingPanel extends JPanel {
     }
 
     private void stepBack() {
+        this.updateLinksAtCurrentStep();
         this.step--;
         if (this.step < tabs.size()-1) {
             this.forward.setEnabled(true);
