@@ -1,11 +1,13 @@
 package gui;
 
 import parse.Link;
+import parse.ParseTable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 public class LinkPanel extends JPanel {
@@ -47,14 +49,30 @@ public class LinkPanel extends JPanel {
         }
     }
 
-    public void paint(Graphics g, int col1Width, int col2Width, ArrayList<Link> links, int newWidth) {
+    public void paint(Graphics g, ParseTable before, ParseTable mergingWith, ArrayList<Link> links) {
         this.links = links;
         this.altered = false;
+        int width = SwingUtilities.getWindowAncestor(this).getWidth()-80;
+        int col1Width,col2Width;
+        if (width - 30 > before.getColumnCount() * 155) {
+            col1Width = 150;
+        } else {
+            col1Width = (width / before.getColumnCount());
+        }
+        if (width - 30 > mergingWith.getColumnCount() * 155) {
+            col2Width = 150;
+        } else {
+            col2Width = (width / mergingWith.getColumnCount());
+        }
+        int newWidth = Math.max(before.getColumnCount()*col1Width,mergingWith.getColumnCount()*col2Width);
         this.setBounds(30,113,newWidth,87);
         Graphics2D g2 = (Graphics2D) g;
         g2.setStroke(new BasicStroke(2));
+        float tab1,tab2;
         for (Link li: links) {
-            g2.draw(li.getLine(col1Width,col2Width));
+            tab1 = (float)(30 + (before.getColIdFromName(li.getFirstCol()) * col1Width) + (0.5 * col1Width));
+            tab2 = (float)(30 + (mergingWith.getColIdFromName(li.getSecondCol()) * col2Width) + (0.5 * col2Width));
+            g2.draw(li.getLine(tab1,tab2));
         }
     }
 

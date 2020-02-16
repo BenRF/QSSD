@@ -3,11 +3,12 @@ package parse;
 import java.awt.geom.Line2D;
 
 public class Link {
-    private int col1,col2,col1Overlap,col2Overlap;
+    private int col1Overlap,col2Overlap;
+    private String col1,col2;
     private boolean sameName;
     private float x1,x2;
 
-    Link(int col1, int col2, boolean name, int col1Overlap, int col2Overlap) {
+    Link(String col1, String col2, boolean name, int col1Overlap, int col2Overlap) {
         this.col1 = col1;
         this.col2 = col2;
         this.sameName = name;
@@ -18,7 +19,7 @@ public class Link {
     }
 
     boolean equal(Link l2) {
-        return (this.col1 == l2.col1 && this.col2 != l2.col2) || (this.col1 != l2.col1 && this.col2 == l2.col2);
+        return (this.col1.equals(l2.col1) && !this.col2.equals(l2.col2)) || (!this.col1.equals(l2.col1) && this.col2.equals(l2.col2));
     }
 
     boolean stronger(Link l2) {
@@ -35,13 +36,17 @@ public class Link {
         return "[" + this.col1 + "," + this.col2 + "," + this.sameName + "," + this.col1Overlap  + "," + this.col2Overlap + "]";
     }
 
-    public Integer[] getColIds() {
-        return new Integer[] {this.col1,this.col2};
+    public String getFirstCol() {
+        return this.col1;
     }
 
-    public Line2D getLine(int col1Width, int col2Width) {
-        this.x1 = (float) (30 + (this.col1 * col1Width) + (0.5 * col1Width));
-        this.x2 = (float) (30 + (this.col2 * col2Width) + (0.5 * col2Width));
+    public String getSecondCol() {
+        return this.col2;
+    }
+
+    public Line2D getLine(float table1Pos, float table2pos) {
+        this.x1 = table1Pos;
+        this.x2 = table2pos;
         return new Line2D.Float(this.x1, 114, this.x2, 199);
     }
 
