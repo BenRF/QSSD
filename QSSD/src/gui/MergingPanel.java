@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class MergingPanel extends JPanel {
     private int step;
@@ -70,25 +71,13 @@ class MergingPanel extends JPanel {
         this.update();
     }
 
-    public void calcLinksAtCurrent() {
-        this.updateLinksAtCurrentStep();
-        ParseTable before;
-        if (this.step - 2 < 0) {
-            before = this.tabs.get(0);
-        } else {
-            before = this.results[this.step - 2];
-        }
-        ParseTable with = this.tabs.get(this.step);
-        this.links.set(this.step-1,before.getLinks(with));
-    }
-
     public void reCalcResultsFromCurrent() {
         this.updateLinksAtCurrentStep();
         for (int i = this.step; i < this.tabs.size(); i++) {
-            if (i - 2 > 0) {
+            if (i - 2 >= 0) {
                 this.results[i - 1] = new ParseTable(this.results[i - 2], this.tabs.get(i), this.links.get(i-1));
             } else {
-                this.results[i - 1] = new ParseTable(this.tabs.get(0), this.tabs.get(i), this.links.get(i-1));
+                this.results[i - 1] = new ParseTable(this.tabs.get(0), this.tabs.get(i), this.links.get(0));
             }
         }
     }
@@ -188,7 +177,6 @@ class MergingPanel extends JPanel {
                 public void mouseReleased(MouseEvent e) {
                     if (dragComplete[0]) {
                         tables[finalI].orderCols(jT.getColumnModel().getColumns());
-                        calcLinksAtCurrent();
                         reCalcResultsFromCurrent();
                         update();
                     }
@@ -238,20 +226,8 @@ class MergingPanel extends JPanel {
             before = this.results[this.step - 2];
         }
         ParseTable mergingWith = this.tabs.get(this.step);
-        int width = this.getWidth() - 80;
-        int col1Width,col2Width;
-        if (width - 30 > before.getColumnCount() * 155) {
-            col1Width = 150;
-        } else {
-            col1Width = (width / before.getColumnCount());
-        }
-        if (width - 30 > mergingWith.getColumnCount() * 155) {
-            col2Width = 150;
-        } else {
-            col2Width = (width / mergingWith.getColumnCount());
-        }
         g2.setStroke(new BasicStroke(2));
-        this.lP.paint(g,col1Width,col2Width,this.links.get(step-1),Math.max(col1Width*before.getColumnCount(),col2Width*mergingWith.getColumnCount()));
+        this.lP.paint(g,before,mergingWith,this.links.get(step-1));
     }
 
     public static ParseTable getResult() {

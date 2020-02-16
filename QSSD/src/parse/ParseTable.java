@@ -38,7 +38,7 @@ public class ParseTable extends AbstractTableModel {
         ArrayList<ParseColumn> t1 = new ArrayList<>();
         ArrayList<ParseColumn> t2 = new ArrayList<>();
         for (Link l: links) {
-            Integer[] cols = l.getColIds();
+            Integer[] cols = {p1.getColIdFromName(l.getFirstCol()),p2.getColIdFromName(l.getSecondCol())};
             t1.add(p1.getCol(cols[0]));
             t2.add(p2.getCol(cols[1]));
         }
@@ -54,7 +54,7 @@ public class ParseTable extends AbstractTableModel {
         }
         ArrayList<int[]> linkedT2Cols = new ArrayList<>();
         for (Link l: links) {
-            linkedT2Cols.add(new int[]{l.getColIds()[1],l.getColIds()[0]});
+            linkedT2Cols.add(new int[]{p2.getColIdFromName(l.getSecondCol()),p1.getColIdFromName(l.getFirstCol())});
         }
         for (ParseColumn c: p2.getColumns()) {
             boolean match = false;
@@ -68,8 +68,9 @@ public class ParseTable extends AbstractTableModel {
                 this.newCol(c.getName());
             }
         }
-        HashSet<Object> tab2Set = p2.getCol(links.get(0).getColIds()[1]).getContentAsSet();
+        HashSet<Object> tab2Set = p2.getCol(p2.getColIdFromName(links.get(0).getSecondCol())).getContentAsSet();
         Object o1,o2;
+        int temp1,temp2;
         for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
@@ -77,8 +78,10 @@ public class ParseTable extends AbstractTableModel {
                 row = p2.getRow(r2);
                 match = true;
                 for (Link l : links) {
-                    o1 = row.get(l.getColIds()[1]);
-                    o2 = this.getRow(r).get(l.getColIds()[0]);
+                    temp1 = p1.getColIdFromName(l.getFirstCol());
+                    temp2 = p2.getColIdFromName(l.getSecondCol());
+                    o1 = row.get(temp2);
+                    o2 = this.getRow(r).get(temp1);
                     if (!o1.equals(o2) && o2 != null) {
                         match = false;
                         break;
@@ -86,7 +89,7 @@ public class ParseTable extends AbstractTableModel {
                 }
                 if (match) {
                     int count = 0;
-                    tab2Set.remove(row.get(links.get(0).getColIds()[1]));
+                    tab2Set.remove(row.get(p2.getColIdFromName(links.get(0).getSecondCol())));
                     for (int[] i : linkedT2Cols) {
                         if (this.isCellEmpty(i[1],r)) {
                             this.setCell(i[1],r,row.get(i[0]-count));
@@ -104,7 +107,7 @@ public class ParseTable extends AbstractTableModel {
         }
         if (tab2Set.size() > 0) {
             for (Object o: tab2Set) {
-                ArrayList<Object> rowToAdd = p2.findRowByObject(links.get(0).getColIds()[1],o);
+                ArrayList<Object> rowToAdd = p2.findRowByObject(p2.getColIdFromName(links.get(0).getSecondCol()),o);
                 this.newRow();
                 for (int[] i : linkedT2Cols) {
                     this.setCell(i[0],this.getRowCount()-1,rowToAdd.get(i[0]));
@@ -131,8 +134,9 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
-    public void orderCols(Enumeration<TableColumn> newOrder) {
+    public ArrayList<Integer> orderCols(Enumeration<TableColumn> newOrder) {
         String[] newOrderNames = new String[this.columns.size()];
+        ArrayList<Integer> resultIds = new ArrayList<>();
         int pos = 0;
         while(newOrder.hasMoreElements()) {
             newOrderNames[pos] = newOrder.nextElement().getHeaderValue().toString();
@@ -140,17 +144,19 @@ public class ParseTable extends AbstractTableModel {
         }
         ArrayList<ParseColumn> result = new ArrayList<>();
         for (String name: newOrderNames) {
-            for (ParseColumn col: this.columns) {
+            for (ParseColumn col : this.columns) {
                 if (col.getName().equals(name)) {
                     if (this.sortedBy == col.getId()) {
                         this.sortedBy = result.size();
                     }
+                    resultIds.add(col.getId());
                     col.setId(result.size());
                     result.add(col);
                 }
             }
         }
         this.columns = result;
+        return resultIds;
     }
 
     public int getColIdFromName(String name) {
@@ -251,8 +257,8 @@ public class ParseTable extends AbstractTableModel {
                     format = c1.getFormat().equals(c2.getFormat());
                 }
                 if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
-                    //[col1Id,col2Id,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
-                    links.add(new Link(c1.getId(),c2.getId(),name,content[0],content[1]));
+                    //[col1Name,col2Name,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
+                    links.add(new Link(c1.getName(),c2.getName(),name,content[0],content[1]));
                 }
             }
         }
