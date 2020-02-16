@@ -30,9 +30,8 @@ public class MainWindow {
         toggleTab(2,false);
         jTP.setVisible(true);
         jTP.addChangeListener(changeEvent -> {
-            if (jTP.getSelectedIndex() == 1) {
+            if (jTP.getSelectedIndex() != 0) {
                 mP.setup();
-            } else if (jTP.getSelectedIndex() == 2) {
                 oP.setup();
             }
         });

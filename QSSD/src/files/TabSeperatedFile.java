@@ -10,12 +10,20 @@ public abstract class TabSeperatedFile {
 
     public ArrayList<ParseTable> getTables() {
         ArrayList<ParseTable> tabs = new ArrayList<>();
-            ArrayList<ArrayList<ArrayList<Object>>> sheet = this.breakIntoContent(this.getContent());
-            for (ArrayList<ArrayList<Object>> table: sheet) {
-                if (table.size() >= 2) {
-                    tabs.add(new ParseTable(table));
+        ArrayList<ArrayList<ArrayList<Object>>> sheet = this.breakIntoContent(this.getContent());
+        boolean isTable;
+        for (ArrayList<ArrayList<Object>> table: sheet) {
+            isTable = true;
+            for (Object o: table.get(0)) {
+                if (!(o instanceof String)) {
+                    isTable = false;
+                    break;
                 }
             }
+            if (table.size() >= 2 && isTable) {
+                tabs.add(new ParseTable(table));
+            }
+        }
         return tabs;
     }
 
