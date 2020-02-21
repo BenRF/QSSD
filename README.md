@@ -3,7 +3,7 @@ This program aims to automate the process of error checking and merging/concaten
 
 ## Getting Started
 
-###Prerequisits
+### Prerequisits
 - Java development kit 8 or higher must be installed on the machine that the program is going to be run on
 
 To run the supplied .jar file on a pc you must have a minimum of Java 8 installed, Excel is not required to be running or present on the system for the program to work.
