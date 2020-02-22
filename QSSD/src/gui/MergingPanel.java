@@ -1,5 +1,7 @@
 package gui;
 
+import files.CSVFile;
+import files.ExcelFile;
 import parse.Link;
 import parse.ParseTable;
 import parse.problems.Problem;
@@ -209,7 +211,33 @@ class MergingPanel extends JPanel {
             this.add(e);
             y = y + 20;
         }
-        //this.links = this.links.get(step);
+        y = 550;
+        JLabel name = new JLabel("File name:");
+        name.setBounds(20,y,100,30);
+        name.setFont(name.getFont().deriveFont(15.0f));
+        JTextField nameInput = new JTextField();
+        nameInput.setFont(nameInput.getFont().deriveFont(15.0f));
+        nameInput.setBounds(115,y,200,30);
+        String[] options = {".xlsx",".csv"};
+        JComboBox<String> extension = new JComboBox<>(options);
+        extension.setFont(extension.getFont().deriveFont(15.0f));
+        extension.setBounds(325,y,100,30);
+        JButton merge = new JButton("Save");
+        merge.setBounds(150,y+40,100,30);
+        merge.addActionListener(e -> {
+            switch (extension.getSelectedIndex()) {
+                case (0):
+                    new ExcelFile(tables[2],nameInput.getText());
+                    break;
+                case (1):
+                    new CSVFile(tables[2],nameInput.getText());
+                    break;
+            }
+        });
+        this.add(merge);
+        this.add(extension);
+        this.add(name);
+        this.add(nameInput);
     }
 
     public void paint (Graphics g) {
