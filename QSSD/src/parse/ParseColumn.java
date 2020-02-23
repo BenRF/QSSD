@@ -182,7 +182,13 @@ public class ParseColumn {
             }
             if (this.sameType) {
                 if (first) {
-                    output = this.content.get(0).getClass().getSimpleName();
+                    int pos = 0;
+                    while (pos < this.content.size() && this.content.get(pos) == null) {
+                        pos++;
+                    }
+                    if (pos < this.content.size()) {
+                        output = this.content.get(pos).getClass().getSimpleName();
+                    }
                 } else {
                     output = output + "," + this.content.get(0).getClass().getSimpleName();
                 }
