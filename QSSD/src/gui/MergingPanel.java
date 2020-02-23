@@ -16,19 +16,19 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 class MergingPanel extends JPanel {
     private int step;
     private ArrayList<ParseTable> tabs;
     private ParseTable[] results;
-    private JButton forward,back;
     private static ParseTable result;
     private ArrayList<ArrayList<Link>> links;
     private LinkPanel lP;
+    private ArrayList<StepButton> steps;
 
     MergingPanel() {
         this.setLayout(null);
+        this.steps = new ArrayList<>();
     }
 
     void setup() {
@@ -36,23 +36,11 @@ class MergingPanel extends JPanel {
         this.revalidate();
         this.updateUI();
         this.repaint();
-        this.back = new JButton("Back");
-        this.back.setBounds(20,20,100,30);
-        this.back.addActionListener(e -> stepBack());
-        this.forward = new JButton("Forward");
-        this.forward.setBounds(150,20,100,30);
-        this.forward.addActionListener(e -> stepForward());
-        this.forward.setEnabled(false);
         this.lP = new LinkPanel();
         this.add(this.lP);
-        this.add(this.back);
-        this.add(this.forward);
         this.tabs = MainWindow.getTables();
         this.results = new ParseTable[this.tabs.size()-1];
         this.step = this.tabs.size()-1;
-        if (this.step == 1) {
-            this.back.setEnabled(false);
-        }
         this.orderTables();
         this.results[0] = new ParseTable(this.tabs.get(0),this.tabs.get(1));
         for (int i = 2; i < this.tabs.size(); i++) {
@@ -70,6 +58,15 @@ class MergingPanel extends JPanel {
             with = this.tabs.get(i);
             this.links.add(before.getLinks(with));
         }
+        int width = (this.getWidth()-80)/(this.tabs.size()-1);
+        this.steps = new ArrayList<>();
+        StepButton temp = new StepButton(this.tabs.get(0).getName() + " + " + this.tabs.get(1).getName(),0,this,width);
+        this.steps.add(temp);
+        for (int i = 2; i < this.tabs.size(); i++) {
+            temp = new StepButton("+ " + this.tabs.get(i).getName(),i-1,this,width);
+            this.steps.add(temp);
+        }
+        this.steps.get(this.steps.size()-1).setEnabled(false);
         this.update();
     }
 
@@ -154,8 +151,9 @@ class MergingPanel extends JPanel {
         this.repaint();
         this.removeAll();
         this.add(this.lP);
-        this.add(this.back);
-        this.add(this.forward);
+        for (StepButton b: this.steps) {
+            this.add(b.getButt());
+        }
         ParseTable[] tables = new ParseTable[3];
         if (this.step - 2 < 0) {
             tables[0] = this.tabs.get(0);
@@ -255,34 +253,18 @@ class MergingPanel extends JPanel {
         }
         ParseTable mergingWith = this.tabs.get(this.step);
         g2.setStroke(new BasicStroke(2));
-        this.lP.paint(g,before,mergingWith,this.links.get(step-1));
+        this.lP.paint(g,before,mergingWith,this.links.get(this.step-1));
     }
 
     public static ParseTable getResult() {
         return result;
     }
 
-    private void stepForward() {
+    public void goToStep(int i) {
+        this.steps.get(this.step-1).setEnabled(true);
         this.updateLinksAtCurrentStep();
-        this.step++;
-        if (this.step >= 1) {
-            this.back.setEnabled(true);
-        }
-        if (this.step == tabs.size()-1) {
-            this.forward.setEnabled(false);
-        }
-        this.update();
-    }
-
-    private void stepBack() {
-        this.updateLinksAtCurrentStep();
-        this.step--;
-        if (this.step < tabs.size()-1) {
-            this.forward.setEnabled(true);
-        }
-        if (this.step <= 1) {
-            this.back.setEnabled(false);
-        }
+        this.step = i+1;
+        this.steps.get(i).setEnabled(false);
         this.update();
     }
 }

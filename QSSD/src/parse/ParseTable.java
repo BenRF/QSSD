@@ -500,4 +500,8 @@ public class ParseTable extends AbstractTableModel {
         name.setText(this.name);
         return name;
     }
+
+    public String getName() {
+        return this.name;
+    }
 }
