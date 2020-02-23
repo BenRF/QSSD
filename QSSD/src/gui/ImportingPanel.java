@@ -14,13 +14,11 @@ class ImportingPanel extends JPanel {
 
     ImportingPanel() {
         this.fO = new ArrayList<>();
-        this.counter = 0;
+        this.counter = 1;
         JButton addFile = new JButton("Add file");
         addFile.setBounds(10,10,85,25);
         addFile.addActionListener(e -> {
             JFileChooser fc;
-            int x = SwingUtilities.getWindowAncestor(this).getX();
-            int y = SwingUtilities.getWindowAncestor(this).getY();
             if (this.previousFile == null) {
                 fc = new CustomFileChooser();
             } else {

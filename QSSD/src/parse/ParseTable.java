@@ -11,6 +11,7 @@ import java.util.*;
 public class ParseTable extends AbstractTableModel {
     private ArrayList<ParseColumn> columns;
     private int sortedBy;
+    private String name;
 
     public ParseTable(ArrayList<ArrayList<Object>> content) {
         sortedBy = -1;
@@ -127,6 +128,7 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public ParseTable(ParseTable table) {
+        this.name = table.name;
         this.columns = new ArrayList<>();
         this.sortedBy = table.sortedBy;
         for (ParseColumn pC: table.columns) {
@@ -134,9 +136,8 @@ public class ParseTable extends AbstractTableModel {
         }
     }
 
-    public ArrayList<Integer> orderCols(Enumeration<TableColumn> newOrder) {
+    public void orderCols(Enumeration<TableColumn> newOrder) {
         String[] newOrderNames = new String[this.columns.size()];
-        ArrayList<Integer> resultIds = new ArrayList<>();
         int pos = 0;
         while(newOrder.hasMoreElements()) {
             newOrderNames[pos] = newOrder.nextElement().getHeaderValue().toString();
@@ -149,14 +150,12 @@ public class ParseTable extends AbstractTableModel {
                     if (this.sortedBy == col.getId()) {
                         this.sortedBy = result.size();
                     }
-                    resultIds.add(col.getId());
                     col.setId(result.size());
                     result.add(col);
                 }
             }
         }
         this.columns = result;
-        return resultIds;
     }
 
     public int getColIdFromName(String name) {
@@ -490,5 +489,15 @@ public class ParseTable extends AbstractTableModel {
     @Override
     public boolean isCellEditable(int row, int col) {
         return false;
+    }
+
+    public void setName(char letter, int num) {
+        this.name = letter + "" + num;
+    }
+
+    public JLabel getJLabel() {
+        JLabel name = new JLabel();
+        name.setText(this.name);
+        return name;
     }
 }
