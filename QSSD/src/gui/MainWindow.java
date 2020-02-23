@@ -19,20 +19,16 @@ public class MainWindow {
         main = new JFrame("QSSD");
         main.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         main.setPreferredSize(new Dimension(500,700));
-        OutputPanel oP = new OutputPanel();
         mP = new MergingPanel();
         jTP = new JTabbedPane();
         jTP.setBounds(0,0, main.getWidth()-2, main.getHeight()-2);
         jTP.add("Files",new ImportingPanel());
         jTP.add("Merging",mP);
-        jTP.add("Output", oP);
-        toggleTab(1,false);
-        toggleTab(2,false);
+        toggleTab(false);
         jTP.setVisible(true);
         jTP.addChangeListener(changeEvent -> {
             if (jTP.getSelectedIndex() != 0) {
                 mP.setup();
-                oP.setup();
             }
         });
         main.add(jTP);
@@ -46,8 +42,8 @@ public class MainWindow {
         main.setVisible(true);
     }
 
-    private static void toggleTab(int id, boolean state) {
-        jTP.setEnabledAt(id,state);
+    private static void toggleTab(boolean state) {
+        jTP.setEnabledAt(1,state);
     }
 
     static void tableCount() {
@@ -56,8 +52,7 @@ public class MainWindow {
             count = count + fO.tableCount();
         }
         boolean state = count > 1;
-        toggleTab(1,state);
-        toggleTab(2,state);
+        toggleTab(state);
     }
 
     static ArrayList<ParseTable> getTables() {

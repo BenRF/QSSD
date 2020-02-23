@@ -45,17 +45,18 @@ class FileOption extends JPanel {
         this.name = name;
         if (f != null) {
             this.tables = f.getTables();
+            for (int i = 0; i < this.tables.size(); i++) {
+                this.tables.get(i).setName((char) (this.id+64),i+1);
+            }
             this.active = new ArrayList<>(Arrays.asList(new Boolean[this.tables.size()]));
             Collections.fill(this.active, Boolean.TRUE);
-            this.setOpaque(false);
-            this.draw();
         } else {
             this.active = new ArrayList<>();
             this.tables = new ArrayList<>();
             System.out.println("ERROR WITH CREATING FILE OBJECT");
-            this.setOpaque(false);
-            this.draw();
         }
+        this.setOpaque(false);
+        this.draw();
     }
 
     private void draw() {
@@ -92,8 +93,11 @@ class FileOption extends JPanel {
                 final int finalCount = count;
                 enable.setSelected(true);
                 enable.addItemListener(e -> this.toggle(finalCount));
-                enable.setBounds(5, height+10, 20, 20);
+                enable.setBounds(5, height+25, 23, 20);
                 enable.setBackground(Color.WHITE);
+                JLabel name = pt.getJLabel();
+                name.setBounds(8,height-3,30,30);
+                this.add(name);
                 this.add(enable);
                 count++;
                 JTable tab = pt.getSummaryJTable();
@@ -104,8 +108,8 @@ class FileOption extends JPanel {
                 if (this.pane.getWidth() - 30 > pt.getColumnCount() * 155) {
                     decidedWidth = pt.getColumnCount() * 150;
                 }
-                Tabheaders.setBounds(30, height, decidedWidth, 20);
-                tab.setBounds(30, height + 20, decidedWidth, 35);
+                Tabheaders.setBounds(35, height, decidedWidth, 20);
+                tab.setBounds(35, height + 20, decidedWidth, 35);
                 ArrayList<Problem> problems = pt.getProblems();
                 if (problems.size() > 0) {
                     height = height + 60;
@@ -151,10 +155,6 @@ class FileOption extends JPanel {
     private void toggle(int id) {
         this.active.set(id,!this.active.get(id));
         MainWindow.tableCount();
-    }
-
-    ArrayList<ParseTable> getTables() {
-        return this.tables;
     }
 
     ArrayList<ParseTable> getActiveTables() {
