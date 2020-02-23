@@ -276,7 +276,7 @@ public class ParseColumn {
         return this.sameType & p2.sameType;
     }
 
-    int[] checkContent(ParseColumn p2) {
+    public int[] checkContent(ParseColumn p2) {
         int[] results = new int[2];
         ArrayList<Object> c1 = new ArrayList<>(this.content);
         ArrayList<Object> c2 = new ArrayList<>(p2.content);

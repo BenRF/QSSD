@@ -468,7 +468,11 @@ public class ParseTable extends AbstractTableModel {
 
     @Override
     public String getColumnName(int col) {
-        return this.columns.get(col).getName();
+        if (col < this.columns.size()) {
+            return this.columns.get(col).getName();
+        } else {
+            return "";
+        }
     }
 
     @Override
@@ -503,5 +507,9 @@ public class ParseTable extends AbstractTableModel {
 
     public String getName() {
         return this.name;
+    }
+
+    public ParseColumn getColumnFromName(String colName) {
+        return this.columns.get(this.getColIdFromName(colName));
     }
 }

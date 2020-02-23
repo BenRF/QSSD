@@ -8,7 +8,7 @@ public class Link {
     private boolean sameName;
     private float x1,x2;
 
-    Link(String col1, String col2, boolean name, int col1Overlap, int col2Overlap) {
+    public Link(String col1, String col2, boolean name, int col1Overlap, int col2Overlap) {
         this.col1 = col1;
         this.col2 = col2;
         this.sameName = name;
