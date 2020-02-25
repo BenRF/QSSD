@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 public class LinkPanel extends JPanel {
@@ -16,14 +17,17 @@ public class LinkPanel extends JPanel {
     private ParseTable before,mergingWith;
     private int col1Width,col2Width;
     private boolean setup;
+    private Line2D linkLine;
 
     public LinkPanel() {
+        this.linkLine = new Line2D.Float(0,0,0,0);
         this.setup = false;
         this.setBackground(Color.ORANGE);
         this.dragger = new LinkDragListener(this);
         this.addMouseMotionListener(this.dragger);
         this.setLayout(null);
         this.setBounds(30,113,MainWindow.getWidth()-80,88);
+        LinkPanel lP = this;
         this.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -35,6 +39,8 @@ public class LinkPanel extends JPanel {
             @Override
             public void mouseReleased(MouseEvent e) {
                 dragger.released();
+                linkLine = new Line2D.Float(0,0,0,0);
+                SwingUtilities.getWindowAncestor(lP).repaint();
             }
             @Override
             public void mouseEntered(MouseEvent e) {}
@@ -79,6 +85,7 @@ public class LinkPanel extends JPanel {
     }
 
     public void paint(Graphics g) {
+        this.revalidate();
         this.removeAll();
         if (this.setup) {
             int newWidth = Math.max(before.getColumnCount() * col1Width, mergingWith.getColumnCount() * col2Width);
@@ -91,6 +98,7 @@ public class LinkPanel extends JPanel {
                 tab2 = (float) (30 + (mergingWith.getColIdFromName(li.getSecondCol()) * this.col2Width) + (0.5 * this.col2Width));
                 g2.draw(li.getLine(tab1, tab2));
             }
+            g2.draw(this.linkLine);
         }
     }
 
@@ -102,7 +110,13 @@ public class LinkPanel extends JPanel {
         return this.links;
     }
 
+    public void updateLine(int x1,int y1, int x2, int y2) {
+        this.linkLine = new Line2D.Float(x1,y1,x2,y2);
+        SwingUtilities.getWindowAncestor(this).repaint();
+    }
+
     public void newLink(int x1,int x2) {
+        this.linkLine = new Line2D.Float(0,0,0,0);
         String col1 = this.before.getColumnName(x1 / col1Width);
         String col2 = this.mergingWith.getColumnName(x2 / col2Width);
         if (col1.length() > 0 && col2.length() > 0) {

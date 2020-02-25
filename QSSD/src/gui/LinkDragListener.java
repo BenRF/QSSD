@@ -17,13 +17,11 @@ public class LinkDragListener implements MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
         if (!dragging) {
             if (e.getY() > 15) {
-                System.out.println("Starting on " + e.getX() + ", " + e.getY());
                 dragging = true;
                 downwards = true;
                 x1 = e.getX();
                 y1 = e.getY();
             } else if (e.getY() > 73) {
-                System.out.println("Starting on " + e.getX() + ", " + e.getY());
                 dragging = true;
                 downwards = false;
                 x1 = e.getX();
@@ -32,6 +30,7 @@ public class LinkDragListener implements MouseMotionListener {
         } else {
             x2 = e.getX();
             y2 = e.getY();
+            this.p.updateLine(this.x1,this.y1,this.x2,this.y2);
         }
 
     }
