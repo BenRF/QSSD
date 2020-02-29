@@ -2,6 +2,7 @@ package gui;
 
 import files.CSVFile;
 import files.ExcelFile;
+
 import parse.Link;
 import parse.ParseTable;
 import parse.problems.Problem;
@@ -16,6 +17,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 class MergingPanel extends JPanel {
     private int step;
@@ -25,6 +27,7 @@ class MergingPanel extends JPanel {
     private ArrayList<ArrayList<Link>> links;
     private LinkPanel lP;
     private ArrayList<StepButton> steps;
+    private JButton next,previous;
 
     MergingPanel() {
         this.setLayout(null);
@@ -36,15 +39,29 @@ class MergingPanel extends JPanel {
         this.revalidate();
         this.updateUI();
         this.repaint();
+        this.next = new JButton(">");
+        this.next.setBounds(85,260,45,25);
+        this.next.addActionListener(e -> this.nextTable());
+        this.previous = new JButton("<");
+        this.previous.setBounds(30,260,45,25);
+        this.previous.addActionListener(e -> this.prevTable());
         this.lP = new LinkPanel();
         this.add(this.lP);
         this.tabs = MainWindow.getTables();
         this.results = new ParseTable[this.tabs.size()-1];
-        this.step = this.tabs.size()-1;
+        Arrays.fill(this.results, null);
         this.orderTables();
-        this.results[0] = new ParseTable(this.tabs.get(0),this.tabs.get(1));
+        System.out.println("Order: " + this.tabs.toString());
+        if (this.tabs.get(0).getLinks(this.tabs.get(1)).size() == 0) {
+            this.results[0] = null;
+        } else {
+            this.results[0] = new ParseTable(this.tabs.get(0), this.tabs.get(1));
+        }
+        System.out.println("Results: " + Arrays.toString(this.results));
         for (int i = 2; i < this.tabs.size(); i++) {
-            this.results[i-1] = new ParseTable(this.results[i-2],this.tabs.get(i));
+            if (this.results[i-2] != null && this.results[i-2].getLinks(this.tabs.get(i)).size() > 0) {
+                this.results[i-1] = new ParseTable(this.results[i-2], this.tabs.get(i));
+            }
         }
         result = this.results[this.results.length-1];
         this.links = new ArrayList<>();
@@ -56,34 +73,77 @@ class MergingPanel extends JPanel {
                 before = this.results[i - 2];
             }
             with = this.tabs.get(i);
-            this.links.add(before.getLinks(with));
+            if (before == null) {
+                this.links.add(null);
+            } else {
+                this.links.add(before.getLinks(with));
+            }
         }
         int width = (this.getWidth()-80)/(this.tabs.size()-1);
         this.steps = new ArrayList<>();
         StepButton temp = new StepButton(this.tabs.get(0).getName() + " + " + this.tabs.get(1).getName(),0,this,width);
         this.steps.add(temp);
         for (int i = 2; i < this.tabs.size(); i++) {
-            temp = new StepButton("+ " + this.tabs.get(i).getName(),i-1,this,width);
-            this.steps.add(temp);
+            if (this.results[i-2] != null) {
+                temp = new StepButton("+ " + this.tabs.get(i).getName(), i - 1, this, width);
+                this.steps.add(temp);
+            }
         }
         this.steps.get(this.steps.size()-1).setEnabled(false);
+        this.step = this.tabs.size()-1;
+        while (this.results[this.step-1] == null) {
+            this.step--;
+        }
+        this.step++;
+        this.update();
+    }
+
+    private int unlinkedTableCount() {
+        int pos = this.results.length-1;
+        while (this.results[pos] == null) {
+            pos--;
+        }
+        return this.results.length - 1 - pos;
+    }
+
+    private void nextTable() {
+        int pos = this.tabs.size() - this.unlinkedTableCount();
+        this.tabs.add(this.tabs.get(pos));
+        this.tabs.remove(pos);
+        this.update();
+    }
+
+    private void prevTable() {
+        int pos = this.tabs.size() - this.unlinkedTableCount();
+        this.tabs.add(pos,this.tabs.get(this.tabs.size()-1));
+        this.tabs.remove(this.tabs.size()-1);
         this.update();
     }
 
     public void reCalcResultsFromCurrent() {
-        this.updateLinksAtCurrentStep();
         for (int i = this.step; i < this.tabs.size(); i++) {
             if (i - 2 >= 0) {
-                this.results[i - 1] = new ParseTable(this.results[i - 2], this.tabs.get(i), this.links.get(i-1));
+                if (this.links.get(i-1) != null) {
+                    this.results[i-1] = new ParseTable(this.results[i - 2], this.tabs.get(i), this.links.get(i - 1));
+                } else {
+                    this.results[i-1] = null;
+                }
             } else {
-                this.results[i - 1] = new ParseTable(this.tabs.get(0), this.tabs.get(i), this.links.get(0));
+                if (this.links.get(0) == null) {
+                    this.results[i-1] = new ParseTable(this.tabs.get(0),this.tabs.get(i));
+                } else {
+                    this.results[i-1] = new ParseTable(this.tabs.get(0), this.tabs.get(i), this.links.get(0));
+                }
             }
         }
     }
 
     public void updateLinksAtCurrentStep() {
-        if (this.lP.hasAltered()) {
-            this.links.set(this.step - 1, this.lP.getLinks());
+        ArrayList<Link> links = this.lP.getLinks();
+        this.links.set(this.step - 1, links);
+        if (links == null) {
+            this.reCalcResultsFromCurrent();
+            this.update();
         }
     }
 
@@ -120,30 +180,35 @@ class MergingPanel extends JPanel {
             } else {
                 before.remove(y-1);
             }
-        }
-        while (before.size() > 0) {
-            ParseTable pT = new ParseTable(tabs.get(0),tabs.get(1));
-            for (int i = 2; i < tabs.size(); i++) {
-                pT = new ParseTable(pT,tabs.get(i));
-            }
-            int[] results = new int[before.size()];
-            for (int i = 0; i < results.length; i++) {
-                results[i] = pT.getLinks(before.get(i)).size();
-            }
-            max = -2;
-            x = -1;
-            for (int i = 0; i < results.length; i++) {
-                if (results[i] > max) {
-                    max = results[i];
-                    x = i;
+            while (before.size() > 0) {
+                ParseTable pT = new ParseTable(tabs.get(0),tabs.get(1));
+                for (int i = 2; i < tabs.size(); i++) {
+                    pT = new ParseTable(pT,tabs.get(i));
+                }
+                int[] results = new int[before.size()];
+                for (int i = 0; i < results.length; i++) {
+                    results[i] = pT.getLinks(before.get(i)).size();
+                }
+                max = -2;
+                x = -1;
+                for (int i = 0; i < results.length; i++) {
+                    if (results[i] > max) {
+                        max = results[i];
+                        x = i;
+                    }
+                }
+                if (max > 0) {
+                    tabs.add(before.get(x));
+                    before.remove(x);
+                } else {
+                    tabs.addAll(before);
+                    break;
                 }
             }
-            if (max > 0) {
-                tabs.add(before.get(x));
-                before.remove(x);
-            }
+            this.tabs = tabs;
+        } else {
+            this.tabs = before;
         }
-        this.tabs = tabs;
     }
 
     private void update() {
@@ -164,50 +229,65 @@ class MergingPanel extends JPanel {
         tables[2] = this.results[this.step-1];
         int[] positions = new int[]{60, 200, 450};
         ParseTable tab;
-        int decidedWidth;
+        int decidedWidth = this.getWidth() - 80;
         for (int i = 0; i < tables.length; i++) {
-            decidedWidth = this.getWidth() - 80;
             tab = tables[i];
-            JTable jT = tab.getSummaryJTable();
-            JTableHeader header = tab.getJTableHeader(jT);
-            final boolean[] dragComplete = {false};
-            int finalI = i;
-            header.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    if (dragComplete[0]) {
-                        tables[finalI].orderCols(jT.getColumnModel().getColumns());
-                        reCalcResultsFromCurrent();
-                        update();
+            if (tab != null) {
+                JTable jT = tab.getSummaryJTable();
+                JTableHeader header = tab.getJTableHeader(jT);
+                final boolean[] dragComplete = {false};
+                int finalI = i;
+                header.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+                        if (dragComplete[0]) {
+                            tables[finalI].orderCols(jT.getColumnModel().getColumns());
+                            updateLinksAtCurrentStep();
+                            reCalcResultsFromCurrent();
+                            update();
+                        }
+                        dragComplete[0] = false;
                     }
-                    dragComplete[0] = false;
+                });
+                jT.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
+                    public void columnMoved(TableColumnModelEvent e) {
+                        dragComplete[0] = true;
+                    }
+
+                    public void columnAdded(TableColumnModelEvent e) {
+                    }
+
+                    public void columnRemoved(TableColumnModelEvent e) {
+                    }
+
+                    public void columnMarginChanged(ChangeEvent e) {
+                    }
+
+                    public void columnSelectionChanged(ListSelectionEvent e) {
+                    }
+                });
+                if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
+                    decidedWidth = tab.getColumnCount() * 150;
                 }
-            });
-            jT.getColumnModel().addColumnModelListener(new TableColumnModelListener() {
-                public void columnMoved(TableColumnModelEvent e) {
-                    dragComplete[0] = true;
-                }
-                public void columnAdded(TableColumnModelEvent e) { }
-                public void columnRemoved(TableColumnModelEvent e) { }
-                public void columnMarginChanged(ChangeEvent e) { }
-                public void columnSelectionChanged(ListSelectionEvent e) { }
-            });
-            if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
-                decidedWidth = tab.getColumnCount() * 150;
+                header.setBounds(30, positions[i], decidedWidth, 20);
+                jT.setBounds(30, positions[i] + 20, decidedWidth, 33);
+                this.add(header);
+                this.add(jT);
+            } else {
+                this.add(this.next);
+                this.add(this.previous);
             }
-            header.setBounds(30, positions[i], decidedWidth, 20);
-            jT.setBounds(30, positions[i]+20, decidedWidth, 33);
-            this.add(header);
-            this.add(jT);
         }
         int y = 510;
         decidedWidth = this.getWidth() - 80;
-        for (Problem p : tables[2].getProblems()) {
-            JLabel e = new JLabel();
-            e.setText(p.getTitle());
-            e.setBounds(30, y, decidedWidth, 15);
-            this.add(e);
-            y = y + 20;
+        if (tables[2] != null) {
+            for (Problem p : tables[2].getProblems()) {
+                JLabel e = new JLabel();
+                e.setText(p.getTitle());
+                e.setBounds(30, y, decidedWidth, 15);
+                this.add(e);
+                y = y + 20;
+            }
         }
         y = 550;
         JLabel name = new JLabel("File name:");
@@ -241,6 +321,7 @@ class MergingPanel extends JPanel {
     public void paint (Graphics g) {
         super.paint(g);
         if (this.lP.hasAltered()) {
+            this.updateLinksAtCurrentStep();
             this.reCalcResultsFromCurrent();
             this.update();
         }

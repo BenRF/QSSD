@@ -71,23 +71,25 @@ public class LinkPanel extends JPanel {
         int width = SwingUtilities.getWindowAncestor(this).getWidth()-80;
         this.before = before;
         this.mergingWith = mergingWith;
-        if (width - 30 > before.getColumnCount() * 155) {
-            this.col1Width = 150;
-        } else {
-            this.col1Width = (width / before.getColumnCount());
+        if (this.before != null) {
+            if (width - 30 > before.getColumnCount() * 155) {
+                this.col1Width = 150;
+            } else {
+                this.col1Width = (width / before.getColumnCount());
+            }
+            if (width - 30 > mergingWith.getColumnCount() * 155) {
+                this.col2Width = 150;
+            } else {
+                this.col2Width = (width / mergingWith.getColumnCount());
+            }
+            this.paint(g);
         }
-        if (width - 30 > mergingWith.getColumnCount() * 155) {
-            this.col2Width = 150;
-        } else {
-            this.col2Width = (width / mergingWith.getColumnCount());
-        }
-        this.paint(g);
     }
 
     public void paint(Graphics g) {
         this.revalidate();
         this.removeAll();
-        if (this.setup) {
+        if (this.setup && this.before != null && links != null) {
             int newWidth = Math.max(before.getColumnCount() * col1Width, mergingWith.getColumnCount() * col2Width);
             this.setBounds(30, 113, newWidth, 87);
             Graphics2D g2 = (Graphics2D) g;
@@ -107,7 +109,11 @@ public class LinkPanel extends JPanel {
     }
 
     public ArrayList<Link> getLinks() {
-        return this.links;
+        if (this.links == null || this.links.size() == 0) {
+            return null;
+        } else {
+            return this.links;
+        }
     }
 
     public void updateLine(int x1,int y1, int x2, int y2) {

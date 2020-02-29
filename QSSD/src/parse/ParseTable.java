@@ -251,11 +251,7 @@ public class ParseTable extends AbstractTableModel {
                 int [] content = c1.checkContent(c2);
                 boolean name = c1.getName().equals(c2.getName());
                 boolean type = c1.checkType(c2);
-                boolean format = false;
-                if (c1.getFormat() != null && c2.getFormat() != null) {
-                    format = c1.getFormat().equals(c2.getFormat());
-                }
-                if (type && (content[0] > 0 || content[1] > 0 || name || format)) {
+                if (type && (content[0] > 0 || content[1] > 0 || name)) {
                     //[col1Name,col2Name,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
                     links.add(new Link(c1.getName(),c2.getName(),name,content[0],content[1]));
                 }
