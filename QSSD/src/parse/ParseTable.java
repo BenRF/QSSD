@@ -10,11 +10,11 @@ import java.util.*;
 
 public class ParseTable extends AbstractTableModel {
     private ArrayList<ParseColumn> columns;
-    private int sortedBy;
+    private String sortedBy;
     private String name;
 
     public ParseTable(ArrayList<ArrayList<Object>> content) {
-        sortedBy = -1;
+        sortedBy = "";
         this.columns = new ArrayList<>();
         for (Object header: content.get(0)) {
             this.newCol(header.toString());
@@ -123,7 +123,7 @@ public class ParseTable extends AbstractTableModel {
                 }
             }
         }
-        this.sortedBy = -1;
+        this.sortedBy = "";
         this.performChecks();
     }
 
@@ -139,17 +139,21 @@ public class ParseTable extends AbstractTableModel {
     public void orderCols(Enumeration<TableColumn> newOrder) {
         String[] newOrderNames = new String[this.columns.size()];
         int pos = 0;
+        String temp,temp2;
         while(newOrder.hasMoreElements()) {
-            newOrderNames[pos] = newOrder.nextElement().getHeaderValue().toString();
+            temp = newOrder.nextElement().getHeaderValue().toString();
+            temp2 = temp.substring(0,temp.length()-1);
+            if (temp2.equals(this.sortedBy)) {
+                newOrderNames[pos] = temp2;
+            } else {
+                newOrderNames[pos] = temp;
+            }
             pos++;
         }
         ArrayList<ParseColumn> result = new ArrayList<>();
         for (String name: newOrderNames) {
             for (ParseColumn col : this.columns) {
-                if (col.getName().equals(name)) {
-                    if (this.sortedBy == col.getId()) {
-                        this.sortedBy = result.size();
-                    }
+                if (col.getName().equals(name) ) {
                     col.setId(result.size());
                     result.add(col);
                 }
@@ -173,9 +177,13 @@ public class ParseTable extends AbstractTableModel {
         this.sortByColId(this.getColIdFromName(name));
     }
 
+    private String getNameById(int id) {
+        return this.getCol(id).getName();
+    }
+
     private void sortByColId(int columnNumber) {
         if (this.columns.size() != 0) {
-            this.sortedBy = columnNumber;
+            this.sortedBy = this.getNameById(columnNumber);
             this.quickSort(columnNumber, 0, this.columns.get(columnNumber).size() - 1);
         }
     }
@@ -424,7 +432,7 @@ public class ParseTable extends AbstractTableModel {
         String[] names = new String[this.columns.size()];
         for (int i = 0; i < this.columns.size(); i++) {
             ParseColumn col = this.columns.get(i);
-            if (this.sortedBy == col.getId()) {
+            if (this.sortedBy.equals(col.getName())) {
                 names[i] = col.getName() + "*";
             } else {
                 names[i] = col.getName();
