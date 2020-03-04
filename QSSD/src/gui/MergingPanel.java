@@ -13,6 +13,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.JTableHeader;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,7 +28,7 @@ class MergingPanel extends JPanel {
     private ArrayList<ArrayList<Link>> links;
     private LinkPanel lP;
     private ArrayList<StepButton> steps;
-    private JButton next,previous;
+    private JButton next,previous,sendToBack;
 
     MergingPanel() {
         this.setLayout(null);
@@ -45,6 +46,8 @@ class MergingPanel extends JPanel {
         this.previous = new JButton("<");
         this.previous.setBounds(30,260,45,25);
         this.previous.addActionListener(e -> this.prevTable());
+        this.sendToBack = new JButton("Send to back");
+        this.sendToBack.setBounds(150,150,125,25);
         this.lP = new LinkPanel();
         this.add(this.lP);
         this.tabs = MainWindow.getTables();
@@ -91,10 +94,14 @@ class MergingPanel extends JPanel {
         }
         this.steps.get(this.steps.size()-1).setEnabled(false);
         this.step = this.tabs.size()-1;
+        boolean noLinks = false;
         while (this.results[this.step-1] == null) {
             this.step--;
+            noLinks = true;
         }
-        this.step++;
+        if (noLinks) {
+            this.step++;
+        }
         this.update();
     }
 
@@ -225,11 +232,11 @@ class MergingPanel extends JPanel {
         } else {
             tables[0] = this.results[this.step - 2];
         }
-        tables[1] = this.tabs.get(step);
+        tables[1] = this.tabs.get(this.step);
         tables[2] = this.results[this.step-1];
         int[] positions = new int[]{60, 200, 450};
         ParseTable tab;
-        int decidedWidth = this.getWidth() - 80;
+        int decidedWidth;
         for (int i = 0; i < tables.length; i++) {
             tab = tables[i];
             if (tab != null) {
@@ -268,6 +275,8 @@ class MergingPanel extends JPanel {
                 });
                 if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
                     decidedWidth = tab.getColumnCount() * 150;
+                } else {
+                    decidedWidth = this.getWidth() - 80;
                 }
                 header.setBounds(30, positions[i], decidedWidth, 20);
                 jT.setBounds(30, positions[i] + 20, decidedWidth, 33);
@@ -276,6 +285,7 @@ class MergingPanel extends JPanel {
             } else {
                 this.add(this.next);
                 this.add(this.previous);
+                this.add(this.sendToBack);
             }
         }
         int y = 510;

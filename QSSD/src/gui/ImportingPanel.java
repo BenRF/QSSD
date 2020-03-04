@@ -40,7 +40,7 @@ class ImportingPanel extends JPanel {
         this.add(addFile);
 
         files = new JPanel();
-        files.setBounds(10,40,460,550);
+        files.setBounds(10,40,460,650);
         files.setBackground(Color.WHITE);
         files.setLayout(null);
         this.add(files);
@@ -51,7 +51,7 @@ class ImportingPanel extends JPanel {
                 super.componentResized(e);
                 int w = MainWindow.main.getWidth();
                 int h = MainWindow.main.getHeight();
-                files.setBounds(10,40,w-40,h-140);
+                files.setBounds(10,40,w-40,h-115);
                 for (FileOption fO: fO) {
                     fO.resize();
                 }
