@@ -38,6 +38,16 @@ class ImportingPanel extends JPanel {
             }
         });
         this.add(addFile);
+        JButton clear = new JButton("Remove all");
+        clear.setBounds(100,10,100,25);
+        clear.addActionListener(e -> {
+            this.counter = 1;
+            this.fO = new ArrayList<>();
+            this.files.removeAll();
+            this.updateUI();
+            this.repaint();
+        });
+        this.add(clear);
 
         files = new JPanel();
         files.setBounds(10,40,460,650);
