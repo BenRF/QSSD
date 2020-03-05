@@ -50,17 +50,19 @@ public class LinkPanel extends JPanel {
     }
 
     void delete(MouseEvent e) {
-        int remove = -1;
-        for (int i = 0; i < this.links.size(); i++) {
-            if (this.links.get(i).isClicked(e.getX(),e.getY())) {
-                remove = i;
-                break;
+        if (this.links != null) {
+            int remove = -1;
+            for (int i = 0; i < this.links.size(); i++) {
+                if (this.links.get(i).isClicked(e.getX(), e.getY())) {
+                    remove = i;
+                    break;
+                }
             }
-        }
-        if (remove != -1) {
-            this.links.remove(remove);
-            this.altered = true;
-            SwingUtilities.getWindowAncestor(this).repaint();
+            if (remove != -1) {
+                this.links.remove(remove);
+                this.altered = true;
+                SwingUtilities.getWindowAncestor(this).repaint();
+            }
         }
     }
 

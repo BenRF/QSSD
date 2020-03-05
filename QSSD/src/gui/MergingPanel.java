@@ -47,7 +47,8 @@ class MergingPanel extends JPanel {
         this.previous.setBounds(30,260,45,25);
         this.previous.addActionListener(e -> this.prevTable());
         this.sendToBack = new JButton("Send to back");
-        this.sendToBack.setBounds(150,150,125,25);
+        this.sendToBack.setBounds(175,260,125,25);
+        this.sendToBack.addActionListener(e -> this.sendBack());
         this.lP = new LinkPanel();
         this.add(this.lP);
         this.tabs = MainWindow.getTables();
@@ -60,12 +61,12 @@ class MergingPanel extends JPanel {
         } else {
             this.results[0] = new ParseTable(this.tabs.get(0), this.tabs.get(1));
         }
-        System.out.println("Results: " + Arrays.toString(this.results));
         for (int i = 2; i < this.tabs.size(); i++) {
             if (this.results[i-2] != null && this.results[i-2].getLinks(this.tabs.get(i)).size() > 0) {
                 this.results[i-1] = new ParseTable(this.results[i-2], this.tabs.get(i));
             }
         }
+        System.out.println("Results: " + Arrays.toString(this.results));
         result = this.results[this.results.length-1];
         this.links = new ArrayList<>();
         ParseTable before,with;
@@ -82,6 +83,7 @@ class MergingPanel extends JPanel {
                 this.links.add(before.getLinks(with));
             }
         }
+        System.out.println("Links: " + this.links.toString() + "\n");
         int width = (this.getWidth()-80)/(this.tabs.size()-1);
         this.steps = new ArrayList<>();
         StepButton temp = new StepButton(this.tabs.get(0).getName() + " + " + this.tabs.get(1).getName(),0,this,width);
@@ -102,6 +104,13 @@ class MergingPanel extends JPanel {
         if (noLinks) {
             this.step++;
         }
+        this.update();
+    }
+
+    private void sendBack() {
+        this.tabs.add(this.tabs.get(this.step));
+        this.tabs.remove(this.step);
+        this.links.remove(this.step);
         this.update();
     }
 
@@ -131,7 +140,7 @@ class MergingPanel extends JPanel {
         for (int i = this.step; i < this.tabs.size(); i++) {
             if (i - 2 >= 0) {
                 if (this.links.get(i-1) != null) {
-                    this.results[i-1] = new ParseTable(this.results[i - 2], this.tabs.get(i), this.links.get(i - 1));
+                    this.results[i-1] = new ParseTable(this.results[i-2], this.tabs.get(i), this.links.get(i-1));
                 } else {
                     this.results[i-1] = null;
                 }
@@ -261,17 +270,10 @@ class MergingPanel extends JPanel {
                         dragComplete[0] = true;
                     }
 
-                    public void columnAdded(TableColumnModelEvent e) {
-                    }
-
-                    public void columnRemoved(TableColumnModelEvent e) {
-                    }
-
-                    public void columnMarginChanged(ChangeEvent e) {
-                    }
-
-                    public void columnSelectionChanged(ListSelectionEvent e) {
-                    }
+                    public void columnAdded(TableColumnModelEvent e) {}
+                    public void columnRemoved(TableColumnModelEvent e) {}
+                    public void columnMarginChanged(ChangeEvent e) {}
+                    public void columnSelectionChanged(ListSelectionEvent e) {}
                 });
                 if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
                     decidedWidth = tab.getColumnCount() * 150;

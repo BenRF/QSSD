@@ -140,7 +140,11 @@ public class Part {
         } else if (this.count != -1 && !this.multiPart) {
             return this.count + "" + type;
         } else {
-            return "(" + this.min + "-" + this.max + ")" + type;
+            if (this.min == this.max) {
+                return this.min + type;
+            } else {
+                return "(" + this.min + "-" + this.max + ")" + type;
+            }
         }
     }
 }
