@@ -127,7 +127,11 @@ public class Expression {
 
     private String getPartString(int partNum) {
         int[] pos = this.expression.get(partNum).getPos();
-        return this.o.toString().substring(pos[0], pos[0] + pos[1]);
+        if (this.o == null) {
+            return "";
+        } else {
+            return this.o.toString().substring(pos[0], pos[0] + pos[1]);
+        }
     }
 
     private Part getPart(int partNum) {

@@ -89,15 +89,14 @@ public class ParseTable extends AbstractTableModel {
                     }
                 }
                 if (match) {
-                    int count = 0;
                     tab2Set.remove(row.get(p2.getColIdFromName(links.get(0).getSecondCol())));
                     for (int[] i : linkedT2Cols) {
                         if (this.isCellEmpty(i[1],r)) {
-                            this.setCell(i[1],r,row.get(i[0]-count));
+                            this.setCell(i[1],r,row.get(i[0]));
                         }
-                        row.remove(i[0] - count);
-                        count++;
+                        row.set(i[0],null);
                     }
+                    row.removeIf(Objects::isNull);
                     for (int c = 0; c < row.size(); c++) {
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
@@ -111,13 +110,12 @@ public class ParseTable extends AbstractTableModel {
                 ArrayList<Object> rowToAdd = p2.findRowByObject(p2.getColIdFromName(links.get(0).getSecondCol()),o);
                 this.newRow();
                 for (int[] i : linkedT2Cols) {
-                    this.setCell(i[0],this.getRowCount()-1,rowToAdd.get(i[0]));
+                    this.setCell(i[1],this.getRowCount()-1,rowToAdd.get(i[0]));
                 }
-                int count = 0;
                 for (int[] i : linkedT2Cols) {
-                    rowToAdd.remove(i[0] - count);
-                    count++;
+                    rowToAdd.set(i[0],null);
                 }
+                rowToAdd.removeIf(Objects::isNull);
                 for (int c = 0; c < rowToAdd.size(); c++) {
                     this.setCell(p1.getColumnCount() + c, this.getRowCount()-1, rowToAdd.get(c));
                 }
@@ -125,6 +123,7 @@ public class ParseTable extends AbstractTableModel {
         }
         this.sortedBy = "";
         this.performChecks();
+
     }
 
     public ParseTable(ParseTable table) {

@@ -75,8 +75,8 @@ class FileOption extends JPanel {
         n.setBounds(15,height,this.Width,35);
         Font f = new Font("Courier", Font.BOLD,18);
         n.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
-        height = height + 40;
         this.add(n);
+        height = height + 40;
         int count = 0;
         if (this.tables.size() < 1) {
             JLabel noTables = new JLabel();
