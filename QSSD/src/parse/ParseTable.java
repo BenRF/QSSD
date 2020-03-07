@@ -123,7 +123,6 @@ public class ParseTable extends AbstractTableModel {
         }
         this.sortedBy = "";
         this.performChecks();
-
     }
 
     public ParseTable(ParseTable table) {

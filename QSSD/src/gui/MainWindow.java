@@ -78,4 +78,9 @@ public class MainWindow {
     static int getHeight() {
         return main.getHeight();
     }
+
+    public static void removeAll() {
+        files = new ArrayList<>();
+        tableCount();
+    }
 }

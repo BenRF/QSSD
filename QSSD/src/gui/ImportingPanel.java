@@ -44,9 +44,9 @@ class ImportingPanel extends JPanel {
             this.counter = 1;
             this.fO = new ArrayList<>();
             this.files.removeAll();
+            MainWindow.removeAll();
             this.updateUI();
             this.repaint();
-            this.updateUI();
         });
         this.add(clear);
 
