@@ -16,13 +16,14 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 
 public class TableViewWindow extends JFrame {
     private ParseTable pT;
     private JTable tab;
     private JTableHeader tabHeader;
     private JCheckBox viewProblems;
+    private JPanel innerScroll;
+    private JScrollPane scrollable;
 
     public TableViewWindow(ParseTable pT) {
         this.pT = pT;
@@ -31,7 +32,10 @@ public class TableViewWindow extends JFrame {
         if (decidedWidth > 1600) {
             decidedWidth = 1600;
         }
-        int decidedHeight = 100 + (pT.getRowCount() * 16);
+        int decidedHeight = 150 + (pT.getRowCount() * 16);
+        if (decidedHeight > 800) {
+            decidedHeight = 800;
+        }
         this.setBounds(MainWindow.getProgramXPos() + (MainWindow.getWidth()/2) - (decidedWidth/2), MainWindow.getProgramYPos() + (MainWindow.getHeight()/2) - (decidedHeight/2), decidedWidth,decidedHeight);
         this.setBackground(Color.WHITE);
         this.setLayout(null);
@@ -52,6 +56,14 @@ public class TableViewWindow extends JFrame {
         problemView.setText("Problems only");
         problemView.setBounds(35,5,100,20);
         this.add(problemView);
+        this.innerScroll = new JPanel();
+        this.innerScroll.setPreferredSize(new Dimension(decidedWidth-40,75 + pT.getRowCount()*16));
+        this.innerScroll.setVisible(true);
+        this.innerScroll.setLayout(null);
+        this.scrollable = new JScrollPane(innerScroll);
+        this.scrollable.setBounds(0,40,decidedWidth-20,decidedHeight-90);
+        this.scrollable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        this.getContentPane().add(scrollable);
         this.tab = pT.getFullJTable();
         this.tabHeader = tab.getTableHeader();
         this.tabHeader.addMouseListener(new MouseAdapter() {
@@ -82,11 +94,11 @@ public class TableViewWindow extends JFrame {
             public void columnMarginChanged(ChangeEvent e) { }
             public void columnSelectionChanged(ListSelectionEvent e) { }
         });
-        this.tabHeader.setBounds(10,30, decidedWidth -40,20);
-        this.tab.setBounds(10,50, decidedWidth -40,pT.getRowCount()*16);
-        this.add(tabHeader);
-        this.add(tab);
-        tab.setDefaultRenderer(Object.class, (table, value, isSelected, hasFocus, row, column) -> {
+        this.tabHeader.setBounds(10,0, decidedWidth-150,20);
+        this.tab.setBounds(10,20, decidedWidth-150,pT.getRowCount()*16);
+        this.innerScroll.add(tabHeader);
+        this.innerScroll.add(tab);
+        this.tab.setDefaultRenderer(Object.class, (table, value, isSelected, hasFocus, row, column) -> {
             DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
             Component c = renderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (this.pT.isProblem(column,row)) {
@@ -111,8 +123,17 @@ public class TableViewWindow extends JFrame {
         if (decidedWidth > this.pT.getColumnCount() * 150) {
             decidedWidth = this.pT.getColumnCount() * 150;
         }
-        this.tabHeader.setBounds(10,30,decidedWidth,20);
-        this.tab.setBounds(10,50,decidedWidth,pT.getRowCount()*16);
+        int decidedHeight = 100 + (pT.getRowCount() * 16);
+        if (decidedHeight > this.getHeight()) {
+            decidedHeight = this.getHeight();
+            this.innerScroll.setPreferredSize(new Dimension(decidedWidth-40,20+pT.getRowCount()*16));
+            this.scrollable.setBounds(10,40,decidedWidth-20,decidedHeight-90);
+        } else {
+            this.innerScroll.setPreferredSize(new Dimension(decidedWidth-35,20+pT.getRowCount()*16));
+            this.scrollable.setBounds(10,40,decidedWidth-30,23+pT.getRowCount()*16);
+        }
+        this.tabHeader.setBounds(0,0,decidedWidth-35,20);
+        this.tab.setBounds(0,20,decidedWidth-35,pT.getRowCount()*16);
         this.revalidate();
     }
 }
