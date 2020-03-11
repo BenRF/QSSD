@@ -9,6 +9,7 @@ import java.util.ArrayList;
 class ImportingPanel extends JPanel {
     private String previousFile;
     private JPanel files;
+    private JScrollPane scrollable;
     private int counter;
     ArrayList<FileOption> fO;
 
@@ -34,6 +35,12 @@ class ImportingPanel extends JPanel {
                 MainWindow.tableCount();
                 this.fO.add(fo);
                 files.add(fo);
+                int w = MainWindow.main.getWidth();
+                int totalheight = 0;
+                for (FileOption fO: fO) {
+                    totalheight = fO.resize();
+                }
+                files.setPreferredSize(new Dimension(w-40,totalheight));
                 this.updateUI();
             }
         });
@@ -45,27 +52,31 @@ class ImportingPanel extends JPanel {
             this.fO = new ArrayList<>();
             this.files.removeAll();
             MainWindow.removeAll();
+            this.files.setPreferredSize(new Dimension(0,0));
             this.updateUI();
             this.repaint();
         });
         this.add(clear);
-
         files = new JPanel();
-        files.setBounds(10,40,460,650);
+        files.setPreferredSize(new Dimension(460,650));
         files.setBackground(Color.WHITE);
         files.setLayout(null);
-        this.add(files);
+        this.scrollable = new JScrollPane(files);
+        this.scrollable.setBounds(10,40,460,650);
+        this.add(this.scrollable);
         this.setLayout(null);
         MainWindow.main.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 super.componentResized(e);
-                int w = MainWindow.main.getWidth();
                 int h = MainWindow.main.getHeight();
-                files.setBounds(10,40,w-40,h-115);
+                int w = MainWindow.main.getWidth();
+                int totalheight = 0;
                 for (FileOption fO: fO) {
-                    fO.resize();
+                    totalheight = fO.resize();
                 }
+                files.setPreferredSize(new Dimension(w-40,totalheight));
+                scrollable.setBounds(10,40,w-35,h-115);
                 MainWindow.main.revalidate();
             }
         });

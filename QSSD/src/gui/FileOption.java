@@ -72,7 +72,7 @@ class FileOption extends JPanel {
         this.removeAll();
         JLabel n = new JLabel();
         n.setText(this.name);
-        n.setBounds(15,height,this.Width,35);
+        n.setBounds(15,height,this.Width-50,35);
         Font f = new Font("Courier", Font.BOLD,18);
         n.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         this.add(n);
@@ -130,13 +130,13 @@ class FileOption extends JPanel {
         }
         this.height = height;
         //this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.RED));
-        this.setBounds(0,0,this.pane.getWidth(),height);
+        this.setBounds(0,0,this.pane.getWidth()-40,height);
         this.setBackground(Color.white);
         this.setLayout(null);
         this.setVisible(true);
     }
 
-    void resize() {
+    int resize() {
         if (this.tables.size() >= 1) {
             for (int i = 0; i < this.tab.size(); i++) {
                 int decidedWidth = this.pane.getWidth() - 80;
@@ -149,7 +149,9 @@ class FileOption extends JPanel {
                 header.setBounds(header.getX(), header.getY(), decidedWidth, header.getHeight());
             }
             this.setBounds(0, 0, this.pane.getWidth(), height);
+            return height;
         }
+        return 30;
     }
 
     private void toggle(int id) {
