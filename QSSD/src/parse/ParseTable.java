@@ -28,7 +28,8 @@ public class ParseTable extends AbstractTableModel {
     }
 
     public ParseTable(ParseTable p1, ParseTable p2) {
-        this.SetupFromTwoTables(p1,p2,p1.getLinks(p2));
+        ArrayList<Link> links = p1.getLinks(p2);
+        this.SetupFromTwoTables(p1,p2,links);
     }
 
     public ParseTable(ParseTable p1, ParseTable p2, ArrayList<Link> links) {
@@ -72,10 +73,13 @@ public class ParseTable extends AbstractTableModel {
         HashSet<Object> tab2Set = p2.getCol(p2.getColIdFromName(links.get(0).getSecondCol())).getContentAsSet();
         Object o1,o2;
         int temp1,temp2;
+        this.sortByColId(this.getColIdFromName(links.get(0).getFirstCol()));
+        p2.sortByColId(p2.getColIdFromName(links.get(0).getSecondCol()));
+        int upTo = 0;
         for (int r = 0; r < this.getRowCount(); r++) {
             ArrayList<Object> row;
             boolean match;
-            for (int r2 = 0; r2 < p2.getRowCount(); r2++) {
+            for (int r2 = upTo; r2 < p2.getRowCount(); r2++) {
                 row = p2.getRow(r2);
                 match = true;
                 for (Link l : links) {
@@ -89,6 +93,7 @@ public class ParseTable extends AbstractTableModel {
                     }
                 }
                 if (match) {
+                    upTo = r2;
                     tab2Set.remove(row.get(p2.getColIdFromName(links.get(0).getSecondCol())));
                     for (int[] i : linkedT2Cols) {
                         if (this.isCellEmpty(i[1],r)) {
@@ -101,7 +106,6 @@ public class ParseTable extends AbstractTableModel {
                         this.setCell(p1.getColumnCount() + c, r, row.get(c));
                     }
                     break;
-
                 }
             }
         }
@@ -252,39 +256,43 @@ public class ParseTable extends AbstractTableModel {
         ArrayList<ParseColumn> p1c = this.columns;
         ArrayList<ParseColumn> p2c = p2.columns;
         ArrayList<Link> links = new ArrayList<>();
-        for (ParseColumn c1: p1c) {
-            for (ParseColumn c2: p2c) {
-                int [] content = c1.checkContent(c2);
-                boolean name = c1.getName().equals(c2.getName());
+        for (ParseColumn c1 : p1c) {
+            for (ParseColumn c2 : p2c) {
                 boolean type = c1.checkType(c2);
-                if (type && (content[0] > 0 || content[1] > 0 || name)) {
-                    //[col1Name,col2Name,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
-                    links.add(new Link(c1.getName(),c2.getName(),name,content[0],content[1]));
+                if (type) {
+                    int[] content = c1.checkContent(c2);
+                    boolean name = c1.getName().equals(c2.getName());
+                    if (content[0] > 80 || content[1] > 80 || name) {
+                        //[col1Name,col2Name,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
+                        links.add(new Link(c1.getName(), c2.getName(), name, content[0], content[1]));
+                    }
                 }
             }
         }
         boolean removed = false;
         int x = 0;
-        while (x < links.size()) {
-            Link link = links.get(x);
-            for (int y = 0; y < links.size(); y++) {
-                Link link2 = links.get(y);
-                if (link.equal(link2)) {
-                    if (link.stronger(link2)) {
-                        links.remove(y);
-                        removed = true;
-                    } else {
-                        links.remove(x);
-                        removed = true;
-                        break;
+        if (links.size() > 1) {
+            while (x < links.size()) {
+                Link link = links.get(x);
+                for (int y = 0; y < links.size(); y++) {
+                    Link link2 = links.get(y);
+                    if (link.equal(link2)) {
+                        if (link.stronger(link2)) {
+                            links.remove(y);
+                            removed = true;
+                        } else {
+                            links.remove(x);
+                            removed = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if (removed) {
-                removed = false;
-                x = 0;
-            } else {
-                x++;
+                if (removed) {
+                    removed = false;
+                    x = 0;
+                } else {
+                    x++;
+                }
             }
         }
         return links;

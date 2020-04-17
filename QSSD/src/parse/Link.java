@@ -26,7 +26,7 @@ public class Link {
         boolean higherSimilarity = this.col1Overlap + this.col2Overlap > l2.col1Overlap + l2.col2Overlap;
         boolean sameOrHigherSimilarity = this.col1Overlap + this.col2Overlap >= l2.col1Overlap + l2.col2Overlap;
         boolean sameNameVal = this.sameName == l2.sameName;
-        boolean overThreshold = this.col1Overlap > 80 || this.col2Overlap > 80;
+        boolean overThreshold = this.col1Overlap > 90 || this.col2Overlap > 90;
         boolean otherHasNameMatch = !this.sameName && l2.sameName;
         boolean thisHasNameMatch = this.sameName && !l2.sameName;
         return (sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameOrHigherSimilarity);

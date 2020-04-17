@@ -164,66 +164,68 @@ class MergingPanel extends JPanel {
     }
 
     private void orderTables() {
-        ArrayList<ParseTable> before = new ArrayList<>(tabs);
-        ArrayList<ParseTable> tabs = new ArrayList<>();
-        int[][] scores = new int[before.size()][before.size()];
-        for (int i = 0; i < before.size(); i++) {
-            for (int j = 0; j < before.size(); j++) {
-                int s = -1;
-                if (i != j) {
-                    s = before.get(i).getLinks(before.get(j)).size();
-                }
-                scores[i][j] = s;
-            }
-        }
-        int max = -2, x = -1, y = -1;
-        for (int i = 0; i < scores.length; i++) {
-            int[] row = scores[i];
-            for (int j = 0; j < row.length; j++) {
-                if (row[j] > max && row[j] > 0) {
-                    max = row[j];
-                    y = i;
-                    x = j;
+        if (tabs.size() > 2) {
+            ArrayList<ParseTable> before = new ArrayList<>(tabs);
+            ArrayList<ParseTable> tabs = new ArrayList<>();
+            int[][] scores = new int[before.size()][before.size()];
+            for (int i = 0; i < before.size(); i++) {
+                for (int j = 0; j < before.size(); j++) {
+                    int s = -1;
+                    if (i != j) {
+                        s = before.get(i).getLinks(before.get(j)).size();
+                    }
+                    scores[i][j] = s;
                 }
             }
-        }
-        if (max > 0) {
-            tabs.add(before.get(x));
-            before.remove(x);
-            tabs.add(before.get(y));
-            if (x > y) {
-                before.remove(y);
-            } else {
-                before.remove(y-1);
-            }
-            while (before.size() > 0) {
-                ParseTable pT = new ParseTable(tabs.get(0),tabs.get(1));
-                for (int i = 2; i < tabs.size(); i++) {
-                    pT = new ParseTable(pT,tabs.get(i));
-                }
-                int[] results = new int[before.size()];
-                for (int i = 0; i < results.length; i++) {
-                    results[i] = pT.getLinks(before.get(i)).size();
-                }
-                max = -2;
-                x = -1;
-                for (int i = 0; i < results.length; i++) {
-                    if (results[i] > max) {
-                        max = results[i];
-                        x = i;
+            int max = -2, x = -1, y = -1;
+            for (int i = 0; i < scores.length; i++) {
+                int[] row = scores[i];
+                for (int j = 0; j < row.length; j++) {
+                    if (row[j] > max && row[j] > 0) {
+                        max = row[j];
+                        y = i;
+                        x = j;
                     }
                 }
-                if (max > 0) {
-                    tabs.add(before.get(x));
-                    before.remove(x);
-                } else {
-                    tabs.addAll(before);
-                    break;
-                }
             }
-            this.tabs = tabs;
-        } else {
-            this.tabs = before;
+            if (max > 0) {
+                tabs.add(before.get(x));
+                before.remove(x);
+                tabs.add(before.get(y));
+                if (x > y) {
+                    before.remove(y);
+                } else {
+                    before.remove(y - 1);
+                }
+                while (before.size() > 0) {
+                    ParseTable pT = new ParseTable(tabs.get(0), tabs.get(1));
+                    for (int i = 2; i < tabs.size(); i++) {
+                        pT = new ParseTable(pT, tabs.get(i));
+                    }
+                    int[] results = new int[before.size()];
+                    for (int i = 0; i < results.length; i++) {
+                        results[i] = pT.getLinks(before.get(i)).size();
+                    }
+                    max = -2;
+                    x = -1;
+                    for (int i = 0; i < results.length; i++) {
+                        if (results[i] > max) {
+                            max = results[i];
+                            x = i;
+                        }
+                    }
+                    if (max > 0) {
+                        tabs.add(before.get(x));
+                        before.remove(x);
+                    } else {
+                        tabs.addAll(before);
+                        break;
+                    }
+                }
+                this.tabs = tabs;
+            } else {
+                this.tabs = before;
+            }
         }
     }
 
