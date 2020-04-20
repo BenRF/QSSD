@@ -56,8 +56,25 @@ public class CSVFile extends TabSeperatedFile {
             BufferedReader csvReader = new BufferedReader(new FileReader(fileName));
             String row;
             while ((row = csvReader.readLine()) != null) {
-                String[] data = row.split(",");
-                ArrayList<Object> r = new ArrayList<>(Arrays.asList(data));
+                ArrayList<Object> r = new ArrayList<>();
+                StringBuilder current = new StringBuilder();
+                boolean quotes = false;
+                for (int i = 0; i < row.length(); i++) {
+                    if (row.charAt(i) == ',' && !quotes) {
+                        if (current.length() == 0) {
+                            r.add(null);
+                        } else {
+                            r.add(current.toString());
+                        }
+
+                        current = new StringBuilder();
+                    } else if (row.charAt(i) == '"') {
+                        quotes = !quotes;
+                    } else {
+                        current.append(row.charAt(i));
+                    }
+                }
+                r.add(current);
                 content.add(r);
             }
             csvReader.close();
@@ -70,7 +87,7 @@ public class CSVFile extends TabSeperatedFile {
             row = content.get(y);
             max = Math.max(max,content.get(y).size());
             for (int x = 0; x < row.size(); x++) {
-                if (content.get(y).get(x).toString().length() == 0) {
+                if (content.get(y).get(x) == null || content.get(y).get(x).toString().length() == 0) {
                     ArrayList<Object> temp = content.get(y);
                     temp.set(x,null);
                     content.set(y,temp);

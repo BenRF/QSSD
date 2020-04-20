@@ -11,11 +11,13 @@ public abstract class TabSeperatedFile {
     public ArrayList<ParseTable> getTables() {
         ArrayList<ParseTable> tabs = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<Object>>> sheet = this.breakIntoContent(this.getContent());
+        System.out.println(sheet.size());
         boolean isTable;
         for (ArrayList<ArrayList<Object>> table: sheet) {
             isTable = true;
             for (Object o: table.get(0)) {
-                if (!(o instanceof String)) {
+                if (!(o instanceof String || o instanceof StringBuilder)) {
+                    System.out.println(o + " isn't string its a " + o.getClass().getSimpleName());
                     isTable = false;
                     break;
                 }
@@ -36,6 +38,8 @@ public abstract class TabSeperatedFile {
         ArrayList<Object> tempRow;
         ArrayList<ArrayList<Object>> tempsection;
         int tempRowPos,tempColPos;
+        boolean onBlock;
+        int blockRowSize;
         while (yPos < rowSize-1) {
             xPos = 0;
             while (xPos < colSize-1) {
@@ -43,10 +47,12 @@ public abstract class TabSeperatedFile {
                     if (content.get(yPos).get(xPos) != null) {
                         tempsection = new ArrayList<>();
                         tempRowPos = 0;
-                        while (content.get(yPos + tempRowPos).get(xPos) != null) {
+                        onBlock = true;
+                        blockRowSize = 0;
+                        while (onBlock) {
                             tempRow = new ArrayList<>();
                             tempColPos = 0;
-                            while (content.get(yPos + tempRowPos).get(xPos + tempColPos) != null) {
+                            while (content.get(yPos + tempRowPos).get(xPos + tempColPos) != null || tempColPos < blockRowSize) {
                                 tempRow.add(content.get(yPos + tempRowPos).get(xPos + tempColPos));
                                 ArrayList<Object> row = content.get(yPos + tempRowPos);
                                 row.set(xPos + tempColPos, null);
@@ -55,9 +61,13 @@ public abstract class TabSeperatedFile {
                                     tempColPos++;
                                 }
                             }
+                            blockRowSize = tempColPos;
                             tempsection.add(tempRow);
                             if (yPos + tempRowPos < rowSize - 1 && content.get(yPos + tempRowPos + 1).size() != 0) {
                                 tempRowPos++;
+                            }
+                            if (content.get(yPos + tempRowPos).get(xPos) == null) {
+                                onBlock = false;
                             }
                         }
                         results.add(tempsection);
