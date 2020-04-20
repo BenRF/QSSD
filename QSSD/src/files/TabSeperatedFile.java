@@ -11,13 +11,11 @@ public abstract class TabSeperatedFile {
     public ArrayList<ParseTable> getTables() {
         ArrayList<ParseTable> tabs = new ArrayList<>();
         ArrayList<ArrayList<ArrayList<Object>>> sheet = this.breakIntoContent(this.getContent());
-        System.out.println(sheet.size());
         boolean isTable;
         for (ArrayList<ArrayList<Object>> table: sheet) {
             isTable = true;
             for (Object o: table.get(0)) {
                 if (!(o instanceof String || o instanceof StringBuilder)) {
-                    System.out.println(o + " isn't string its a " + o.getClass().getSimpleName());
                     isTable = false;
                     break;
                 }
