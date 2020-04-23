@@ -68,7 +68,11 @@ public class LinkPanel extends JPanel {
 
     public void paint(Graphics g, ParseTable before, ParseTable mergingWith, ArrayList<Link> links) {
         this.setup = true;
-        this.links = links;
+        if (links != null) {
+            this.links = links;
+        } else {
+            this.links = new ArrayList<>();
+        }
         this.altered = false;
         int width = SwingUtilities.getWindowAncestor(this).getWidth()-80;
         this.before = before;

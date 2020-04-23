@@ -28,7 +28,7 @@ class MergingPanel extends JPanel {
     private ArrayList<ArrayList<Link>> links;
     private LinkPanel lP;
     private ArrayList<StepButton> steps;
-    private JButton next,previous,sendToBack;
+    private JButton next,previous;
 
     MergingPanel() {
         this.setLayout(null);
@@ -46,9 +46,6 @@ class MergingPanel extends JPanel {
         this.previous = new JButton("<");
         this.previous.setBounds(30,260,45,25);
         this.previous.addActionListener(e -> this.prevTable());
-        this.sendToBack = new JButton("Send to back");
-        this.sendToBack.setBounds(175,260,125,25);
-        this.sendToBack.addActionListener(e -> this.sendBack());
         this.lP = new LinkPanel();
         this.add(this.lP);
         this.tabs = MainWindow.getTables();
@@ -84,16 +81,7 @@ class MergingPanel extends JPanel {
             }
         }
         System.out.println("Links: " + this.links.toString() + "\n");
-        int width = (this.getWidth()-80)/(this.tabs.size()-1);
-        this.steps = new ArrayList<>();
-        StepButton temp = new StepButton(this.tabs.get(0).getName() + " + " + this.tabs.get(1).getName(),0,this,width);
-        this.steps.add(temp);
-        for (int i = 2; i < this.tabs.size(); i++) {
-            if (this.results[i-2] != null) {
-                temp = new StepButton("+ " + this.tabs.get(i).getName(), i - 1, this, width);
-                this.steps.add(temp);
-            }
-        }
+        this.calcStepButtons();
         this.steps.get(this.steps.size()-1).setEnabled(false);
         this.step = this.tabs.size()-1;
         boolean noLinks = false;
@@ -104,13 +92,6 @@ class MergingPanel extends JPanel {
         if (noLinks) {
             this.step++;
         }
-        this.update();
-    }
-
-    private void sendBack() {
-        this.tabs.add(this.tabs.get(this.step));
-        this.tabs.remove(this.step);
-        this.links.remove(this.step);
         this.update();
     }
 
@@ -126,6 +107,7 @@ class MergingPanel extends JPanel {
         int pos = this.tabs.size() - this.unlinkedTableCount();
         this.tabs.add(this.tabs.get(pos));
         this.tabs.remove(pos);
+        this.calcStepButtons();
         this.update();
     }
 
@@ -133,16 +115,18 @@ class MergingPanel extends JPanel {
         int pos = this.tabs.size() - this.unlinkedTableCount();
         this.tabs.add(pos,this.tabs.get(this.tabs.size()-1));
         this.tabs.remove(this.tabs.size()-1);
+        this.calcStepButtons();
         this.update();
     }
 
     public void reCalcResultsFromCurrent() {
         for (int i = this.step; i < this.tabs.size(); i++) {
             if (i - 2 >= 0) {
-                if (this.links.get(i-1) != null) {
+                if (this.links.get(i-1) != null && this.results[i-2] != null) {
                     this.results[i-1] = new ParseTable(this.results[i-2], this.tabs.get(i), this.links.get(i-1));
                 } else {
                     this.results[i-1] = null;
+                    this.links.set(i-1,null);
                 }
             } else {
                 if (this.links.get(0) == null) {
@@ -159,6 +143,7 @@ class MergingPanel extends JPanel {
         this.links.set(this.step - 1, links);
         if (links == null) {
             this.reCalcResultsFromCurrent();
+            this.calcStepButtons();
             this.update();
         }
     }
@@ -233,8 +218,9 @@ class MergingPanel extends JPanel {
         this.revalidate();
         this.repaint();
         this.removeAll();
+        this.calcStepButtons();
         this.add(this.lP);
-        for (StepButton b: this.steps) {
+        for (StepButton b : this.steps) {
             this.add(b.getButt());
         }
         ParseTable[] tables = new ParseTable[3];
@@ -244,7 +230,7 @@ class MergingPanel extends JPanel {
             tables[0] = this.results[this.step - 2];
         }
         tables[1] = this.tabs.get(this.step);
-        tables[2] = this.results[this.step-1];
+        tables[2] = this.results[this.step - 1];
         int[] positions = new int[]{60, 200, 450};
         ParseTable tab;
         int decidedWidth;
@@ -272,10 +258,17 @@ class MergingPanel extends JPanel {
                         dragComplete[0] = true;
                     }
 
-                    public void columnAdded(TableColumnModelEvent e) {}
-                    public void columnRemoved(TableColumnModelEvent e) {}
-                    public void columnMarginChanged(ChangeEvent e) {}
-                    public void columnSelectionChanged(ListSelectionEvent e) {}
+                    public void columnAdded(TableColumnModelEvent e) {
+                    }
+
+                    public void columnRemoved(TableColumnModelEvent e) {
+                    }
+
+                    public void columnMarginChanged(ChangeEvent e) {
+                    }
+
+                    public void columnSelectionChanged(ListSelectionEvent e) {
+                    }
                 });
                 if (this.getWidth() - 30 > tab.getColumnCount() * 155) {
                     decidedWidth = tab.getColumnCount() * 150;
@@ -286,10 +279,9 @@ class MergingPanel extends JPanel {
                 jT.setBounds(30, positions[i] + 20, decidedWidth, 33);
                 this.add(header);
                 this.add(jT);
-            } else {
+            } else if (this.unlinkedTableCount() > 1) {
                 this.add(this.next);
                 this.add(this.previous);
-                this.add(this.sendToBack);
             }
         }
         int y = 510;
@@ -305,27 +297,33 @@ class MergingPanel extends JPanel {
         }
         y = 550;
         JLabel name = new JLabel("File name:");
-        name.setBounds(20,y,100,30);
+        name.setBounds(20, y, 100, 30);
         name.setFont(name.getFont().deriveFont(15.0f));
         JTextField nameInput = new JTextField();
         nameInput.setFont(nameInput.getFont().deriveFont(15.0f));
-        nameInput.setBounds(115,y,200,30);
-        String[] options = {".xlsx",".csv"};
+        nameInput.setBounds(115, y, 200, 30);
+        String[] options = {".xlsx", ".csv"};
         JComboBox<String> extension = new JComboBox<>(options);
         extension.setFont(extension.getFont().deriveFont(15.0f));
-        extension.setBounds(325,y,100,30);
+        extension.setBounds(325, y, 100, 30);
         JButton merge = new JButton("Save");
-        merge.setBounds(150,y+40,100,30);
+        merge.setBounds(150, y + 40, 100, 30);
         merge.addActionListener(e -> {
             switch (extension.getSelectedIndex()) {
                 case (0):
-                    new ExcelFile(tables[2],nameInput.getText());
+                    new ExcelFile(tables[2], nameInput.getText());
                     break;
                 case (1):
-                    new CSVFile(tables[2],nameInput.getText());
+                    new CSVFile(tables[2], nameInput.getText());
                     break;
             }
         });
+        if (this.links.get(this.step-1) == null) {
+            merge.setEnabled(false);
+            extension.setEnabled(false);
+            name.setEnabled(false);
+            nameInput.setEnabled(false);
+        }
         this.add(merge);
         this.add(extension);
         this.add(name);
@@ -361,5 +359,21 @@ class MergingPanel extends JPanel {
         this.step = i+1;
         this.steps.get(i).setEnabled(false);
         this.update();
+    }
+
+    private void calcStepButtons() {
+        this.steps = new ArrayList<>();
+        int width = (this.getWidth()-80)/(this.tabs.size()-1);
+        StepButton temp = new StepButton(this.tabs.get(0).getName() + " + " + this.tabs.get(1).getName(),0,this,width);
+        this.steps.add(temp);
+        for (int i = 2; i < this.tabs.size(); i++) {
+            if (this.results[i-2] != null) {
+                temp = new StepButton("+ " + this.tabs.get(i).getName(), i - 1, this, width);
+                this.steps.add(temp);
+            }
+        }
+        if (this.step != 0) {
+            this.steps.get(this.step - 1).setEnabled(false);
+        }
     }
 }
