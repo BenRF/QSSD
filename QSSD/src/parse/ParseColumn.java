@@ -83,16 +83,25 @@ public class ParseColumn {
                 nulls.add(i);
             }
         }
-        if (count >= this.content.size() * 0.1) {
+        if (count != 0) {
             this.errors.add(new MissingValues(this.id,nulls,this.name));
         }
     }
 
     private void checkUnique() {
         Set<Object> content = new HashSet<>(this.content);
+        boolean hadNull = content.remove(null);
+        int nullCount = 0;
+        if (hadNull) {
+            for (Object o: this.content) {
+                if (o == null) {
+                    nullCount++;
+                }
+            }
+        }
         this.numOfUniqueVals = content.size();
-        this.uniqueValues = content.size() == this.content.size();
-        if (content.size() > this.content.size() * 0.85 && content.size() < this.content.size()) {
+        this.uniqueValues = content.size() == this.content.size() - nullCount;
+        if (content.size() > (this.content.size()-nullCount) * 0.85 && content.size() < this.content.size() - nullCount) {
             ArrayList<Integer> flags = new ArrayList<>();
             Map<Object,ArrayList<Integer>> valsWithPos = new HashMap<>();
             for (int i = 0; i < this.content.size(); i++) {
@@ -174,7 +183,7 @@ public class ParseColumn {
         String output = "";
         boolean first = true;
         if (this.empty) {
-            return "EMPTY";
+            return "Empty";
         } else {
             if (this.uniqueValues) {
                 output = output + "Unique";
@@ -190,7 +199,9 @@ public class ParseColumn {
                         output = this.content.get(pos).getClass().getSimpleName();
                     }
                 } else {
-                    output = output + "," + this.content.get(0).getClass().getSimpleName();
+                    if (this.content.get(0) != null) {
+                        output = output + "," + this.content.get(0).getClass().getSimpleName();
+                    }
                 }
             }
             return output;

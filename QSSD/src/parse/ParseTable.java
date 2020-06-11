@@ -87,7 +87,7 @@ public class ParseTable extends AbstractTableModel {
                     temp2 = p2.getColIdFromName(l.getSecondCol());
                     o1 = row.get(temp2);
                     o2 = this.getRow(r).get(temp1);
-                    if (!o1.equals(o2) && o2 != null) {
+                    if (o1 != null && o2 != null && !o1.equals(o2)) {
                         match = false;
                         break;
                     }
@@ -259,10 +259,10 @@ public class ParseTable extends AbstractTableModel {
         for (ParseColumn c1 : p1c) {
             for (ParseColumn c2 : p2c) {
                 boolean type = c1.checkType(c2);
-                if (type) {
+                if (type || c1.isEmpty() || c2.isEmpty()) {
                     int[] content = c1.checkContent(c2);
                     boolean name = c1.getName().equals(c2.getName());
-                    if (content[0] > 80 || content[1] > 80 || name) {
+                    if (content[0] > 85 || content[1] > 85 || name) {
                         //[col1Name,col2Name,sameName,%c1ContentMatch,%c2ContentMatch,formatMatch]
                         links.add(new Link(c1.getName(), c2.getName(), name, content[0], content[1]));
                     }
