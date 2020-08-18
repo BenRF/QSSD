@@ -1,23 +1,23 @@
 
 # Querying Semi-Structured Data
 This project focuses on automating the process of joining tables from various semi-structured file formats, the created solution can:
-* Automated detection of tables inside user imported files.
-* Potential problem detection within each table.
-* Expression generation to summarize data inside each column.
-* Table relation recognition based on overlapping content or similar column headers.
-* Outer table joining of all selected table.
-* The ability to override these automated decisions.
+* Detect tables inside user imported files.
+* Find potential problem detection within each table.
+* Generate expression to summarize data inside each column.
+* Recognize table relations based on overlapping content or similar column headers.
+* Perform an outer join on selected tables.
+* Allow the user to override these automated decisions.
 
 ![alt text][overview]
 
-[overview]: https://cseegit.essex.ac.uk/ce301_2019/ce301_ramsay_foster_b/-/raw/master/QSSD/overview.png "Both tabs of the program"
+[overview]: https://github.com/BenRF/QSSD/blob/master/Screenshots/overview.png "Both tabs of the program"
 
 ## Getting Started
 
 ### Prerequisites
 - Java development kit 8 or higher must be installed on the machine that the program is going to be run on
 - Microsoft Excel is not required to run the program but will be needed to edit and view the files this program works with.
-- The built version of the program is available as a .jar executable can be downloaded from [here](https://cseegit.essex.ac.uk/ce301_2019/ce301_ramsay_foster_b/-/blob/master/QSSD/QSSD.jar)
+- The built version of the program is available as a .jar executable
 
 ### Valid file formats
 All imported files can contain any number of one-dimensional tables of any size provided all tables have a minimum of one empty row/column between it and any adjacent content.
@@ -25,7 +25,7 @@ All imported files can contain any number of one-dimensional tables of any size 
 * .csv: Comma-separated values Can read and understand tables that are placed anywhere inside each file.
 
 ## Importing a file
-<img src="https://cseegit.essex.ac.uk/ce301_2019/ce301_ramsay_foster_b/-/raw/master/QSSD/importing.png" width="300"/>
+<img src="https://github.com/BenRF/QSSD/blob/master/Screenshots/importing.png" width="300"/>
 
 When running the program you will be presented with the importing panel, from here you can import files, select which tables you would like to merge and check each table for problems.
 
@@ -37,7 +37,7 @@ When running the program you will be presented with the importing panel, from he
 * If a problem was detected within that table a short description of what the problem was and which columns it occurred in will be shown underneath the table. The cells which were identified as a problem will be highlighted in the full table window.
 
 ## Merging tables
-<img src="https://cseegit.essex.ac.uk/ce301_2019/ce301_ramsay_foster_b/-/raw/master/QSSD/merging.png" width="300"/>
+<img src="https://github.com/BenRF/QSSD/blob/master/Screenshots/merging.png" width="300"/>
 
 Once a minimum of two tables has been imported the merging panel becomes available to select, by navigating to the merging panel the program will automatically order the tables, detect relations between tables and generate the resulting table. 
 
