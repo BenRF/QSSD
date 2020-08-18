@@ -6,7 +6,7 @@ public class Expression {
     private ArrayList<Part> expression;
     private Object o;
 
-    Expression(Object o) {
+    public Expression(Object o) {
         this.o = o;
         this.expression = new ArrayList<>();
         if (o != null && o.toString().length() > 0) {

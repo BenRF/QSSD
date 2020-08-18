@@ -11,7 +11,7 @@ public class Part {
     private int max;
     private int startPos;
 
-    Part(int type, int startPos) {
+    public Part(int type, int startPos) {
         this.count = 1;
         this.min = -1;
         this.max = -1;
@@ -20,7 +20,7 @@ public class Part {
         this.multiPart = false;
     }
 
-    Part(int type, int count, int startPos) {
+    public Part(int type, int count, int startPos) {
         this.count = count;
         this.min = -1;
         this.max = -1;
@@ -29,7 +29,7 @@ public class Part {
         this.typeCalc(type);
     }
 
-    Part(Part p1, Part p2) {
+    public Part(Part p1, Part p2) {
         this.multiPart = true;
         this.alphabetical = p1.alphabetical || p2.alphabetical;
         this.digit = p1.digit || p2.digit;
@@ -74,7 +74,7 @@ public class Part {
     //-1 = no link
     // 0 = exact same
     // 1 = same type
-    int compare(Part p) {
+    public int compare(Part p) {
         if (this.count == p.count && this.sameTypes(p) && this.min == p.min && this.max == p.max) {
             return 0;
         } else if (this.sameTypes(p)) {

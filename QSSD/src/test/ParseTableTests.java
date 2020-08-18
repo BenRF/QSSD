@@ -1,9 +1,10 @@
-package parse;
+package test;
 
 import files.ExcelFile;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import parse.ParseTable;
 
 import java.util.ArrayList;
 import java.util.Arrays;

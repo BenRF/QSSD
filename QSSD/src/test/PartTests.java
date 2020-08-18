@@ -1,8 +1,9 @@
-package parse;
+package test;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import parse.Part;
 
 public class PartTests {
     Part c,n,s,sy;

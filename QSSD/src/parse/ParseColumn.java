@@ -15,7 +15,7 @@ public class ParseColumn {
     private Expression format;
     private ArrayList<Problem> errors;
 
-    ParseColumn(String columnName, int id) {
+    public ParseColumn(String columnName, int id) {
         this.name = columnName;
         this.id = id;
         this.content = new ArrayList<>();
@@ -46,21 +46,21 @@ public class ParseColumn {
         this.empty = column.empty;
     }
 
-    void addContent(Object newObj) {
+    public void addContent(Object newObj) {
         content.add(newObj);
     }
 
-    void normalise(int newSize) {
+    public void normalise(int newSize) {
         while (this.content.size() < newSize) {
             this.content.add(null);
         }
     }
 
-    void set(int rowNum, Object newObj) {
+    public void set(int rowNum, Object newObj) {
         this.content.set(rowNum,newObj);
     }
 
-    void performChecks() {
+    public void performChecks() {
         this.isEmpty();
         if (!this.empty) {
             this.findExpressions();
@@ -131,7 +131,7 @@ public class ParseColumn {
         }
     }
 
-    ArrayList<Problem> getProblems() {
+    public ArrayList<Problem> getProblems() {
         return this.errors;
     }
 
@@ -169,17 +169,17 @@ public class ParseColumn {
         return this.name;
     }
 
-    int size() {
+    public int size() {
         return this.content.size();
     }
 
-    String getName() { return this.name; }
+    public String getName() { return this.name; }
 
-    int getId() { return this.id; }
+    public int getId() { return this.id; }
 
     void setId(int newId) { this.id = newId; }
 
-    String getAttributes() {
+    public String getAttributes() {
         String output = "";
         boolean first = true;
         if (this.empty) {
@@ -208,11 +208,11 @@ public class ParseColumn {
         }
     }
 
-    Object get(int rowNum) {
+    public Object get(int rowNum) {
         return this.content.get(rowNum);
     }
 
-    int findRowByObject(Object obj) {
+    public int findRowByObject(Object obj) {
         for (int i = 0; i < this.content.size(); i++) {
             if (this.content.get(i).equals(obj)) {
                 return i;
@@ -225,13 +225,13 @@ public class ParseColumn {
         return new HashSet<>(this.content);
     }
 
-    void swap(int rowOne, int rowTwo) {
+    public void swap(int rowOne, int rowTwo) {
         Object temp = this.content.get(rowOne);
         this.content.set(rowOne,this.content.get(rowTwo));
         this.content.set(rowTwo,temp);
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         boolean empty = true;
         for (Object o: this.content) {
             if (o != null) {
@@ -283,7 +283,7 @@ public class ParseColumn {
         this.format = overallExpression;
     }
 
-    boolean checkType(ParseColumn otherColumn) {
+    public boolean checkType(ParseColumn otherColumn) {
         return this.sameType & otherColumn.sameType;
     }
 
