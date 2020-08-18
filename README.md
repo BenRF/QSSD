@@ -2,8 +2,8 @@
 # Querying Semi-Structured Data
 This project focuses on automating the process of joining tables from various semi-structured file formats, the created solution can:
 * Detect tables inside user imported files.
-* Find potential problem detection within each table.
-* Generate expression to summarize data inside each column.
+* Find potential errors within each table.
+* Generate expressions to summarize data inside each column.
 * Recognize table relations based on overlapping content or similar column headers.
 * Perform an outer join on selected tables.
 * Allow the user to override these automated decisions.
