@@ -522,4 +522,24 @@ public class ParseTable extends AbstractTableModel {
     public ParseColumn getColumnFromName(String colName) {
         return this.columns.get(this.getColIdFromName(colName));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ParseTable) {
+            ParseTable pt = (ParseTable) o;
+            if (pt.getColumnCount() == this.getColumnCount()) {
+                for (int i = 0; i < this.getColumnCount(); i++) {
+                    if (!this.getCol(i).equals(pt.getCol(i))){
+                        System.out.println(this.getCol(i).getName() + " vs " + pt.getCol(i).getName() + " = " + this.getCol(i).equals(pt.getCol(i)));
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

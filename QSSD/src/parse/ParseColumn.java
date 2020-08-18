@@ -289,22 +289,41 @@ public class ParseColumn {
 
     public int[] checkContent(ParseColumn otherColumn) {
         int[] results = new int[2];
-        HashSet<Object> c1 = new HashSet<>(this.content);
-        HashSet<Object> c2 = new HashSet<>(otherColumn.content);
-        for (Object o : this.content) {
+        HashSet<Object> c1 = this.getContentAsSet();
+        HashSet<Object> c2 = otherColumn.getContentAsSet();
+        for (Object o : this.getContentAsSet()) {
             c2.removeAll(Collections.singletonList(o));
         }
-        for (Object o : otherColumn.content) {
+        for (Object o : otherColumn.getContentAsSet()) {
             c1.removeAll(Collections.singletonList(o));
         }
-          results[0] = ((this.content.size() - c1.size()) / this.content.size()) * 100;
-          results[1] = ((this.content.size() - c2.size()) / this.content.size()) * 100;
+        results[0] = ((this.content.size() - c1.size()) / this.content.size()) * 100;
+        results[1] = Math.round((((float)otherColumn.getContentAsSet().size() - (float)c2.size()) / (float)otherColumn.getContentAsSet().size()) * 100);
         return results;
     }
 
     boolean isProblemCell(int rowNum) {
         for (Problem p: this.errors) {
             if (p.isProblem(rowNum)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ParseColumn) {
+            ParseColumn pc = (ParseColumn) o;
+            if (this.name.equals(pc.getName())) {
+                for (int i = 0; i < this.size(); i++) {
+                    if ((this.get(i) == null && pc.get(i) != null) || (this.get(i) != null && pc.get(i) == null)) {
+                        break;
+                    } else if ((this.get(i) != null || pc.get(i) != null) && !this.get(i).equals(pc.get(i))) {
+                        System.out.println(this.get(i) + " vs " + pc.get(i) + " = " + this.get(i).equals(pc.get(i)));
+                        break;
+                    }
+                }
                 return true;
             }
         }

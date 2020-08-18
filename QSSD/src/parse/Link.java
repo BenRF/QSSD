@@ -19,14 +19,19 @@ public class Link {
     }
 
     boolean equal(Link l2) {
-        return (this.col1.equals(l2.col1) && !this.col2.equals(l2.col2)) || (!this.col1.equals(l2.col1) && this.col2.equals(l2.col2));
+        boolean col1Match = this.col1.equals(l2.col1);
+        boolean col2Match = this.col2.equals(l2.col2);
+        return (col1Match && !col2Match) || (!col1Match && col2Match);
     }
 
     boolean stronger(Link l2) {
-        boolean higherSimilarity = this.col1Overlap + this.col2Overlap > l2.col1Overlap + l2.col2Overlap;
-        boolean sameOrHigherSimilarity = this.col1Overlap + this.col2Overlap >= l2.col1Overlap + l2.col2Overlap;
+        int thisOverlap = this.col1Overlap + this.col2Overlap;
+        int otherOverlap = l2.col1Overlap + l2.col2Overlap;
         boolean sameNameVal = this.sameName == l2.sameName;
-        boolean overThreshold = this.col1Overlap > 95 || this.col2Overlap > 95;
+
+        boolean higherSimilarity = thisOverlap > otherOverlap;
+        boolean sameOrHigherSimilarity = thisOverlap >= otherOverlap;
+        boolean overThreshold = Math.max(this.col1Overlap,this.col2Overlap) > 95;
         boolean otherHasNameMatch = !this.sameName && l2.sameName;
         boolean thisHasNameMatch = this.sameName && !l2.sameName;
         return (sameNameVal && higherSimilarity) || (overThreshold && otherHasNameMatch) || (thisHasNameMatch && sameOrHigherSimilarity);

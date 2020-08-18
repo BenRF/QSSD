@@ -11,6 +11,7 @@ import parse.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class ExcelFile extends TabSeperatedFile{
@@ -55,6 +56,13 @@ public class ExcelFile extends TabSeperatedFile{
                     c.setCellValue((Integer) pTo.get(j));
                 } else if (pTo.get(j) instanceof Double) {
                     c.setCellValue((Double) pTo.get(j));
+                } else if (pTo.get(j) instanceof Date) {
+                    CellStyle cS = wb.createCellStyle();
+                    CreationHelper createHelper = wb.getCreationHelper();
+                    cS.setDataFormat(createHelper.createDataFormat().getFormat("d/m/yy h.mm;@"));
+                    System.out.println(pTo.get(j));
+                    c.setCellValue((Date) pTo.get(j));
+                    c.setCellStyle(cS);
                 }
             }
         }
