@@ -1,8 +1,7 @@
 package test;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 import parse.Expression;
 
 class ExpressionTests {
@@ -19,18 +18,18 @@ class ExpressionTests {
 
     @Test
     void equals() {
-        Assert.assertEquals(expression,same);
-        Assert.assertEquals(expression,expression);
-        Assert.assertNotEquals(expression,different);
-        Assert.assertNotEquals(expression,shorter);
-        Assert.assertNotEquals(expression,longer);
+        assertEquals(expression,same);
+        assertEquals(expression,expression);
+        assertNotEquals(expression,different);
+        assertNotEquals(expression,shorter);
+        assertNotEquals(expression,longer);
     }
 
     @Test
     void toStringTest() {
-        Assert.assertEquals("4Let",expression.toString());
-        Assert.assertEquals("Let,Num,2Let",different.toString());
-        Assert.assertEquals("3Let",shorter.toString());
-        Assert.assertEquals("5Let",longer.toString());
+        assertEquals("4Let",expression.toString());
+        assertEquals("Let,Num,2Let",different.toString());
+        assertEquals("3Let",shorter.toString());
+        assertEquals("5Let",longer.toString());
     }
 }

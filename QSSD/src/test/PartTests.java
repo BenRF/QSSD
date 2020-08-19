@@ -1,8 +1,7 @@
 package test;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 import parse.Part;
 
 public class PartTests {
@@ -24,9 +23,9 @@ public class PartTests {
             for (int y = 0; y < parts.length; y++) {
                 Part p2 = parts[y];
                 if (i == y) {
-                    Assert.assertEquals(p1,p2);
+                    assertEquals(p1,p2);
                 } else {
-                    Assert.assertNotEquals(p1,p2);
+                    assertNotEquals(p1,p2);
                 }
             }
         }
@@ -40,22 +39,22 @@ public class PartTests {
             for (int y = 0; y < parts.length; y++) {
                 Part p2 = parts[y];
                 if (i == y) {
-                    Assert.assertEquals(0,p1.compare(p2));
+                    assertEquals(0,p1.compare(p2));
                 } else {
-                    Assert.assertNotEquals(0,p1.compare(p2));
+                    assertNotEquals(0,p1.compare(p2));
                 }
             }
         }
         Part c2 = new Part(76,2,2);
         Part combined = new Part(c,c2);
-        Assert.assertEquals(1,c.compare(combined));
-        Assert.assertEquals(1,c.compare(c2));
+        assertEquals(1,c.compare(combined));
+        assertEquals(1,c.compare(c2));
     }
 
     @Test
     void MultiParts() {
         Part c2 = new Part(76,2,2);
         Part combined = new Part(c,c2);
-        Assert.assertNotEquals(c,combined);
+        assertNotEquals(c,combined);
     }
 }

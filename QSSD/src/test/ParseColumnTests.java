@@ -1,8 +1,7 @@
 package test;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 import parse.ParseColumn;
 
 class ParseColumnTests {
@@ -15,17 +14,17 @@ class ParseColumnTests {
 
     @Test
     void Constructor() {
-        Assert.assertEquals(0,column.size());
-        Assert.assertEquals("Column",column.getName());
-        Assert.assertEquals(1,column.getId());
-        Assert.assertEquals(0,column.getProblems().size());
-        Assert.assertTrue(column.isEmpty());
+        assertEquals(0,column.size());
+        assertEquals("Column",column.getName());
+        assertEquals(1,column.getId());
+        assertEquals(0,column.getProblems().size());
+        assertTrue(column.isEmpty());
     }
 
     @Test
     void Normalize() {
         column.normalise(5);
-        Assert.assertEquals(5,column.size());
+        assertEquals(5,column.size());
     }
 
     @Test
@@ -34,7 +33,7 @@ class ParseColumnTests {
         for (Object o: data) {
             column.addContent(o);
         }
-        Assert.assertEquals(6,column.size());
+        assertEquals(6,column.size());
     }
 
     @Test
@@ -43,9 +42,9 @@ class ParseColumnTests {
         for (Object o: data) {
             column.addContent(o);
         }
-        Assert.assertEquals("two",column.get(1));
+        assertEquals("two",column.get(1));
         column.set(1,"three");
-        Assert.assertEquals("three",column.get(1));
+        assertEquals("three",column.get(1));
     }
 
     @Test
@@ -54,18 +53,18 @@ class ParseColumnTests {
         for (Object o: data) {
             column.addContent(o);
         }
-        Assert.assertEquals("two",column.get(1));
-        Assert.assertEquals("three",column.get(2));
+        assertEquals("two",column.get(1));
+        assertEquals("three",column.get(2));
         column.swap(1,2);
-        Assert.assertEquals("two",column.get(2));
-        Assert.assertEquals("three",column.get(1));
+        assertEquals("two",column.get(2));
+        assertEquals("three",column.get(1));
     }
 
     @Test
     void isEmpty() {
-        Assert.assertTrue(column.isEmpty());
+        assertTrue(column.isEmpty());
         column.addContent(null);
-        Assert.assertTrue(column.isEmpty());
+        assertTrue(column.isEmpty());
     }
 
     @Test
@@ -74,26 +73,26 @@ class ParseColumnTests {
         for (Object o: data) {
             column.addContent(o);
         }
-        Assert.assertEquals(-1,column.findRowByObject("five"));
-        Assert.assertEquals(1,column.findRowByObject("two"));
+        assertEquals(-1,column.findRowByObject("five"));
+        assertEquals(1,column.findRowByObject("two"));
     }
 
     @Test
     void performChecks() {
         column.performChecks();
-        Assert.assertEquals("Empty",column.getAttributes());
+        assertEquals("Empty",column.getAttributes());
         Object[] data = {"one","two","three","four"};
         for (Object o: data) {
             column.addContent(o);
         }
         column.performChecks();
-        Assert.assertEquals("Unique,String",column.getAttributes());
+        assertEquals("Unique,String",column.getAttributes());
         column.addContent("two");
         column.performChecks();
-        Assert.assertEquals("String",column.getAttributes());
+        assertEquals("String",column.getAttributes());
         column.addContent(2);
         column.performChecks();
-        Assert.assertEquals("",column.getAttributes());
+        assertEquals("",column.getAttributes());
     }
 
     @Test
@@ -103,7 +102,7 @@ class ParseColumnTests {
         ParseColumn col2 = new ParseColumn("col2",2);
         col2.addContent("two");
         col2.performChecks();
-        Assert.assertTrue(column.checkType(col2));
+        assertTrue(column.checkType(col2));
     }
 
     @Test
@@ -114,7 +113,7 @@ class ParseColumnTests {
         int[] values = {1,2,3,4,5};
         for (int i: values) {
             col2.addContent(i);
-            Assert.assertArrayEquals(new int[]{100, Math.round(100f/ (float)i)},column.checkContent(col2));
+            assertArrayEquals(new int[]{100, Math.round(100f/ (float)i)},column.checkContent(col2));
         }
     }
 }

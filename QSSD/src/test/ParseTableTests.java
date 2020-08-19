@@ -1,9 +1,8 @@
 package test;
 
 import files.ExcelFile;
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 import parse.ParseTable;
 
 import java.util.ArrayList;
@@ -30,15 +29,15 @@ public class ParseTableTests {
 
     @Test
     void testCountingMethods() {
-        Assert.assertEquals(this.table.getRowCount(),5);
-        Assert.assertEquals(this.table.getColumnCount(),3);
+        assertEquals(this.table.getRowCount(),5);
+        assertEquals(this.table.getColumnCount(),3);
     }
 
     @Test
     void testHeaderNames() {
-        Assert.assertArrayEquals(this.content.get(0).toArray(),this.table.getHeaderNames());
+        assertArrayEquals(this.content.get(0).toArray(),this.table.getHeaderNames());
         for (int i = 0; i < 3; i++) {
-            Assert.assertEquals(this.content.get(0).get(i),this.table.getColumnName(i));
+            assertEquals(this.content.get(0).get(i),this.table.getColumnName(i));
         }
     }
 
@@ -49,7 +48,7 @@ public class ParseTableTests {
             expected = this.content.get(i);
             actual = this.table.getRow(i-1);
             for (int y = 0; y < expected.size(); y++) {
-                Assert.assertEquals(expected.get(y),actual.get(y));
+                assertEquals(expected.get(y),actual.get(y));
             }
         }
     }
@@ -57,7 +56,7 @@ public class ParseTableTests {
     @Test
     void testGetColumnIdFromName() {
         for (int i = 0; i < this.content.get(0).size(); i++) {
-            Assert.assertEquals(i,this.table.getColIdFromName(this.content.get(0).get(i).toString()));
+            assertEquals(i,this.table.getColIdFromName(this.content.get(0).get(i).toString()));
         }
     }
 
@@ -67,7 +66,7 @@ public class ParseTableTests {
         ParseTable result = new ParseTable(tables.get(0),tables.get(1));
 
         ParseTable expected = new ExcelFile("./testing/Results/Composite key tables results.xlsx").getTables().get(0);
-        Assert.assertEquals(result, expected);
+        assertEquals(result, expected);
     }
 
     @Test
@@ -76,7 +75,7 @@ public class ParseTableTests {
         ParseTable result = new ParseTable(tables.get(0),tables.get(1));
 
         ParseTable expected = new ExcelFile("./testing/Results/Concactenate result.xlsx").getTables().get(0);
-        Assert.assertEquals(result,expected);
+        assertEquals(result,expected);
     }
 
     @Test
@@ -88,7 +87,7 @@ public class ParseTableTests {
         result = new ParseTable(result,tables.get(3));
 
         ParseTable expected = new ExcelFile("./testing/Results/5 table merge result.xlsx").getTables().get(0);
-        Assert.assertEquals(result, expected);
+        assertEquals(result, expected);
     }
 
     @Test
@@ -97,7 +96,7 @@ public class ParseTableTests {
         ParseTable result = new ParseTable(tables.get(0),tables.get(1));
 
         ParseTable expected = new ExcelFile("./testing/Results/Multple Occurrences result.xlsx").getTables().get(0);
-        Assert.assertEquals(result,expected);
+        assertEquals(result,expected);
     }
 
     @Test
@@ -106,6 +105,6 @@ public class ParseTableTests {
         ParseTable result = new ParseTable(tables.get(0),tables.get(1));
 
         ParseTable expected = new ExcelFile("./testing/Results/Tables with overlap result.xlsx").getTables().get(0);
-        Assert.assertEquals(result,expected);
+        assertEquals(result,expected);
     }
 }
