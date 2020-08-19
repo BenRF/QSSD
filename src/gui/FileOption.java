@@ -28,9 +28,9 @@ class FileOption extends JPanel {
         this.pane = pane;
         this.Width = this.pane.getWidth();
         TabSeperatedFile f = null;
-        if (fileLocation.substring(fileLocation.length()-5).equals(".xlsx")) {
+        if (fileLocation.endsWith(".xlsx")) {
             f = new ExcelFile(fileLocation);
-        } else if (fileLocation.substring(fileLocation.length()-4).equals(".csv")) {
+        } else if (fileLocation.endsWith(".csv")) {
             f = new CSVFile(fileLocation);
         }
         String name = "";
